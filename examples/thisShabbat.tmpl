@@ -1,5 +1,5 @@
 {{- $d := .now}}
-{{- $loc := LookupCity "Phoenix"}}
+{{- $loc := lookupCity "Phoenix"}}
 {{- $timeFormat := "03:04 PM"}}
 {{- range 7}}
 {{-   if ne $d.Weekday $.time.Saturday}}

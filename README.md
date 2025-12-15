@@ -32,7 +32,7 @@ Today: 2025-12-14
 Hebrew: 24 Kislev 5786
 ```
 
-## Example: Custom zmanim for a configurable day
+## Example: Custom zmanim for a configurable day and city
 
 <details>
     <summary>examples/customZmanim.tmpl</summary>
@@ -97,7 +97,7 @@ A halachic hour is 49m31s.
 
 ```tmpl
 {{- $d := .now}}
-{{- $loc := LookupCity "Phoenix"}}
+{{- $loc := lookupCity "Phoenix"}}
 {{- $timeFormat := "03:04 PM"}}
 {{- range 7}}
 {{-   if ne $d.Weekday $.time.Saturday}}
