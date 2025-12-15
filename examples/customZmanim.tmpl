@@ -1,0 +1,20 @@
+{{- $loc := getenv "CITY" | lookupCity -}}
+{{- $tz := timeLoadLocation $loc.TimeZoneId -}}
+{{- $d := timeParseInLocation $.time.DateOnly (getenv "DATE") $tz -}}
+{{- $z := forLocationDate $loc $d -}}
+Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
+
+{{- $fmt := $.time.TimeOnly}}
+
+{{( (timeAtAngle $z $tz 8.5 true).Add (timeParseDuration "-72m") ).Format $fmt}} : 72 minutes before 8.5 degrees below horizon
+{{ (timeAtAngle $z $tz 8.5 true).Format $fmt}} : 8.5 degrees below horizon
+{{$z.AlotHaShachar.Format $fmt}} : Alot HaShachar
+{{$z.Misheyakir.Format $fmt}} : Misheyakir 
+{{$z.Sunrise.Format $fmt}} : Netz
+{{$z.Chatzot.Format $fmt}} : Chatzot
+{{$z.Sunset.Format $fmt}} : Shkiah
+
+A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
+{{- range 13}}
+{{    (hourOffset $z $tz (itof .)).Format $fmt}} : {{.}} halachic hour{{if ne . 1}}s{{end}}
+{{- end}}

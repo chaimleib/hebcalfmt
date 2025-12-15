@@ -1,0 +1,4 @@
+{{- $RFC3339 := "2006-01-02 03:04" -}}
+Now: {{ .now.Format $RFC3339 }}
+HDate: {{ hdateFromTime .now }}
+Hour: {{ (.z.Hour | secondsDuration).Round 1000000000 }}

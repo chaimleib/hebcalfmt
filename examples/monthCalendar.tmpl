@@ -1,0 +1,55 @@
+{{- /* A hyphen ("-") at the beginning or end of a directive means
+to delete whitespace in that direction until a file boundary,
+non-whitespace, or another directive. */}}
+
+{{- /* Month calendar */}}
+{{- /* English month label */}}
+{{- $monthDay := timeDate $.now.Year $.now.Month 1 0 0 0 0 $.tz}}
+{{- $nextMonth := $monthDay.AddDate 0 1 0}}
+{{- $monthDay.Month}} {{$.now.Year}}
+
+{{- /* Hebrew month label(s) */}}
+{{- $hdate := hdateFromTime $monthDay}}
+{{- $hdateLast := hdateFromTime ($nextMonth.AddDate 0 0 -1)}}
+{{$hdate.Month}}
+{{- if ne $hdate.Year $hdateLast.Year}} {{$hdate.Year}}{{end}}
+{{- /* If the Hebrew month changes, hyphenate the range. */}}
+{{- if ne $hdateLast.Month $hdate.Month}}
+{{-   " - "}}{{$hdateLast.Month}}
+{{- end}}
+{{- " "}}{{$hdateLast.Year}}
+
+|  Sun  |  Mon  |  Tue  |  Wed  | Thurs |  Fri  |  Sat  |
+{{- $cellWidth := 7}}
+{{- /* header rule */}}
+{{repeat (printf "|%s" (repeat "-" $cellWidth)) 7}}|
+
+{{- /* Skip days of the week until day 1 of the month. */}}
+{{- range 7}}
+{{-   if eq $monthDay.Weekday .}}{{break}}{{end}}
+{{-   "\n|"}}{{repeat " " 7}}
+{{- end}}
+
+{{- /* Number the cells with the Gregorian and Hebrew days of the month. */}}
+{{- range 31}}
+{{-   if not ($monthDay.Before $nextMonth)}}{{break}}{{end}}
+{{-   "|" -}}
+{{    if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
+{{-   printf "%2d %2d" $monthDay.Day (hdateFromTime $monthDay).Day}}
+{{-   if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
+{{-   if eq $monthDay.Weekday $.time.Saturday}}
+{{-     "|\n"}}
+{{-   end}}
+{{-   $monthDay = $monthDay.AddDate 0 0 1}}
+{{- end}}
+
+{{- /* blank boxes until end of week */ -}}
+{{- range 8}}
+{{-   if eq $monthDay.Weekday $.time.Sunday}}
+{{-     "|"}}
+{{-     break}}
+{{-   end}}
+{{-   "|"}}{{repeat " " $cellWidth}}
+{{-   $monthDay = $monthDay.AddDate 0 0 1}}
+{{- end}}
+

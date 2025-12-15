@@ -1,0 +1,35 @@
+{{- $d := .now}}
+{{- $loc := LookupCity "Phoenix"}}
+{{- $timeFormat := "03:04 PM"}}
+{{- range 7}}
+{{-   if ne $d.Weekday $.time.Saturday}}
+{{-     $d = $d.AddDate 0 0 1}}
+{{-     continue}}
+{{-   end}}
+{{-   $z := forLocationDate $loc $d}}
+{{-   $erev := $d.AddDate 0 0 -1}}
+{{-   $zErev := forLocationDate $loc $erev}}
+
+{{- /* swallow whitespace */ -}}
+
+Erev Shabbat: {{$erev.Format "Mon Jan 02 2006"}} / {{hdateFromTime $erev}}
+{{-   range timedEvents $zErev}}
+{{-     if eq .Flags $.event.ZMANIM}}
+{{-       continue}}
+{{-     end}}
+{{      .EventTime.Format $timeFormat}}
+{{- ": "}}
+{{-     .Desc}}
+{{-   end}}
+
+Shabbat: {{$d.Format "Mon Jan 02 2006"}} / {{hdateFromTime $d}}
+{{-   range timedEvents $z}}
+{{-     if eq .Desc "Tzeit HaKochavim"}}
+{{-       continue}}
+{{-     end}}
+{{      .EventTime.Format $timeFormat}}
+{{- ": "}}
+{{-     .Desc}}
+{{-   end}}
+
+{{- end}}
