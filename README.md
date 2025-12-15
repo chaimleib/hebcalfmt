@@ -4,14 +4,6 @@ Formats hebcal information using the Go Template language.
 
 Usage: `hebcalfmt path/to/template.tmpl`
 
-For further reference, see:
- * The [`text/template` package docs](https://pkg.go.dev/text/template), for
- learning the templating language.
- * The
- [`github.com/hebcal/hdate.HDate`](https://pkg.go.dev/github.com/hebcal/hdate#HDate)
- type's fields and methods.
- * The [`github.com/hebcal/hebcal-go/zmanim.Zmanim`](https://pkg.go.dev/github.com/hebcal/hebcal-go/zmanim#Zmanim) type's fields and methods.
-
 ## Install
 
 ```bash
@@ -32,7 +24,52 @@ Today: 2025-12-14
 Hebrew: 24 Kislev 5786
 ```
 
+## Example: Calculate Mincha times
+
+Some shuls adjust when Mincha begins
+so that it always starts at least 15 minutes before sunset,
+rounded to the quarter hour or five minutes.
+
+examples/mincha.tmpl
+```tmpl
+{{- $d := timeParse $.time.DateOnly "2025-09-01"}}
+{{- $rounding := timeParseDuration "5m"}}
+{{- $advance := timeParseDuration "-15m"}}
+{{- range 14}}
+{{-   $z := forDate $d}}
+{{-   $mincha := ($z.Sunset.Add $advance).Truncate $rounding}}
+{{-   $mincha.Format "Mon Jan 02, 2006: 3:04 PM\n"}}
+{{-   $d = $d.AddDate 0 0 1}}
+{{-  end}}
+```
+
+```bash
+$ hebcalfmt examples/mincha.tmpl
+Mon Sep 01, 2025: 6:35 PM
+Tue Sep 02, 2025: 6:35 PM
+Wed Sep 03, 2025: 6:35 PM
+Thu Sep 04, 2025: 6:35 PM
+Fri Sep 05, 2025: 6:30 PM
+Sat Sep 06, 2025: 6:30 PM
+Sun Sep 07, 2025: 6:30 PM
+Mon Sep 08, 2025: 6:25 PM
+Tue Sep 09, 2025: 6:25 PM
+Wed Sep 10, 2025: 6:25 PM
+Thu Sep 11, 2025: 6:25 PM
+Fri Sep 12, 2025: 6:20 PM
+Sat Sep 13, 2025: 6:20 PM
+Sun Sep 14, 2025: 6:20 PM
+```
+
 ## Example: Custom zmanim for a configurable day and city
+
+Although `$.z`, `$.loc`, `$.now`, and `$.tz` are provided for convenience,
+you aren't limited to using preconfigured values.
+You have the power to parse them from environment variables of your choosing.
+
+You also can choose how to compute your zmanim.
+This is useful if you use a different opinion than hebcal's defaults,
+or if you simply want to switch your water sprinkler on after dark.
 
 <details>
     <summary>examples/customZmanim.tmpl</summary>
@@ -91,6 +128,9 @@ A halachic hour is 49m31s.
 ```
 
 ## Example: Show zmanim for this Shabbos
+
+Showing zmanim for upcoming days is also possible,
+since you have the power to do arithmetic with times and durations.
 
 <details>
     <summary>examples/thisShabbos.tmpl</summary>
@@ -161,6 +201,11 @@ Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 ```
 
 ## Example: Show this month's calendar with Hebrew dates
+
+The control flow in the Go templating language is so powerful
+that you can program your own calendar in it.
+This one outputs a calendar in Markdown table format,
+but JSON, and even HTML can be hacked together.
 
 <details>
     <summary>examples/monthCalendar.tmpl</summary>
@@ -237,3 +282,16 @@ Kislev - Tevet 5786
 | 21  1 | 22  2 | 23  3 | 24  4 | 25  5 | 26  6 | 27  7 |
 | 28  8 | 29  9 | 30 10 | 31 11 |       |       |       |
 ```
+
+## Documentation for going deep
+
+If you want to get the most out of `hebcalfmt`,
+it helps to know these documents well:
+
+ * The [`text/template` package docs](https://pkg.go.dev/text/template), for
+ learning the templating language.
+ * The
+ [`github.com/hebcal/hdate.HDate`](https://pkg.go.dev/github.com/hebcal/hdate#HDate)
+ type's fields and methods.
+ * The [`github.com/hebcal/hebcal-go/zmanim.Zmanim`](https://pkg.go.dev/github.com/hebcal/hebcal-go/zmanim#Zmanim) type's fields and methods.
+

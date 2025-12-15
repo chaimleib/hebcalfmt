@@ -1,0 +1,9 @@
+{{- $d := timeParse $.time.DateOnly "2025-09-01"}}
+{{- $rounding := timeParseDuration "5m"}}
+{{- $advance := timeParseDuration "-15m"}}
+{{- range 14}}
+{{-   $z := forDate $d}}
+{{-   $mincha := ($z.Sunset.Add $advance).Truncate $rounding}}
+{{-   $mincha.Format "Mon Jan 02, 2006: 3:04 PM\n"}}
+{{-   $d = $d.AddDate 0 0 1}}
+{{-  end}}
