@@ -4,6 +4,14 @@ Formats hebcal information using the Go Template language.
 
 Usage: `hebcalfmt path/to/template.tmpl`
 
+For further reference, see:
+ * The [`text/template` package docs](https://pkg.go.dev/text/template), for
+ learning the templating language.
+ * The
+ [`github.com/hebcal/hdate.HDate`](https://pkg.go.dev/github.com/hebcal/hdate#HDate)
+ type's fields and methods.
+ * The [`github.com/hebcal/hebcal-go/zmanim.Zmanim`](https://pkg.go.dev/github.com/hebcal/hebcal-go/zmanim#Zmanim) type's fields and methods.
+
 ## Install
 
 ```bash
@@ -12,7 +20,7 @@ go install github.com/chaimleib/hebcalfmt
 
 ## Example: Show today's date
 
-`examples/date.tmpl`
+examples/date.tmpl
 ```tmpl
 Today: {{$.now.Format $.time.DateOnly}}
 Hebrew: {{hdateFromTime $.now}}
@@ -27,7 +35,7 @@ Hebrew: 24 Kislev 5786
 ## Example: Custom zmanim for a configurable day
 
 <details>
-    <summary>`examples/customZmanim.tmpl`</summary>
+    <summary>examples/customZmanim.tmpl</summary>
 
 ```tmpl
 {{- $loc := getenv "CITY" | lookupCity -}}
@@ -85,7 +93,7 @@ A halachic hour is 49m31s.
 ## Example: Show zmanim for this Shabbos
 
 <details>
-    <summary>`examples/thisShabbos.tmpl`</summary>
+    <summary>examples/thisShabbos.tmpl</summary>
 
 ```tmpl
 {{- $d := .now}}
@@ -155,7 +163,7 @@ Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 ## Example: Show this month's calendar with Hebrew dates
 
 <details>
-    <summary>`examples/monthCalendar.tmpl`</summary>
+    <summary>examples/monthCalendar.tmpl</summary>
 
 ```tmpl
 {{- /* A hyphen ("-") at the beginning or end of a directive means
