@@ -41,7 +41,7 @@ examples/mincha.tmpl
 {{-   $mincha := ($z.Sunset.Add $advance).Truncate $rounding}}
 {{-   $mincha.Format "Mon Jan 02, 2006: 3:04 PM\n"}}
 {{-   $d = $d.AddDate 0 0 1}}
-{{-  end}}
+{{- end}}
 ```
 
 ```bash
@@ -216,7 +216,6 @@ but JSON, and even HTML can be hacked together.
 to delete whitespace in that direction until a file boundary,
 non-whitespace, or another directive. */}}
 
-{{- /* Month calendar */}}
 {{- /* English month label */}}
 {{- $monthDay := timeDate $.now.Year $.now.Month 1 0 0 0 0 $.tz}}
 {{- $nextMonth := $monthDay.AddDate 0 1 0}}
