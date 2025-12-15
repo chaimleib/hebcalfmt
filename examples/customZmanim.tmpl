@@ -1,20 +1,30 @@
-{{- $loc := getenv "CITY" | lookupCity -}}
+{{- $city := "Phoenix" -}}
+{{- with getenv "CITY"}}{{$city = .}}{{end -}}
+{{- $loc := lookupCity $city -}}
+
 {{- $tz := timeLoadLocation $loc.TimeZoneId -}}
-{{- $d := timeParseInLocation $.time.DateOnly (getenv "DATE") $tz -}}
+
+{{- $d := $.now -}}
+{{- with getenv "DATE"}}{{$d = timeParseInLocation $.time.DateOnly . $tz}}{{end -}}
+
 {{- $z := forLocationDate $loc $d -}}
 Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
 
 {{- $fmt := $.time.TimeOnly}}
 
-{{( (timeAtAngle $z $tz 8.5 true).Add (timeParseDuration "-72m") ).Format $fmt}} : 72 minutes before 8.5 degrees below horizon
-{{ (timeAtAngle $z $tz 8.5 true).Format $fmt}} : 8.5 degrees below horizon
-{{$z.AlotHaShachar.Format $fmt}} : Alot HaShachar
-{{$z.Misheyakir.Format $fmt}} : Misheyakir 
-{{$z.Sunrise.Format $fmt}} : Netz
-{{$z.Chatzot.Format $fmt}} : Chatzot
-{{$z.Sunset.Format $fmt}} : Shkiah
+{{$z.AlotHaShachar.Format $fmt}}: Alot HaShachar
+{{$z.Misheyakir.Format $fmt}}: Misheyakir
+{{$z.Sunrise.Format $fmt}}: Netz
+{{$z.Chatzot.Format $fmt}}: Chatzot
+{{$z.Sunset.Format $fmt}}: Shkiah
+{{ $dark85 := timeAtAngle $z $tz 8.5 false -}}
+{{ $dark85.Format $fmt -}}
+  : 8.5 degrees below horizon
+{{( $dark85.Add (timeParseDuration "72m") ).Format $fmt -}}
+  : 72m after 8.5 degrees below horizon
 
 A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
 {{- range 13}}
-{{    (hourOffset $z $tz (itof .)).Format $fmt}} : {{.}} halachic hour{{if ne . 1}}s{{end}}
+{{    (hourOffset $z $tz (itof .)).Format $fmt -}}
+  : {{.}} halachic hour{{if ne . 1}}s{{end}}
 {{- end}}

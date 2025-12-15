@@ -68,7 +68,7 @@ Although `$.z`, `$.loc`, `$.now`, and `$.tz` are provided for convenience,
 you aren't limited to using preconfigured values.
 You have the power to parse them from environment variables of your choosing.
 
-You also can choose how to compute your zmanim.
+You also can choose how to compute your zmanim, and which zmanim to display.
 This is useful if you use a different opinion than hebcal's defaults,
 or if you simply want to switch your water sprinkler on after dark.
 
@@ -76,25 +76,35 @@ or if you simply want to switch your water sprinkler on after dark.
     <summary>examples/customZmanim.tmpl</summary>
 
 ```tmpl
-{{- $loc := getenv "CITY" | lookupCity -}}
+{{- $city := "Phoenix" -}}
+{{- with getenv "CITY"}}{{$city = .}}{{end -}}
+{{- $loc := lookupCity $city -}}
+
 {{- $tz := timeLoadLocation $loc.TimeZoneId -}}
-{{- $d := timeParseInLocation $.time.DateOnly (getenv "DATE") $tz -}}
+
+{{- $d := $.now -}}
+{{- with getenv "DATE"}}{{$d = timeParseInLocation $.time.DateOnly . $tz}}{{end -}}
+
 {{- $z := forLocationDate $loc $d -}}
 Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
 
 {{- $fmt := $.time.TimeOnly}}
 
-{{( (timeAtAngle $z $tz 8.5 true).Add (timeParseDuration "-72m") ).Format $fmt}} : 72 minutes before 8.5 degrees below horizon
-{{ (timeAtAngle $z $tz 8.5 true).Format $fmt}} : 8.5 degrees below horizon
-{{$z.AlotHaShachar.Format $fmt}} : Alot HaShachar
-{{$z.Misheyakir.Format $fmt}} : Misheyakir 
-{{$z.Sunrise.Format $fmt}} : Netz
-{{$z.Chatzot.Format $fmt}} : Chatzot
-{{$z.Sunset.Format $fmt}} : Shkiah
+{{$z.AlotHaShachar.Format $fmt}}: Alot HaShachar
+{{$z.Misheyakir.Format $fmt}}: Misheyakir
+{{$z.Sunrise.Format $fmt}}: Netz
+{{$z.Chatzot.Format $fmt}}: Chatzot
+{{$z.Sunset.Format $fmt}}: Shkiah
+{{ $dark85 := timeAtAngle $z $tz 8.5 false -}}
+{{ $dark85.Format $fmt -}}
+  : 8.5 degrees below horizon
+{{( $dark85.Add (timeParseDuration "72m") ).Format $fmt -}}
+  : 72m after 8.5 degrees below horizon
 
 A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
 {{- range 13}}
-{{    (hourOffset $z $tz (itof .)).Format $fmt}} : {{.}} halachic hour{{if ne . 1}}s{{end}}
+{{    (hourOffset $z $tz (itof .)).Format $fmt -}}
+  : {{.}} halachic hour{{if ne . 1}}s{{end}}
 {{- end}}
 ```
 
@@ -104,28 +114,28 @@ A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
 $ CITY="Los Angeles" DATE=2025-12-14 hebcalfmt examples/customZmanim.tmpl
 Displaying zmanim for 2025-12-14 in Los Angeles.
 
-04:57:57 : 72 minutes before 8.5 degrees below horizon
-06:09:57 : 8.5 degrees below horizon
-05:30:55 : Alot HaShachar
-05:54:24 : Misheyakir
-06:50:50 : Netz
-11:47:54 : Chatzot
-16:44:58 : Shkiah
+05:30:55: Alot HaShachar
+05:54:24: Misheyakir
+06:50:50: Netz
+11:47:54: Chatzot
+16:44:58: Shkiah
+17:25:51: 8.5 degrees below horizon
+18:37:51: 72m after 8.5 degrees below horizon
 
 A halachic hour is 49m31s.
-06:50:50 : 0 halachic hours
-07:40:20 : 1 halachic hour
-08:29:51 : 2 halachic hours
-09:19:22 : 3 halachic hours
-10:08:52 : 4 halachic hours
-10:58:23 : 5 halachic hours
-11:47:54 : 6 halachic hours
-12:37:24 : 7 halachic hours
-13:26:55 : 8 halachic hours
-14:16:26 : 9 halachic hours
-15:05:56 : 10 halachic hours
-15:55:27 : 11 halachic hours
-16:44:58 : 12 halachic hours
+06:50:50: 0 halachic hours
+07:40:20: 1 halachic hour
+08:29:51: 2 halachic hours
+09:19:22: 3 halachic hours
+10:08:52: 4 halachic hours
+10:58:23: 5 halachic hours
+11:47:54: 6 halachic hours
+12:37:24: 7 halachic hours
+13:26:55: 8 halachic hours
+14:16:26: 9 halachic hours
+15:05:56: 10 halachic hours
+15:55:27: 11 halachic hours
+16:44:58: 12 halachic hours
 ```
 
 ## Example: Show zmanim for this Shabbos
@@ -153,6 +163,7 @@ since you have the power to do arithmetic with times and durations.
 
 Erev Shabbat: {{$erev.Format "Mon Jan 02 2006"}} / {{hdateFromTime $erev}}
 {{-   range timedEvents $zErev}}
+{{- /* Skip normal zmanim, only show candlelighting. */}}
 {{-     if eq .Flags $.event.ZMANIM}}
 {{-       continue}}
 {{-     end}}
@@ -163,7 +174,7 @@ Erev Shabbat: {{$erev.Format "Mon Jan 02 2006"}} / {{hdateFromTime $erev}}
 
 Shabbat: {{$d.Format "Mon Jan 02 2006"}} / {{hdateFromTime $d}}
 {{-   range timedEvents $z}}
-{{-     if eq .Desc "Tzeit HaKochavim"}}
+{{-     if eq .Desc "Tzeit HaKochavim"}}{{/* redundant, so skip */}}
 {{-       continue}}
 {{-     end}}
 {{      .EventTime.Format $timeFormat}}
