@@ -72,14 +72,10 @@ func handleArgs() (opts *hebcal.CalOptions, tmpl *template.Template, err error) 
 		NoModern:       true,
 	}
 
+	// Set up the Template's FuncMap.
+	// This must be done before parsing the file.
 	tmpl = new(template.Template)
-	funcs := make(map[string]any)
-	maps.Insert(funcs, maps.All(templating.HebcalFuncs(opts)))
-	maps.Insert(funcs, maps.All(templating.StringFuncs))
-	maps.Insert(funcs, maps.All(templating.TimeFuncs))
-	maps.Insert(funcs, maps.All(templating.CastFuncs))
-	maps.Insert(funcs, maps.All(templating.EnvFuncs))
-	tmpl = tmpl.Funcs(funcs)
+	tmpl = setFuncMap(tmpl, opts)
 
 	tmpl, err = parseFile(tmpl, os.Args[1])
 	if err != nil {
@@ -87,6 +83,21 @@ func handleArgs() (opts *hebcal.CalOptions, tmpl *template.Template, err error) 
 	}
 
 	return opts, tmpl, nil
+}
+
+func setFuncMap(
+	tmpl interface {
+		Funcs(template.FuncMap) *template.Template
+	},
+	opts *hebcal.CalOptions,
+) *template.Template {
+	funcs := make(map[string]any)
+	maps.Insert(funcs, maps.All(templating.HebcalFuncs(opts)))
+	maps.Insert(funcs, maps.All(templating.StringFuncs))
+	maps.Insert(funcs, maps.All(templating.TimeFuncs))
+	maps.Insert(funcs, maps.All(templating.CastFuncs))
+	maps.Insert(funcs, maps.All(templating.EnvFuncs))
+	return tmpl.Funcs(funcs)
 }
 
 func parseFile(tmpl *template.Template, fpath string) (*template.Template, error) {
