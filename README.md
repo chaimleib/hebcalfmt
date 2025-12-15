@@ -1,6 +1,7 @@
 # hebcalfmt
 
-Formats hebcal information using the Go Template language.
+Formats [hebcal](https://github.com/hebcal/hebcal) information using
+the [Go Template language](https://pkg.go.dev/text/template).
 
 Usage: `hebcalfmt path/to/template.tmpl`
 
