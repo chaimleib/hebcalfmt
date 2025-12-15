@@ -4,6 +4,12 @@ Formats hebcal information using the Go Template language.
 
 Usage: `hebcalfmt path/to/template.tmpl`
 
+## Install
+
+```bash
+go install github.com/chaimleib/hebcalfmt
+```
+
 ## Example: Show today's date
 
 `examples/date.tmpl`
@@ -49,7 +55,7 @@ A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
 </details>
 
 ```bash
-$ CITY="Los Angeles" DATE=2025-12-14 go run . examples/customZmanim.tmpl
+$ CITY="Los Angeles" DATE=2025-12-14 hebcalfmt examples/customZmanim.tmpl
 Displaying zmanim for 2025-12-14 in Los Angeles.
 
 04:57:57 : 72 minutes before 8.5 degrees below horizon
@@ -210,3 +216,16 @@ non-whitespace, or another directive. */}}
 
 </details>
 
+```bash
+$ hebcalfmt examples/monthCalendar.tmpl
+December 2025
+Kislev - Tevet 5786
+
+|  Sun  |  Mon  |  Tue  |  Wed  | Thurs |  Fri  |  Sat  |
+|-------|-------|-------|-------|-------|-------|-------|
+|       |  1 11 |  2 12 |  3 13 |  4 14 |  5 15 |  6 16 |
+|  7 17 |  8 18 |  9 19 | 10 20 | 11 21 | 12 22 | 13 23 |
+|*14 24*| 15 25 | 16 26 | 17 27 | 18 28 | 19 29 | 20 30 |
+| 21  1 | 22  2 | 23  3 | 24  4 | 25  5 | 26  6 | 27  7 |
+| 28  8 | 29  9 | 30 10 | 31 11 |       |       |       |
+```
