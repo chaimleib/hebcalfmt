@@ -68,8 +68,10 @@ Although `$.z`, `$.loc`, `$.now`, and `$.tz` are provided for convenience,
 you aren't limited to using preconfigured values.
 You have the power to parse them from environment variables of your choosing.
 
-You also can choose how to compute your zmanim, and which zmanim to display.
-This is useful if you use a different opinion than hebcal's defaults,
+You also can choose which zmanim to display,
+and even how to compute your zmanim.
+We provide `timeAtAngle`, `hourOffset` and `timeParseDuration` for this purpose.
+These are useful if you use a different opinion than hebcal's defaults,
 or if you simply want to switch your water sprinkler on after dark.
 
 <details>
@@ -142,6 +144,12 @@ A halachic hour is 49m31s.
 
 Showing zmanim for upcoming days is also possible,
 since you have the power to do arithmetic with times and durations.
+
+If hebcal's classic output is mostly what you want,
+but you are only interested in the zmanim,
+we provide a `timedEvents` function for you.
+You can then filter these `hebcal.TimedEvent` structs yourself,
+based on their `.Flags` or `.Desc` or anything else.
 
 <details>
     <summary>examples/thisShabbos.tmpl</summary>
