@@ -152,7 +152,7 @@ You can then filter these `hebcal.TimedEvent` structs yourself,
 based on their `.Flags` or `.Desc` or anything else.
 
 <details>
-    <summary>examples/thisShabbos.tmpl</summary>
+    <summary>examples/thisShabbat.tmpl</summary>
 
 ```tmpl
 {{- $d := .now}}
