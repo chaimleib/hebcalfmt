@@ -11,6 +11,8 @@ non-whitespace, or another directive. */}}
 {{- $hdate := hdateFromTime $monthDay}}
 {{- $hdateLast := hdateFromTime ($nextMonth.AddDate 0 0 -1)}}
 {{$hdate.Month}}
+{{- /* If the Hebrew year changes, */}}
+{{- /* show the starting year by the starting month. */}}
 {{- if ne $hdate.Year $hdateLast.Year}} {{$hdate.Year}}{{end}}
 {{- /* If the Hebrew month changes, hyphenate the range. */}}
 {{- if ne $hdateLast.Month $hdate.Month}}
@@ -23,16 +25,17 @@ non-whitespace, or another directive. */}}
 {{- /* header rule */}}
 {{repeat (printf "|%s" (repeat "-" $cellWidth)) 7}}|
 
-{{- /* Skip days of the week until day 1 of the month. */}}
+{{- /* Add blank boxes each weekday until day 1 of the month. */}}
 {{- range 7}}
 {{-   if eq $monthDay.Weekday .}}{{break}}{{end}}
-{{-   "\n|"}}{{repeat " " 7}}
+{{-   "\n|"}}{{repeat " " $cellWidth}}
 {{- end}}
 
 {{- /* Number the cells with the Gregorian and Hebrew days of the month. */}}
 {{- range 31}}
 {{-   if not ($monthDay.Before $nextMonth)}}{{break}}{{end}}
-{{-   "|" -}}
+{{-   "|"}}
+{{- /* Put asterisks around today's date, else use spaces. */ -}}
 {{    if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
 {{-   printf "%2d %2d" $monthDay.Day (hdateFromTime $monthDay).Day}}
 {{-   if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
@@ -42,7 +45,7 @@ non-whitespace, or another directive. */}}
 {{-   $monthDay = $monthDay.AddDate 0 0 1}}
 {{- end}}
 
-{{- /* blank boxes until end of week */ -}}
+{{- /* Add blank boxes until the end of the last week. */ -}}
 {{- range 8}}
 {{-   if eq $monthDay.Weekday $.time.Sunday}}
 {{-     "|"}}
@@ -51,4 +54,3 @@ non-whitespace, or another directive. */}}
 {{-   "|"}}{{repeat " " $cellWidth}}
 {{-   $monthDay = $monthDay.AddDate 0 0 1}}
 {{- end}}
-

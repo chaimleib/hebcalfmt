@@ -36,6 +36,90 @@ Today: 2025-12-14
 Hebrew: 24 Kislev 5786
 ```
 
+## Example: Show this month's calendar with Hebrew dates
+
+The control flow in the Go templating language is so powerful
+that you can program your own calendar in it.
+This one outputs a calendar in Markdown table format,
+but JSON, and even HTML can be hacked together.
+
+<details>
+    <summary>examples/monthCalendar.tmpl</summary>
+
+```tmpl
+{{- /* A hyphen ("-") at the beginning or end of a directive means
+to delete whitespace in that direction until a file boundary,
+non-whitespace, or another directive. */}}
+
+{{- /* English month label */}}
+{{- $monthDay := timeDate $.now.Year $.now.Month 1 0 0 0 0 $.tz}}
+{{- $nextMonth := $monthDay.AddDate 0 1 0}}
+{{- $monthDay.Month}} {{$.now.Year}}
+
+{{- /* Hebrew month label(s) */}}
+{{- $hdate := hdateFromTime $monthDay}}
+{{- $hdateLast := hdateFromTime ($nextMonth.AddDate 0 0 -1)}}
+{{$hdate.Month}}
+{{- /* If the Hebrew year changes, */}}
+{{- /* show the starting year by the starting month. */}}
+{{- if ne $hdate.Year $hdateLast.Year}} {{$hdate.Year}}{{end}}
+{{- /* If the Hebrew month changes, hyphenate the range. */}}
+{{- if ne $hdateLast.Month $hdate.Month}}
+{{-   " - "}}{{$hdateLast.Month}}
+{{- end}}
+{{- " "}}{{$hdateLast.Year}}
+
+|  Sun  |  Mon  |  Tue  |  Wed  | Thurs |  Fri  |  Sat  |
+{{- $cellWidth := 7}}
+{{- /* header rule */}}
+{{repeat (printf "|%s" (repeat "-" $cellWidth)) 7}}|
+
+{{- /* Add blank boxes each weekday until day 1 of the month. */}}
+{{- range 7}}
+{{-   if eq $monthDay.Weekday .}}{{break}}{{end}}
+{{-   "\n|"}}{{repeat " " $cellWidth}}
+{{- end}}
+
+{{- /* Number the cells with the Gregorian and Hebrew days of the month. */}}
+{{- range 31}}
+{{-   if not ($monthDay.Before $nextMonth)}}{{break}}{{end}}
+{{-   "|"}}
+{{- /* Put asterisks around today's date, else use spaces. */ -}}
+{{    if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
+{{-   printf "%2d %2d" $monthDay.Day (hdateFromTime $monthDay).Day}}
+{{-   if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
+{{-   if eq $monthDay.Weekday $.time.Saturday}}
+{{-     "|\n"}}
+{{-   end}}
+{{-   $monthDay = $monthDay.AddDate 0 0 1}}
+{{- end}}
+
+{{- /* Add blank boxes until the end of the last week. */ -}}
+{{- range 8}}
+{{-   if eq $monthDay.Weekday $.time.Sunday}}
+{{-     "|"}}
+{{-     break}}
+{{-   end}}
+{{-   "|"}}{{repeat " " $cellWidth}}
+{{-   $monthDay = $monthDay.AddDate 0 0 1}}
+{{- end}}
+```
+
+</details>
+
+```bash
+$ hebcalfmt examples/monthCalendar.tmpl
+December 2025
+Kislev - Tevet 5786
+
+|  Sun  |  Mon  |  Tue  |  Wed  | Thurs |  Fri  |  Sat  |
+|-------|-------|-------|-------|-------|-------|-------|
+|       |  1 11 |  2 12 |  3 13 |  4 14 |  5 15 |  6 16 |
+|  7 17 |  8 18 |  9 19 | 10 20 | 11 21 | 12 22 | 13 23 |
+|*14 24*| 15 25 | 16 26 | 17 27 | 18 28 | 19 29 | 20 30 |
+| 21  1 | 22  2 | 23  3 | 24  4 | 25  5 | 26  6 | 27  7 |
+| 28  8 | 29  9 | 30 10 | 31 11 |       |       |       |
+```
 ## Example: Convert dates between Hebrew and Gregorian
 
 examples/date.tmpl
@@ -337,88 +421,6 @@ Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 05:43 PM: Bein HaShemashot
 06:36 PM: Havdalah
 06:36 PM: Chanukah: 7 Candles
-```
-
-## Example: Show this month's calendar with Hebrew dates
-
-The control flow in the Go templating language is so powerful
-that you can program your own calendar in it.
-This one outputs a calendar in Markdown table format,
-but JSON, and even HTML can be hacked together.
-
-<details>
-    <summary>examples/monthCalendar.tmpl</summary>
-
-```tmpl
-{{- /* A hyphen ("-") at the beginning or end of a directive means
-to delete whitespace in that direction until a file boundary,
-non-whitespace, or another directive. */}}
-
-{{- /* English month label */}}
-{{- $monthDay := timeDate $.now.Year $.now.Month 1 0 0 0 0 $.tz}}
-{{- $nextMonth := $monthDay.AddDate 0 1 0}}
-{{- $monthDay.Month}} {{$.now.Year}}
-
-{{- /* Hebrew month label(s) */}}
-{{- $hdate := hdateFromTime $monthDay}}
-{{- $hdateLast := hdateFromTime ($nextMonth.AddDate 0 0 -1)}}
-{{$hdate.Month}}
-{{- if ne $hdate.Year $hdateLast.Year}} {{$hdate.Year}}{{end}}
-{{- /* If the Hebrew month changes, hyphenate the range. */}}
-{{- if ne $hdateLast.Month $hdate.Month}}
-{{-   " - "}}{{$hdateLast.Month}}
-{{- end}}
-{{- " "}}{{$hdateLast.Year}}
-
-|  Sun  |  Mon  |  Tue  |  Wed  | Thurs |  Fri  |  Sat  |
-{{- $cellWidth := 7}}
-{{- /* header rule */}}
-{{repeat (printf "|%s" (repeat "-" $cellWidth)) 7}}|
-
-{{- /* Skip days of the week until day 1 of the month. */}}
-{{- range 7}}
-{{-   if eq $monthDay.Weekday .}}{{break}}{{end}}
-{{-   "\n|"}}{{repeat " " 7}}
-{{- end}}
-
-{{- /* Number the cells with the Gregorian and Hebrew days of the month. */}}
-{{- range 31}}
-{{-   if not ($monthDay.Before $nextMonth)}}{{break}}{{end}}
-{{-   "|" -}}
-{{    if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
-{{-   printf "%2d %2d" $monthDay.Day (hdateFromTime $monthDay).Day}}
-{{-   if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
-{{-   if eq $monthDay.Weekday $.time.Saturday}}
-{{-     "|\n"}}
-{{-   end}}
-{{-   $monthDay = $monthDay.AddDate 0 0 1}}
-{{- end}}
-
-{{- /* blank boxes until end of week */ -}}
-{{- range 8}}
-{{-   if eq $monthDay.Weekday $.time.Sunday}}
-{{-     "|"}}
-{{-     break}}
-{{-   end}}
-{{-   "|"}}{{repeat " " $cellWidth}}
-{{-   $monthDay = $monthDay.AddDate 0 0 1}}
-{{- end}}
-```
-
-</details>
-
-```bash
-$ hebcalfmt examples/monthCalendar.tmpl
-December 2025
-Kislev - Tevet 5786
-
-|  Sun  |  Mon  |  Tue  |  Wed  | Thurs |  Fri  |  Sat  |
-|-------|-------|-------|-------|-------|-------|-------|
-|       |  1 11 |  2 12 |  3 13 |  4 14 |  5 15 |  6 16 |
-|  7 17 |  8 18 |  9 19 | 10 20 | 11 21 | 12 22 | 13 23 |
-|*14 24*| 15 25 | 16 26 | 17 27 | 18 28 | 19 29 | 20 30 |
-| 21  1 | 22  2 | 23  3 | 24  4 | 25  5 | 26  6 | 27  7 |
-| 28  8 | 29  9 | 30 10 | 31 11 |       |       |       |
 ```
 
 ## Documentation for going deep
