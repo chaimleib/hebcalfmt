@@ -313,7 +313,7 @@ Shabbat: {{$d.Gregorian.Format "Mon Jan 02 2006"}} / {{$d}}
 </details>
 
 ```bash
-$ hebcalfmt -c thisShabbat.json thisShabbat.tmpl
+$ hebcalfmt -c examples/thisShabbat.json examples/thisShabbat.tmpl
 This Shabbat in Phoenix:
 
 Erev Shabbat: Fri Dec 19 2025 / 29 Kislev 5786
