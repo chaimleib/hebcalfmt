@@ -42,7 +42,7 @@ func NewFlags() *pflag.FlagSet {
 		"info",
 		"i",
 		"",
-		"show data from the internal databases or compiled values. Available options: default-city, cities, languages",
+		"show data from the internal databases or compiled values. Available options: cities, default-city, languages",
 	)
 
 	return fs

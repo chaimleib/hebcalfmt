@@ -3,7 +3,18 @@
 Formats [hebcal](https://github.com/hebcal/hebcal) information using
 the [Go Template language](https://pkg.go.dev/text/template).
 
-Usage: `hebcalfmt path/to/template.tmpl`
+```text
+usage:
+  hebcalfmt [{ --config | -c } config.json ] template.tmpl [[ month [ day ]] year ]
+  hebcalfmt { --info | -i } { cities | default-city | languages }
+  hebcalfmt [ -h | --help | --version ]
+
+OPTIONS:
+  -c, --config string   select a JSON config file (default $HOME/.config/hebcalfmt/config.json)
+  -h, --help            print this help text
+  -i, --info string     show data from the internal databases or compiled values. Available options: cities, default-city, languages
+      --version         show version number
+```
 
 ## Install
 

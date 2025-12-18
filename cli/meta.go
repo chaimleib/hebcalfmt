@@ -15,7 +15,10 @@ func usage(fs *pflag.FlagSet) string {
 				"  %s [{ --config | -c } config.json ] template.tmpl [[ month [ day ]] year ]",
 				ProgName,
 			),
-			fmt.Sprintf("  %s --list { cities | languages }", ProgName),
+			fmt.Sprintf(
+				"  %s { --info | -i } { cities | default-city | languages }",
+				ProgName,
+			),
 			fmt.Sprintf("  %s [ -h | --help | --version ]", ProgName),
 			"",
 			"OPTIONS:",
