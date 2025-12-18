@@ -18,9 +18,22 @@ import (
 func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 	return map[string]any{
 		// hdate.HDate
-		"hdateFromTime":   hdate.FromTime,
-		"hdatePartsEqual": HDatePartsEqual,
-		"hdateParse":      HDateParse,
+		"hdatePartsEqual":             HDatePartsEqual,
+		"hdateParse":                  HDateParse,
+		"hdateIsLeapYear":             hdate.IsLeapYear,
+		"hdateMonthsInYear":           hdate.MonthsInYear,
+		"hdateDaysInYear":             hdate.DaysInYear,
+		"hdateLongCheshvan":           hdate.LongCheshvan,
+		"hdateShortKislev":            hdate.ShortKislev,
+		"hdateDaysInMonth":            hdate.DaysInMonth,
+		"hdateToRD":                   hdate.ToRD,
+		"hdateNew":                    hdate.New,
+		"hdateFromRD":                 hdate.FromRD,
+		"hdateFromGregorian":          hdate.FromGregorian,
+		"hdateFromProlepticGregorian": hdate.FromProlepticGregorian,
+		"hdateFromTime":               hdate.FromTime,
+		"hdateMonthFromName":          hdate.MonthFromName,
+		"hdateDayOnOrBefore":          hdate.DayOnOrBefore,
 
 		// zmanim.Location
 		"lookupCity":  zmanim.LookupCity,

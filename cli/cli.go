@@ -94,8 +94,9 @@ func Run() int {
 		"tz":            tz,
 		"location":      opts.Location,
 		"z":             &z,
-		"time":          templating.TimeConsts,
+		"hdate":         templating.HDateConsts,
 		"event":         templating.EventConsts,
+		"time":          templating.TimeConsts,
 	})
 	if err != nil {
 		log.Println(err)
