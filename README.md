@@ -154,6 +154,8 @@ Hebrew: 25 Kislev 5786
 
 This example emulates the classic hebcal program,
 while exposing some internals for you to customize, if you wish.
+For example, you could change the date format to "Mon, 01/02/2025"
+to also show the days of the week.
 
 examples/hebcalClassic.tmpl
 ```tmpl
@@ -161,11 +163,6 @@ examples/hebcalClassic.tmpl
 {{-   .GetDate.Gregorian.Format "01/02/2006 "}}
 {{-     .Render $.language}}
 {{  end}}
-```
-
-examples/yahrzeit.txt
-```text
-1 2 1967 Joe Shmo
 ```
 
 ```bash
@@ -201,17 +198,38 @@ $ hebcalfmt examples/hebcalClassic.tmpl Tishrei 5787
 10/03/2026 Shmini Atzeret
 10/04/2026 Simchat Torah
 10/11/2026 Rosh Chodesh Cheshvan
+```
 
-$ hebcalfmt -c <(echo '{"yahrzeits_file": "examples/yahrzeit.txt"}') examples/hebcalClassic.tmpl 1 1968
-01/01/1968 Chag HaBanot
-01/01/1968 Chanukah: 7 Candles
-01/01/1968 Rosh Chodesh Tevet
-01/02/1968 Chanukah: 8 Candles
-01/02/1968 Rosh Chodesh Tevet
-01/03/1968 Chanukah: 8th Day
-01/11/1968 Asara B'Tevet
-01/21/1968 Joe Shmo
-01/31/1968 Rosh Chodesh Sh'vat
+### Hebcal classic example: Yahrzeits and Events
+We also support parsing yahrzeit (MM DD YYYY Desc)
+and events files (MMMM DD Desc).
+
+examples/yahrzeit.txt
+```text
+10 8 1967 Yahrzeit - Joe Shmo
+```
+
+examples/event.txt
+```text
+Tishrei 2 Birthday - Ben Ploni (5713)
+```
+
+examples/events.json
+```json
+{
+  "no_holidays": true,
+  "add_hebrew_dates_for_events": true,
+  "events_file": "examples/event.txt",
+  "yahrzeits_file": "examples/yahrzeit.txt"
+}
+```
+
+```bash
+$ hebcalfmt -c examples/events.json examples/hebcalClassic.tmpl 9 1968
+09/24/1968 2nd of Tishrei, 5729
+09/24/1968 Birthday - Ben Ploni (5713)
+09/26/1968 4th of Tishrei, 5729
+09/26/1968 Yahrzeit - Joe Shmo
 ```
 
 ## Example: Calculate Mincha times
