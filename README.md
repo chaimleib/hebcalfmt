@@ -13,16 +13,110 @@ go install github.com/chaimleib/hebcalfmt
 
 ## Example: Show today's date
 
-examples/date.tmpl
+examples/today.tmpl
 ```tmpl
-Today: {{$.now.Format $.time.DateOnly}}
+Gregorian: {{$.now.Format $.time.DateOnly}}
 Hebrew: {{hdateFromTime $.now}}
 ```
 
 ```bash
-$ hebcalfmt examples/date.tmpl
+$ hebcalfmt examples/today.tmpl
 Today: 2025-12-14
 Hebrew: 24 Kislev 5786
+```
+
+## Example: Convert dates between Hebrew and Gregorian
+
+examples/date.tmpl
+```tmpl
+{{- /* Read date from CLI args, as in classic hebcal, with NoJulian=false. */}}
+{{- $d := $.dateRange.Start false}}
+{{- /* In classic hebcal, no args defaults to just the year. */}}
+{{- /* We want today's full date. */}}
+{{- if $.dateRange.Source.IsZero}}
+{{-   $d = hdateFromTime $.now}}
+{{- end -}}
+
+Gregorian: {{$d.Gregorian.Format $.time.DateOnly}}
+Hebrew: {{$d.Day}} {{$d.MonthName $.language}} {{$d.Year}}
+```
+
+```bash
+$ hebcalfmt examples/date.tmpl
+Gregorian: 2025-12-18
+Hebrew: 28 Kislev 5786
+
+$ hebcalfmt examples/date.tmpl 12 1 2020
+Gregorian: 2020-12-01
+Hebrew: 15 Kislev 5781
+
+$ hebcalfmt examples/date.tmpl Kislev 25 5786
+Gregorian: 2025-12-15
+Hebrew: 25 Kislev 5786
+```
+
+## Example: Classic Hebcal
+
+This example emulates the classic hebcal program,
+while exposing some internals for you to customize, if you wish.
+
+examples/hebcalClassic.tmpl
+```tmpl
+{{- range hebcal}}
+{{-   .GetDate.Gregorian.Format "01/02/2006 "}}
+{{-     .Render $.language}}
+{{  end}}
+```
+
+examples/yahrzeit.txt
+```text
+1 2 1967 Joe Shmo
+```
+
+```bash
+$ hebcalfmt examples/hebcalClassic.tmpl
+01/01/2025 Chanukah: 8 Candles
+01/01/2025 Rosh Chodesh Tevet
+01/02/2025 Chanukah: 8th Day
+...
+12/21/2025 Chanukah: 8 Candles
+12/21/2025 Rosh Chodesh Tevet
+12/22/2025 Chanukah: 8th Day
+12/30/2025 Asara B'Tevet
+
+$ hebcalfmt -c <(echo '{"today": true}') examples/hebcalClassic.tmpl
+12/18/2025 28th of Kislev, 5786
+12/18/2025 Chanukah: 5 Candles
+
+$ hebcalfmt examples/hebcalClassic.tmpl Tishrei 5787
+09/12/2026 Rosh Hashana 5787
+09/13/2026 Rosh Hashana II
+09/14/2026 Tzom Gedaliah
+09/19/2026 Shabbat Shuva
+09/20/2026 Erev Yom Kippur
+09/21/2026 Yom Kippur
+09/25/2026 Erev Sukkot
+09/26/2026 Sukkot I
+09/27/2026 Sukkot II
+09/28/2026 Sukkot III (CH''M)
+09/29/2026 Sukkot IV (CH''M)
+09/30/2026 Sukkot V (CH''M)
+10/01/2026 Sukkot VI (CH''M)
+10/02/2026 Sukkot VII (Hoshana Raba)
+10/03/2026 Shmini Atzeret
+10/04/2026 Simchat Torah
+10/11/2026 Rosh Chodesh Cheshvan
+
+$ hebcalfmt -c <(echo '{"yahrzeits_file": "examples/yahrzeit.txt"}') examples/hebcalClassic.tmpl 1 1968
+01/01/1968 Chag HaBanot
+01/01/1968 Chanukah: 7 Candles
+01/01/1968 Rosh Chodesh Tevet
+01/02/1968 Chanukah: 8 Candles
+01/02/1968 Rosh Chodesh Tevet
+01/03/1968 Chanukah: 8th Day
+01/11/1968 Asara B'Tevet
+01/21/1968 Joe Shmo
+01/31/1968 Rosh Chodesh Sh'vat
 ```
 
 ## Example: Calculate Mincha times
@@ -64,7 +158,7 @@ Sun Sep 14, 2025: 6:20 PM
 
 ## Example: Custom zmanim for a configurable day and city
 
-Although `$.z`, `$.loc`, `$.now`, and `$.tz` are provided for convenience,
+Although `$.z`, `$.location`, `$.now`, and `$.tz` are provided for convenience,
 you aren't limited to using preconfigured values.
 You have the power to parse them from environment variables of your choosing.
 
@@ -155,48 +249,62 @@ based on their `.Flags` or `.Desc` or anything else.
     <summary>examples/thisShabbat.tmpl</summary>
 
 ```tmpl
-{{- $d := .now}}
-{{- $loc := lookupCity "Phoenix"}}
+This Shabbat in {{$.location.Name}}:
+
+{{- /* Read date from CLI args, as in classic hebcal, with NoJulian=false. */}}
+{{- $d := $.dateRange.Start false}}
+{{- /* In classic hebcal, no args defaults to just the year. */}}
+{{- /* We want today's full date. */}}
+{{- if $.dateRange.Source.IsZero}}
+{{-   $d = hdateFromTime $.now}}
+{{- end}}
+
 {{- $timeFormat := "03:04 PM"}}
-{{- range 7}}
-{{-   if ne $d.Weekday $.time.Saturday}}
-{{-     $d = $d.AddDate 0 0 1}}
+
+{{- $d = $d.OnOrAfter $.time.Saturday}}
+{{- $z := forLocationDate $.location $d.Gregorian}}
+{{- $erev := $d.Prev}}
+{{- $zErev := forLocationDate $.location $erev.Gregorian}}
+
+Erev Shabbat: {{$erev.Gregorian.Format "Mon Jan 02 2006"}} / {{$erev}}
+{{- range timedEvents $zErev}}
+{{- /* Skip normal zmanim, only show candlelighting. */}}
+{{-   if eq .Flags $.event.ZMANIM}}
 {{-     continue}}
 {{-   end}}
-{{-   $z := forLocationDate $loc $d}}
-{{-   $erev := $d.AddDate 0 0 -1}}
-{{-   $zErev := forLocationDate $loc $erev}}
+{{    .EventTime.Format $timeFormat -}}
+        : {{.Desc}}
+{{- end}}
 
-{{- /* swallow whitespace */ -}}
-
-Erev Shabbat: {{$erev.Format "Mon Jan 02 2006"}} / {{hdateFromTime $erev}}
-{{-   range timedEvents $zErev}}
-{{- /* Skip normal zmanim, only show candlelighting. */}}
-{{-     if eq .Flags $.event.ZMANIM}}
-{{-       continue}}
-{{-     end}}
-{{      .EventTime.Format $timeFormat}}
-{{- ": "}}
-{{-     .Desc}}
+Shabbat: {{$d.Gregorian.Format "Mon Jan 02 2006"}} / {{$d}}
+{{- range timedEvents $z}}
+{{-   if eq .Desc "Tzeit HaKochavim"}}{{/* redundant, so skip */}}
+{{-     continue}}
 {{-   end}}
-
-Shabbat: {{$d.Format "Mon Jan 02 2006"}} / {{hdateFromTime $d}}
-{{-   range timedEvents $z}}
-{{-     if eq .Desc "Tzeit HaKochavim"}}{{/* redundant, so skip */}}
-{{-       continue}}
-{{-     end}}
-{{      .EventTime.Format $timeFormat}}
-{{- ": "}}
-{{-     .Desc}}
-{{-   end}}
-
+{{    .EventTime.Format $timeFormat -}}
+        : {{.Desc}}
 {{- end}}
 ```
 
 </details>
 
+<details>
+    <summary>examples/thisShabbat.json</summary>
+
+```json
+{
+  "daily_zmanim": true,
+  "candle_lighting": true,
+  "city": "Phoenix"
+}
+```
+
+</details>
+
 ```bash
-$ hebcalfmt thisShabbat.tmpl
+$ hebcalfmt -c thisShabbat.json thisShabbat.tmpl
+This Shabbat in Phoenix:
+
 Erev Shabbat: Fri Dec 19 2025 / 29 Kislev 5786
 05:05 PM: Chanukah: 6 Candles
 05:05 PM: Candle lighting
@@ -216,8 +324,8 @@ Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 04:21 PM: Plag HaMincha
 05:24 PM: Sunset
 05:43 PM: Bein HaShemashot
-06:04 PM: Havdalah
-06:04 PM: Chanukah: 7 Candles
+06:36 PM: Havdalah
+06:36 PM: Chanukah: 7 Candles
 ```
 
 ## Example: Show this month's calendar with Hebrew dates
@@ -313,4 +421,6 @@ it helps to know these documents well:
  [`github.com/hebcal/hdate.HDate`](https://pkg.go.dev/github.com/hebcal/hdate#HDate)
  type's fields and methods.
  * The [`github.com/hebcal/hebcal-go/zmanim.Zmanim`](https://pkg.go.dev/github.com/hebcal/hebcal-go/zmanim#Zmanim) type's fields and methods.
-
+ * The [`github.com/chaimleib/hebcalfmt/templating`](https://github.com/chaimleib/hebcalfmt/tree/master/templating) folder
+   contains \*funcs.go and \*consts.go files which are made available
+   inside the template.

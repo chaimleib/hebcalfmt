@@ -1,2 +1,10 @@
-Today: {{$.now.Format $.time.DateOnly}}
-Hebrew: {{hdateFromTime $.now}}
+{{- /* Read date from CLI args, as in classic hebcal, with NoJulian=false. */}}
+{{- $d := $.dateRange.Start false}}
+{{- /* In classic hebcal, no args defaults to just the year. */}}
+{{- /* We want today's full date. */}}
+{{- if $.dateRange.Source.IsZero}}
+{{-   $d = hdateFromTime $.now}}
+{{- end -}}
+
+Gregorian: {{$d.Gregorian.Format $.time.DateOnly}}
+Hebrew: {{$d.Day}} {{$d.MonthName $.language}} {{$d.Year}}

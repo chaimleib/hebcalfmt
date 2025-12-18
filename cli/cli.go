@@ -1,35 +1,70 @@
 package cli
 
 import (
-	"fmt"
+	"errors"
 	"log"
-	"maps"
+	"log/slog"
 	"os"
 	"text/template"
 	"time"
 
-	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/zmanim"
 
 	"github.com/chaimleib/hebcalfmt/templating"
 )
 
-func usage() string {
-	prog := os.Args[0]
-	return fmt.Sprintf("usage: %s template-path", prog)
+var ProgName = "hebcalfmt"
+
+var InitLogging = func() {
+	// slog is for identifying code defects in hebcalfmt or its imports.
+	// I want source file names, line numbers, and probably values to be logged.
+	// In this case, dev-friendliness is more important than user-friendliness.
+	// Hence JSON format.
+	slogger := slog.New(slog.NewJSONHandler(
+		os.Stderr,
+		&slog.HandlerOptions{
+			AddSource: true,
+		},
+	))
+	slog.SetDefault(slogger)
+
+	// log is for general user errors.
+	// This must be set after slog, since slog.SetDefault clobbers these settings.
+	log.Default().SetFlags(0)
+	log.Default().SetOutput(os.Stderr)
+	log.Default().SetPrefix("")
 }
 
 func Run() int {
-	log.SetFlags(0)
+	InitLogging()
 
-	opts, tmpl, err := handleArgs()
+	fs := NewFlags()
+	cfg, err := processFlags(fs, os.Args[1:])
+	if errors.Is(err, ErrDone) {
+		return 0
+	}
 	if err != nil {
 		log.Println(err)
 		return 1
 	}
 
-	now := time.Now()
-	z := zmanim.New(opts.Location, now)
+	tmplPath, err := processArgs(fs.Args(), cfg)
+	if errors.Is(err, ErrUsage) {
+		log.Println(usage(fs))
+		log.Println(err)
+		return 1
+	}
+	if err != nil {
+		log.Println(err)
+		return 1
+	}
+
+	opts, err := cfg.CalOptions()
+	if err != nil {
+		log.Printf("failed to build hebcal options from %s: %v",
+			cfg.ConfigSource, err)
+		return 1
+	}
 
 	tz, err := time.LoadLocation(opts.Location.TimeZoneId)
 	if err != nil {
@@ -37,13 +72,30 @@ func Run() int {
 		return 1
 	}
 
+	z := zmanim.New(opts.Location, cfg.Now)
+
+	// Set up the Template's FuncMap.
+	// This must be done before parsing the file.
+	tmpl := new(template.Template)
+	tmpl = templating.SetFuncMap(tmpl, opts)
+
+	tmpl, err = templating.ParseFile(tmpl, tmplPath)
+	if err != nil {
+		log.Println(err)
+		return 1
+	}
+
 	err = tmpl.Execute(os.Stdout, map[string]any{
-		"now":      now,
-		"tz":       tz,
-		"location": opts.Location,
-		"z":        &z,
-		"time":     templating.TimeConsts,
-		"event":    templating.EventConsts,
+		"now":           cfg.Now,
+		"nowInLocation": cfg.Now.In(tz),
+		"calOptions":    opts,
+		"language":      cfg.Language,
+		"dateRange":     cfg.DateRange,
+		"tz":            tz,
+		"location":      opts.Location,
+		"z":             &z,
+		"time":          templating.TimeConsts,
+		"event":         templating.EventConsts,
 	})
 	if err != nil {
 		log.Println(err)
@@ -51,61 +103,4 @@ func Run() int {
 	}
 
 	return 0
-}
-
-func handleArgs() (opts *hebcal.CalOptions, tmpl *template.Template, err error) {
-	if len(os.Args) != 2 {
-		log.Println(usage())
-		return nil, nil, fmt.Errorf("expected path to a template")
-	}
-
-	loc := zmanim.LookupCity("Phoenix")
-	now := time.Now()
-	opts = &hebcal.CalOptions{
-		Year:           now.Year(),
-		Month:          now.Month(),
-		Sedrot:         true,
-		CandleLighting: true,
-		DailyZmanim:    true,
-		Location:       loc,
-		HavdalahDeg:    zmanim.Tzeit3SmallStars,
-		NoModern:       true,
-	}
-
-	// Set up the Template's FuncMap.
-	// This must be done before parsing the file.
-	tmpl = new(template.Template)
-	tmpl = setFuncMap(tmpl, opts)
-
-	tmpl, err = parseFile(tmpl, os.Args[1])
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return opts, tmpl, nil
-}
-
-func setFuncMap(
-	tmpl interface {
-		Funcs(template.FuncMap) *template.Template
-	},
-	opts *hebcal.CalOptions,
-) *template.Template {
-	funcs := make(map[string]any)
-	maps.Insert(funcs, maps.All(templating.HebcalFuncs(opts)))
-	maps.Insert(funcs, maps.All(templating.StringFuncs))
-	maps.Insert(funcs, maps.All(templating.TimeFuncs))
-	maps.Insert(funcs, maps.All(templating.CastFuncs))
-	maps.Insert(funcs, maps.All(templating.EnvFuncs))
-	return tmpl.Funcs(funcs)
-}
-
-func parseFile(tmpl *template.Template, fpath string) (*template.Template, error) {
-	buf, err := os.ReadFile(fpath)
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl, err = tmpl.Parse(string(buf))
-	return tmpl, err
 }

@@ -3,13 +3,14 @@ module github.com/chaimleib/hebcalfmt
 go 1.25.5
 
 require (
+	github.com/hebcal/greg v1.0.2
 	github.com/hebcal/hdate v1.2.1
 	github.com/hebcal/hebcal-go v0.10.6
 	github.com/nathan-osman/go-sunrise v1.1.0
+	github.com/spf13/pflag v1.0.10
 )
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/hebcal/gematriya v1.0.1 // indirect
-	github.com/hebcal/greg v1.0.2 // indirect
 )
