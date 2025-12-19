@@ -189,10 +189,10 @@ func processArgs(
 	// Humans would get confused if, e.g.,
 	// results for Jan. 1 next year get generated
 	// when for them it is still Dec. 31, and they didn't specify the date:
-	//   hebcalfmt examples/hebcal-classic.tmpl
+	//   hebcalfmt examples/hebcalClassic.tmpl
 	// For those wanting full consistency, they should specify a timezone
 	// in the template or on the CLI. For example:
-	//   TZ=America/New_York hebcalfmt examples/hebcal-classic.tmpl
+	//   TZ=America/New_York hebcalfmt examples/hebcalClassic.tmpl
 	cfg.Now = time.Now()
 
 	if cfg.Today && cfg.DateRange.Source.IsZero() {
