@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"os"
 	"text/template"
-	"time"
 
 	"github.com/hebcal/hebcal-go/zmanim"
 
@@ -66,12 +65,6 @@ func Run() int {
 		return 1
 	}
 
-	tz, err := time.LoadLocation(opts.Location.TimeZoneId)
-	if err != nil {
-		log.Println(err)
-		return 1
-	}
-
 	z := zmanim.New(opts.Location, cfg.Now)
 
 	// Set up the Template's FuncMap.
@@ -87,11 +80,11 @@ func Run() int {
 
 	err = tmpl.Execute(os.Stdout, map[string]any{
 		"now":           cfg.Now,
-		"nowInLocation": cfg.Now.In(tz),
+		"nowInLocation": cfg.Now.In(z.TimeZone),
 		"calOptions":    opts,
 		"language":      cfg.Language,
 		"dateRange":     cfg.DateRange,
-		"tz":            tz,
+		"tz":            z.TimeZone,
 		"location":      opts.Location,
 		"z":             &z,
 		"hdate":         templating.HDateConsts,

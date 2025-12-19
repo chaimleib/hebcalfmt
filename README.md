@@ -277,7 +277,8 @@ You have the power to parse them from environment variables of your choosing.
 
 You also can choose which zmanim to display,
 and even how to compute your zmanim.
-We provide `timeAtAngle`, `hourOffset` and `timeParseDuration` for this purpose.
+`$.z.TimeAtAngle`, `%.z.HourOffset`
+and `timeParseDuration` are exposed for this purpose.
 These are useful if you use a different opinion than hebcal's defaults,
 or if you simply want to switch your water sprinkler on after dark.
 
@@ -289,10 +290,8 @@ or if you simply want to switch your water sprinkler on after dark.
 {{- with getenv "CITY"}}{{$city = .}}{{end -}}
 {{- $loc := lookupCity $city -}}
 
-{{- $tz := timeLoadLocation $loc.TimeZoneId -}}
-
 {{- $d := $.now -}}
-{{- with getenv "DATE"}}{{$d = timeParseInLocation $.time.DateOnly . $tz}}{{end -}}
+{{- with getenv "DATE"}}{{$d = timeParse $.time.DateOnly .}}{{end -}}
 
 {{- $z := forLocationDate $loc $d -}}
 Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
@@ -304,7 +303,7 @@ Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
 {{$z.Sunrise.Format $fmt}}: Netz
 {{$z.Chatzot.Format $fmt}}: Chatzot
 {{$z.Sunset.Format $fmt}}: Shkiah
-{{ $dark85 := timeAtAngle $z $tz 8.5 false -}}
+{{ $dark85 := $z.TimeAtAngle 8.5 false -}}
 {{ $dark85.Format $fmt -}}
   : 8.5 degrees below horizon
 {{( $dark85.Add (timeParseDuration "72m") ).Format $fmt -}}
@@ -312,7 +311,7 @@ Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
 
 A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
 {{- range 13}}
-{{    (hourOffset $z $tz (itof .)).Format $fmt -}}
+{{    ($z.HourOffset (itof .)).Format $fmt -}}
   : {{.}} halachic hour{{if ne . 1}}s{{end}}
 {{- end}}
 ```

@@ -12,7 +12,6 @@ import (
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/omer"
 	"github.com/hebcal/hebcal-go/zmanim"
-	"github.com/nathan-osman/go-sunrise"
 )
 
 func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
@@ -60,9 +59,10 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 
 		// as<Type>Event converts [event.CalEvent]s to struct types.
 		// It returns nil if it fails.
-		"asTimedEvent":   AsEvent[hebcal.TimedEvent],
 		"asHolidayEvent": AsEvent[event.HolidayEvent],
 		"asOmerEvent":    AsEvent[omer.OmerEvent],
+		"asTimedEvent":   AsEvent[hebcal.TimedEvent],
+		"asUserEvent":    AsEvent[event.UserEvent],
 
 		// timedEvents returns a slice of [hebcal.TimedEvent]
 		"timedEvents": func(z *zmanim.Zmanim) ([]hebcal.TimedEvent, error) {
@@ -75,10 +75,6 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"setYear":         SetYear(opts),
 		"setNumYears":     SetNumYears(opts),
 		"setIsHebrewYear": SetIsHebrewYear(opts),
-
-		// zmanim.Zmanim -> time.Time
-		"timeAtAngle": TimeAtAngle,
-		"hourOffset":  HourOffset,
 	}
 }
 
@@ -91,44 +87,6 @@ func AsEvent[T event.CalEvent](e event.CalEvent) *T {
 		return &te
 	}
 	return nil
-}
-
-// HourOffset returns a time for the given number of halachic hours
-// past sunrise.
-func HourOffset(z *zmanim.Zmanim, tz *time.Location, hours float64) time.Time {
-	rise := z.Sunrise()
-	seconds := rise.Unix() + int64(z.Hour()*hours)
-	return time.Unix(seconds, 0).In(tz)
-}
-
-// TimeAtAngle returns when the center of the sun
-// will be at the given angle below the horizon.
-// AM or PM can be chosen via the rising bool.
-func TimeAtAngle(
-	z *zmanim.Zmanim,
-	tz *time.Location,
-	angle float64,
-	rising bool,
-) time.Time {
-	morning, evening := sunrise.TimeOfElevation(
-		z.Location.Latitude,
-		z.Location.Longitude,
-		-angle,
-		z.Year,
-		z.Month,
-		z.Day,
-	)
-	if rising {
-		return InLoc(tz, morning)
-	}
-	return InLoc(tz, evening)
-}
-
-func InLoc(tz *time.Location, t time.Time) time.Time {
-	if t.IsZero() {
-		return t
-	}
-	return t.In(tz)
 }
 
 // TimedEvents uses the given opts and returns just the [event.CalEvent]s
