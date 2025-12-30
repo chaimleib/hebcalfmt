@@ -17,7 +17,7 @@ var gregRe = regexp.MustCompile(`^(\d+)\s+(\d+)\s+(\d+)\s+(.+)$`)
 
 // ParseYahrzeits parses an [io.Reader] of event lines
 // and returns a slice of [hebcal.UserYahrzeit] entries.
-// In case of an error, filename helps with debugging.
+// In case of an error, fileName helps with debugging.
 //
 // The lines are in the following format, using Gregorian dates:
 //
@@ -26,12 +26,16 @@ var gregRe = regexp.MustCompile(`^(\d+)\s+(\d+)\s+(\d+)\s+(.+)$`)
 // Description is a newline-terminated string.
 func ParseYahrzeits(
 	f io.Reader,
-	filename string,
+	fileName string,
 ) ([]hebcal.UserYahrzeit, error) {
 	lineNumber := 0
 	var errs []error
 	lineErr := func(err error) {
-		errs = append(errs, SyntaxError{err, filename, lineNumber})
+		errs = append(errs, SyntaxError{
+			Err:        err,
+			FileName:   fileName,
+			LineNumber: lineNumber,
+		})
 	}
 
 	entries := make([]hebcal.UserYahrzeit, 0, 10)
