@@ -17,13 +17,13 @@ var gregRe = regexp.MustCompile(`^(\d+)\s+(\d+)\s+(\d+)\s+(.+)$`)
 
 // ParseYahrzeits parses an [io.Reader] of event lines
 // and returns a slice of [hebcal.UserYahrzeit] entries.
+// In case of an error, filename helps with debugging.
+//
 // The lines are in the following format, using Gregorian dates:
 //
 //	MM DD YYYY Description
 //
 // Description is a newline-terminated string.
-//
-// In case of an error, filename helps with debugging.
 func ParseYahrzeits(
 	f io.Reader,
 	filename string,

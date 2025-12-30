@@ -16,14 +16,14 @@ var hebRe = regexp.MustCompile(`^(\S+)\s+(\d+)\s+(.+)$`)
 
 // ParseEvents parses an [io.Reader] of event lines
 // and returns a slice of [hebcal.UserEvent] entries.
+// In case of an error, filename helps with debugging.
+//
 // The lines are in the following format, using Hebrew dates:
 //
 //	MMMM DD Description
 //
 // MMMM is a string identifying the Hebrew month.
 // Description is a newline-terminated string.
-//
-// In case of an error, filename helps with debugging.
 func ParseEvents(f io.Reader, filename string) ([]hebcal.UserEvent, error) {
 	lineNumber := 0
 	var errs []error
