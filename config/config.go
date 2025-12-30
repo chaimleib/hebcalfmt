@@ -536,7 +536,7 @@ func (c *Config) Location() (*zmanim.Location, error) {
 		log.Println(
 			"Use a nearby city; or set geo.lat, geo.lon, and timezone.",
 			"To show available cities, run:",
-			"  hebcalfmt --all-cities",
+			"  hebcalfmt --info cities",
 		)
 		return nil, fmt.Errorf("unknown city: %q", c.City)
 	}
