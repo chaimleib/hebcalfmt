@@ -318,32 +318,27 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 		cOpts.HavdalahMins = 72
 	}
 
+	// Read secondary files
 	// UserEvents
-	if c.EventsFile != "" {
-		f, err := c.FS.Open(c.EventsFile)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		events, err := hcfiles.ParseEvents(f, c.EventsFile)
-		if err != nil {
-			return nil, err
-		}
-		cOpts.UserEvents = events
+	err = parseFile(
+		c.FS,
+		c.EventsFile,
+		hcfiles.ParseEvents,
+		&cOpts.UserEvents,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Yahrzeits
-	if c.YahrzeitsFile != "" {
-		f, err := c.FS.Open(c.YahrzeitsFile)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		yahrzeits, err := hcfiles.ParseYahrzeits(f, c.YahrzeitsFile)
-		if err != nil {
-			return nil, err
-		}
-		cOpts.Yahrzeits = yahrzeits
+	err = parseFile(
+		c.FS,
+		c.YahrzeitsFile,
+		hcfiles.ParseYahrzeits,
+		&cOpts.Yahrzeits,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	return cOpts, nil
@@ -594,4 +589,27 @@ func (c Config) setToday(cOpts *hebcal.CalOptions) {
 func (c Config) setChagOnly(cOpts *hebcal.CalOptions) {
 	cOpts.Mask = event.CHAG | event.LIGHT_CANDLES |
 		event.LIGHT_CANDLES_TZEIS | event.YOM_TOV_ENDS
+}
+
+func parseFile[T any](
+	fs fs.FS,
+	fpath string,
+	parse func(io.Reader, string) (T, error),
+	target *T,
+) error {
+	if fpath == "" {
+		return nil
+	}
+
+	f, err := fs.Open(fpath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	item, err := parse(f, fpath)
+	if err != nil {
+		return err
+	}
+	*target = item
+	return nil
 }
