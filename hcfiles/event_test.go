@@ -9,6 +9,7 @@ import (
 	"github.com/hebcal/hebcal-go/hebcal"
 
 	"github.com/chaimleib/hebcalfmt/hcfiles"
+	"github.com/chaimleib/hebcalfmt/test"
 )
 
 func TestParseEvents(t *testing.T) {
@@ -101,7 +102,7 @@ func TestParseEvents(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			f := strings.NewReader(c.Content)
 			got, err := hcfiles.ParseEvents(f, fileName)
-			checkErr(t, err, c.WantErr)
+			test.CheckErr(t, err, c.WantErr)
 			var i, j int
 			for j = range c.Want {
 				if i >= len(got) {

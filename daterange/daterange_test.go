@@ -1,7 +1,6 @@
 package daterange_test
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"testing"
@@ -11,26 +10,8 @@ import (
 	"github.com/hebcal/hdate"
 
 	"github.com/chaimleib/hebcalfmt/daterange"
+	"github.com/chaimleib/hebcalfmt/test"
 )
-
-func checkErr(t *testing.T, got error, wantErr string) {
-	t.Helper()
-
-	if wantErr == "" {
-		if got != nil {
-			t.Errorf("want nil err, got %q", got.Error())
-		}
-		return
-	}
-
-	if got == nil {
-		t.Errorf("got nil err, want %q", wantErr)
-		return
-	}
-	if got.Error() != wantErr {
-		t.Errorf("got wrong err:\n%q\nwant:\n%q", got.Error(), wantErr)
-	}
-}
 
 func date(y int, m time.Month, d int) time.Time {
 	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
@@ -41,26 +22,6 @@ func date(y int, m time.Month, d int) time.Time {
 // and that field may or may not be populated.
 func hdatesEqual(a, b hdate.HDate) bool {
 	return a.Day() == b.Day() && a.Month() == b.Month() && a.Year() == b.Year()
-}
-
-type RecordHandler struct {
-	records []slog.Record
-}
-
-var _ slog.Handler = (*RecordHandler)(nil)
-
-func (h *RecordHandler) Records() []slog.Record { return h.records }
-
-func (h *RecordHandler) WithAttrs(attrs []slog.Attr) slog.Handler { return h }
-func (h *RecordHandler) WithGroup(group string) slog.Handler      { return h }
-
-func (h *RecordHandler) Enabled(context.Context, slog.Level) bool {
-	return true
-}
-
-func (h *RecordHandler) Handle(_ context.Context, record slog.Record) error {
-	h.records = append(h.records, record)
-	return nil
 }
 
 func TestRangeType_String(t *testing.T) {
@@ -130,74 +91,6 @@ func TestSource_IsZero(t *testing.T) {
 	}
 }
 
-func checkSource(t *testing.T, want, got daterange.Source) {
-	// Check the simple fields.
-	if want.IsHebrewDate != got.IsHebrewDate {
-		t.Errorf("Source.IsHebrewDate's do not match - want: %v, got: %v",
-			want.IsHebrewDate, got.IsHebrewDate)
-	}
-	if want.Now != got.Now {
-		t.Errorf("Source.Now's do not match - want:\n%s\ngot:\n%s",
-			want.Now, got.Now)
-	}
-	if want.FromTime != got.FromTime {
-		t.Errorf("Source.FromTime's do not match - want:\n%s\ngot:\n%s",
-			want.FromTime, got.FromTime)
-	}
-
-	// Diff the Args
-	wantArgsNil := want.Args == nil
-	gotArgsNil := got.Args == nil
-	if len(want.Args) != len(got.Args) {
-		t.Errorf("length of Source.Args does not match - want: %d, got: %d",
-			len(want.Args), len(got.Args))
-	} else if wantArgsNil != gotArgsNil {
-		t.Errorf("nil-ness of Source.Args does not match - want.Source.Args==nil: %v, got.Source.Args==nil: %v",
-			wantArgsNil, gotArgsNil)
-	}
-	var i, j int
-	for j = range got.Args {
-		if i >= len(want.Args) {
-			t.Errorf(
-				"unexpected extra Source.Args at index %d, skipping rest - got: %q",
-				j,
-				got.Args[j],
-			)
-			break
-		}
-		if want.Args[i] != got.Args[j] {
-			t.Errorf(
-				"unexpected Source.Args[%d] - want: %q, got: %q",
-				j,
-				want.Args[i],
-				got.Args[j],
-			)
-			continue
-		}
-		i++
-	}
-}
-
-func checkDateRange(t *testing.T, want, got daterange.DateRange) {
-	checkSource(t, want.Source, got.Source)
-	for _, field := range []struct {
-		Name      string
-		Want, Got any
-	}{
-		{"RangeType", want.RangeType, got.RangeType},
-		{"Day", want.Day, got.Day},
-		{"GregMonth", want.GregMonth, got.GregMonth},
-		{"HebMonth", want.HebMonth, got.HebMonth},
-		{"Year", want.Year, got.Year},
-		{"IsHebrewDate", want.IsHebrewDate, got.IsHebrewDate},
-	} {
-		if field.Want != field.Got {
-			t.Errorf("%s's did not match - want: %v, got: %v",
-				field.Name, field.Want, field.Got)
-		}
-	}
-}
-
 func TestDateRange_FromTime(t *testing.T) {
 	cases := []struct {
 		Name  string
@@ -233,7 +126,7 @@ func TestDateRange_FromTime(t *testing.T) {
 				t.Errorf("got unexpected nil from daterange.FromTime()")
 				return
 			}
-			checkDateRange(t, c.Want, *got)
+			test.CheckDateRange(t, c.Want, *got)
 		})
 	}
 }
@@ -517,7 +410,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
 			got, err := daterange.FromArgs(c.Args, c.IsHebrewDate, now)
-			checkErr(t, err, c.Err)
+			test.CheckErr(t, err, c.Err)
 			if err != nil {
 				if got != nil {
 					t.Errorf(
@@ -533,7 +426,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				t.Errorf("got unexpected nil from daterange.FromArgs()")
 				return
 			}
-			checkDateRange(t, c.Want, *got)
+			test.CheckDateRange(t, c.Want, *got)
 		})
 	}
 }
@@ -796,7 +689,7 @@ func TestDateRange_Start(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			var slogHandler RecordHandler
+			var slogHandler test.RecordHandler
 			if c.Name == "invalid RangeType" {
 				// capture and check expected error
 				slog.SetDefault(slog.New(&slogHandler))
@@ -980,7 +873,7 @@ func TestDateRange_End(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			var slogHandler RecordHandler
+			var slogHandler test.RecordHandler
 			if c.Name == "invalid RangeType" {
 				// capture and check expected error
 				slog.SetDefault(slog.New(&slogHandler))

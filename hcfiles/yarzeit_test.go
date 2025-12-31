@@ -9,26 +9,8 @@ import (
 	"github.com/hebcal/hebcal-go/hebcal"
 
 	"github.com/chaimleib/hebcalfmt/hcfiles"
+	"github.com/chaimleib/hebcalfmt/test"
 )
-
-func checkErr(t *testing.T, got error, wantErr string) {
-	t.Helper()
-
-	if wantErr == "" {
-		if got != nil {
-			t.Errorf("want nil err, got %q", got.Error())
-		}
-		return
-	}
-
-	if got == nil {
-		t.Errorf("got nil err, want %q", wantErr)
-		return
-	}
-	if got.Error() != wantErr {
-		t.Errorf("got wrong err:\n%q\nwant:\n%q", got.Error(), wantErr)
-	}
-}
 
 func date(y int, m time.Month, d int) time.Time {
 	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
@@ -121,7 +103,7 @@ func TestParseYahrzeits(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			f := strings.NewReader(c.Content)
 			got, err := hcfiles.ParseYahrzeits(f, fileName)
-			checkErr(t, err, c.WantErr)
+			test.CheckErr(t, err, c.WantErr)
 			var i, j int
 			for j = range c.Want {
 				if i >= len(got) {
