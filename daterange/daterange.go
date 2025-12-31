@@ -1,6 +1,7 @@
 package daterange
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"slices"
@@ -11,6 +12,8 @@ import (
 	"github.com/hebcal/greg"
 	"github.com/hebcal/hdate"
 )
+
+var UnreachableError = errors.New("unreachable")
 
 type RangeType int
 
@@ -44,7 +47,7 @@ type Source struct {
 }
 
 func (s Source) IsZero() bool {
-	return len(s.Args) == 0 && s.FromTime.IsZero()
+	return s.Now.IsZero() && s.FromTime.IsZero()
 }
 
 type DateRange struct {
@@ -116,7 +119,9 @@ func FromArgs(
 			break
 		}
 
-		t, err := time.Parse(time.DateOnly, arg0)
+		// Use custom date format,
+		// since time.DateOnly requires leading zeroes for month and day.
+		t, err := time.Parse("2006-1-2", arg0)
 		if err != nil {
 			return nil, err
 		}
@@ -129,7 +134,7 @@ func FromArgs(
 	case 2:
 		yy, err := strconv.Atoi(args[1])
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid year: %w", err)
 		}
 		dr.Year = yy
 		if err := dr.parseGregOrHebMonth(args[0]); err != nil {
@@ -140,19 +145,20 @@ func FromArgs(
 	case 3:
 		dd, err := strconv.Atoi(args[1])
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid day: %w", err)
 		}
 		dr.Day = dd
 
 		yy, err := strconv.Atoi(args[2])
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid year: %w", err)
 		}
 		dr.Year = yy
 
 		if err := dr.parseGregOrHebMonth(args[0]); err != nil {
 			return nil, err
 		}
+
 		dr.RangeType = RangeTypeDay
 
 	default:
@@ -160,6 +166,45 @@ func FromArgs(
 			Errorf("expected at most 3 args for date range spec, got %d", len(args))
 	}
 
+	// Check months
+	switch dr.RangeType {
+	case RangeTypeMonth, RangeTypeDay, RangeTypeToday:
+		if dr.IsHebrewDate {
+			// invalid Hebrew month ranges should be impossible
+			lastMonth := hdate.HMonth(hdate.MonthsInYear(dr.Year))
+			if dr.HebMonth <= 0 || dr.HebMonth > lastMonth {
+				slog.Error("impossible Hebrew month",
+					"HebMonth", dr.HebMonth,
+					"daterange", dr,
+				)
+				return nil, fmt.Errorf("%w: invalid month: %v",
+					UnreachableError, dr.HebMonth)
+			}
+		} else {
+			const lastMonth = time.December
+			if dr.GregMonth <= 0 || dr.GregMonth > lastMonth {
+				return nil, fmt.Errorf("invalid month: %d",
+					dr.GregMonth)
+			}
+		}
+	}
+
+	// Check days in month
+	if dr.RangeType == RangeTypeDay {
+		if dr.IsHebrewDate {
+			lastDay := hdate.DaysInMonth(dr.HebMonth, dr.Year)
+			if dr.Day <= 0 || dr.Day > lastDay {
+				return nil, fmt.Errorf("invalid day for %s %d: %d",
+					dr.HebMonth, dr.Year, dr.Day)
+			}
+		} else {
+			lastDay := greg.DaysIn(dr.GregMonth, dr.Year)
+			if dr.Day <= 0 || dr.Day > lastDay {
+				return nil, fmt.Errorf("invalid day for %s %d: %d",
+					dr.GregMonth, dr.Year, dr.Day)
+			}
+		}
+	}
 	return dr, nil
 }
 
@@ -182,7 +227,7 @@ func parseGregOrHebMonth(
 	mm, err := strconv.Atoi(arg)
 	if err == nil {
 		if isHebrewYear {
-			err = fmt.Errorf("expected Hebrew month name, got a number %v", mm)
+			err = fmt.Errorf("expected Hebrew month name, got a number: %v", mm)
 			return
 		}
 		gregMonth = time.Month(mm) /* gregorian month */
@@ -191,7 +236,11 @@ func parseGregOrHebMonth(
 
 	hm, err := hdate.MonthFromName(arg)
 	if err != nil {
-		err = fmt.Errorf("unknown Hebrew month %q", arg)
+		if isHebrewYear {
+			err = fmt.Errorf("unknown Hebrew month: %q", arg)
+		} else {
+			err = fmt.Errorf("Gregorian months must be numeric, got %q", arg)
+		}
 		return
 	}
 
@@ -208,6 +257,10 @@ func (dr DateRange) String() string {
 }
 
 func (dr DateRange) basicString() string {
+	if dr.Source.IsZero() {
+		return "empty"
+	}
+
 	switch dr.RangeType {
 	case RangeTypeYear:
 		if dr.IsHebrewDate {
