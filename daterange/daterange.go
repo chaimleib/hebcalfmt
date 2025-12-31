@@ -13,7 +13,7 @@ import (
 	"github.com/hebcal/hdate"
 )
 
-var UnreachableError = errors.New("unreachable")
+var ErrUnreachable = errors.New("unreachable")
 
 type RangeType int
 
@@ -178,7 +178,7 @@ func FromArgs(
 					"daterange", dr,
 				)
 				return nil, fmt.Errorf("%w: invalid month: %v",
-					UnreachableError, dr.HebMonth)
+					ErrUnreachable, dr.HebMonth)
 			}
 		} else {
 			const lastMonth = time.December
