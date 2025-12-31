@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"io/fs"
 	"log"
 	"log/slog"
 	"os"
@@ -34,6 +36,12 @@ type Config struct {
 	// Now ensures that all parts of the calendar program
 	// have a consistent idea of the current time.
 	Now time.Time `json:"-"`
+
+	// FS controls where secondary files are loaded from.
+	// If replaced, it can allow access to internet-hosted files
+	// compiled-in resources, or stubbing out the default FS for testing.
+	// If nil, use os.DirFS() starting from the current working directory.
+	FS fs.FS `json:"-"`
 
 	// Language sets the output language.
 	// Available options are in locales.AllLocales.
@@ -194,20 +202,38 @@ var Default = Config{
 }
 
 // FromFile parses configPath into a config as JSON.
-// Then it populates ConfigSource with the configPath.
+// For the sake of debugging, it then populates ConfigSource with configPath.
 // NOTE: This does not populate DateRange.
 func FromFile(configPath string) (*Config, error) {
-	buf, err := os.ReadFile(configPath)
+	f, err := os.Open(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("config file could not be read: %w", err)
 	}
+	defer f.Close()
 
+	return FromReader(f, configPath)
+}
+
+// FromReader parses the io.Reader into a config as JSON.
+// For the sake of debugging, it then populates ConfigSource with configPath.
+func FromReader(r io.Reader, configPath string) (*Config, error) {
 	cfg := Default
-	if err := json.Unmarshal(buf, &cfg); err != nil {
-		return nil, fmt.Errorf("failed to parse config file: %w", err)
+	if err := json.NewDecoder(r).Decode(&cfg); err != nil {
+		return nil, fmt.Errorf(
+			"failed to parse config from %q: %w",
+			configPath,
+			err,
+		)
 	}
 
 	cfg.ConfigSource = configPath
+
+	// prep for accessing secondary files
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("failed to Getwd: %w", err)
+	}
+	cfg.FS = os.DirFS(cwd)
 
 	return &cfg, nil
 }
@@ -294,7 +320,12 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 
 	// UserEvents
 	if c.EventsFile != "" {
-		events, err := parseEventsFile(c.EventsFile)
+		f, err := c.FS.Open(c.EventsFile)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		events, err := hcfiles.ParseEvents(f, c.EventsFile)
 		if err != nil {
 			return nil, err
 		}
@@ -303,7 +334,12 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 
 	// Yahrzeits
 	if c.YahrzeitsFile != "" {
-		yahrzeits, err := parseYahrzeitsFile(c.YahrzeitsFile)
+		f, err := c.FS.Open(c.YahrzeitsFile)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		yahrzeits, err := hcfiles.ParseYahrzeits(f, c.YahrzeitsFile)
 		if err != nil {
 			return nil, err
 		}
@@ -558,22 +594,4 @@ func (c Config) setToday(cOpts *hebcal.CalOptions) {
 func (c Config) setChagOnly(cOpts *hebcal.CalOptions) {
 	cOpts.Mask = event.CHAG | event.LIGHT_CANDLES |
 		event.LIGHT_CANDLES_TZEIS | event.YOM_TOV_ENDS
-}
-
-func parseEventsFile(fpath string) ([]hebcal.UserEvent, error) {
-	f, err := os.Open(fpath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return hcfiles.ParseEvents(f, fpath)
-}
-
-func parseYahrzeitsFile(fpath string) ([]hebcal.UserYahrzeit, error) {
-	f, err := os.Open(fpath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return hcfiles.ParseYahrzeits(f, fpath)
 }
