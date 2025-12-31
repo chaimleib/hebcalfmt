@@ -44,19 +44,19 @@ func ParseEvents(f io.Reader, fileName string) ([]hebcal.UserEvent, error) {
 
 		fields := hebRe.FindStringSubmatch(line)
 		if len(fields) != 4 {
-			lineErr(errInvalidFormat)
+			lineErr(ErrInvalidFormat)
 			continue
 		}
 
 		month, err := hdate.MonthFromName(fields[1])
 		if err != nil {
-			lineErr(errInvalidMonth)
+			lineErr(ErrInvalidMonth)
 			continue
 		}
 
 		day, _ := strconv.Atoi(fields[2])
 		if day < 1 || day > 30 {
-			lineErr(errInvalidDays)
+			lineErr(ErrInvalidDays)
 			continue
 		}
 

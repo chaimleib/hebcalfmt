@@ -47,20 +47,22 @@ func ParseYahrzeits(
 
 		fields := gregRe.FindStringSubmatch(line)
 		if len(fields) != 5 {
-			lineErr(errInvalidFormat)
+			lineErr(ErrInvalidFormat)
 			continue
 		}
 
 		month0, _ := strconv.Atoi(fields[1])
 		if month0 < 1 || month0 > 12 {
-			lineErr(errInvalidMonth)
+			lineErr(ErrInvalidMonth)
+			continue
 		}
 
 		day, _ := strconv.Atoi(fields[2])
 		year, _ := strconv.Atoi(fields[3])
 		month := time.Month(month0)
 		if day < 1 || day > greg.DaysIn(month, year) {
-			lineErr(errInvalidDays)
+			lineErr(ErrInvalidDays)
+			continue
 		}
 
 		gregDate := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)

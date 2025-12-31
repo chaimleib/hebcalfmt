@@ -20,7 +20,7 @@ func (e SyntaxError) Error() string {
 func (e SyntaxError) Unwrap() error { return e.Err }
 
 var (
-	errInvalidFormat = errors.New("invalid format")
-	errInvalidMonth  = errors.New("invalid month")
-	errInvalidDays   = errors.New("invalid days")
+	ErrInvalidFormat = errors.New("invalid format")
+	ErrInvalidMonth  = errors.New("invalid month")
+	ErrInvalidDays   = errors.New("invalid days")
 )
