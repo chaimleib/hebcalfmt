@@ -1,5 +1,8 @@
 # hebcalfmt
 
+[![Build Status](https://github.com/chaimleib/hebcalfmt/actions/workflows/go.yml/badge.svg)](https://github.com/chaimleib/hebcalfmt/actions/workflows/go.yml)
+[![GoDoc](https://pkg.go.dev/badge/github.com/chaimleib/hebcalfmt?status.svg)](https://pkg.go.dev/github.com/chaimleib/hebcalfmt)
+
 Formats [hebcal](https://github.com/hebcal/hebcal) information using
 the [Go Template language](https://pkg.go.dev/text/template).
 
