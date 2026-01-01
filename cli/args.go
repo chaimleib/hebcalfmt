@@ -154,7 +154,7 @@ func loadConfigOrDefault(fpath string) (*config.Config, error) {
 		return &defaultCfg, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to load config from %s", fpath)
+		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
 
 	return cfg, nil
