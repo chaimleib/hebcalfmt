@@ -106,6 +106,12 @@ func FromArgs(
 	isHebrewDate bool,
 	now time.Time,
 ) (*DateRange, error) {
+	if now.IsZero() {
+		return nil, errors.New(
+			"daterange.FromArgs: now must not be a zero time",
+		)
+	}
+
 	dr := new(DateRange)
 	dr.Source = Source{
 		Args:         args,
