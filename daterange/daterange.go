@@ -15,12 +15,19 @@ import (
 
 var ErrUnreachable = errors.New("unreachable")
 
+// RangeType marks how long the requested DateRange should be.
+// This is passed to classic hebcal to select calendar lengths
+// of a year, a month, or a day.
 type RangeType int
 
 const (
 	RangeTypeYear RangeType = iota
 	RangeTypeMonth
 	RangeTypeDay
+
+	// RangeTypeToday appears to be identical in behavior to RangeTypeDay.
+	// We provide it to interoperate with hebcal classic,
+	// but its purpose is unknown.
 	RangeTypeToday
 )
 
@@ -39,6 +46,7 @@ func (t RangeType) String() string {
 	}
 }
 
+// Source describes how a [DateRange] was produced.
 type Source struct {
 	Args         []string
 	IsHebrewDate bool
@@ -46,6 +54,9 @@ type Source struct {
 	FromTime     time.Time
 }
 
+// IsZero returns true if the `Now` and `FromTime` fields are both zero.
+// When initialized with [FromArgs] or [FromTime],
+// one of those will be set.
 func (s Source) IsZero() bool {
 	return s.Now.IsZero() && s.FromTime.IsZero()
 }
@@ -76,13 +87,20 @@ func FromTime(t time.Time) *DateRange {
 // FromArgs takes a slice of strings containing a date range spec,
 // and returns the DateRange indicated.
 //
-// If isHebrewDate is false,
-// it will change to true if a Hebrew month is specified.
+// The `args` slice should be in the sequence `[[ month [ day ]] year]`,
+// where `day` and `year` are numeric.
+// `month` must be numeric for Gregorian months,
+// or the name of a Hebrew month.
+// For Adar 1 and 2, do not include any spaces.
+//
+// Even if `isHebrewDate` is false,
+// the result's `IsHebrewDate` will be forced true
+// if a Hebrew month is specified.
 // Otherwise, it will be respected and errors raised
 // if an invalid date for isHebrewDate is provided.
 //
-// now is only used for the calendar date it contains,
-// and only if args is length 0.
+// If `args` is length 0, `now` is used for the calendar date it contains.
+// Regardless, `now` must be non-zero, since it marks the DateRange as non-zero.
 func FromArgs(
 	args []string,
 	isHebrewDate bool,
@@ -296,9 +314,7 @@ func fromGregorianFunc(
 	return hdate.FromGregorian
 }
 
-// Start returns the first day of the DateRange,
-// where DateRange is of RangeType Day, Today, or Month.
-// It is an error to call Start when the DateRange is of RangeType Year.
+// Start returns the first day of the DateRange.
 func (dr DateRange) Start(noJulian bool) hdate.HDate {
 	fromGregorian := fromGregorianFunc(noJulian)
 
@@ -332,9 +348,7 @@ func (dr DateRange) Start(noJulian bool) hdate.HDate {
 	}
 }
 
-// End returns the first day of the DateRange,
-// where DateRange is of RangeType Day, Today, or Month.
-// It is an error to call Start when the DateRange is of RangeType Year.
+// End returns the last day of the DateRange.
 func (dr DateRange) End(noJulian bool) hdate.HDate {
 	fromGregorian := fromGregorianFunc(noJulian)
 
