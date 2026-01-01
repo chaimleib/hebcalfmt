@@ -2,11 +2,14 @@ package config
 
 import "fmt"
 
+// Coordinates holds a latitude-longitude pair.
 type Coordinates struct {
 	Lat float64 `json:"lat"`
 	Lon float64 `json:"lon"`
 }
 
+// Validate returns an error if the `Lat` or `Lon` field is out of bounds,
+// or if the [Coordinates] pair is nil.
 func (c *Coordinates) Validate() error {
 	if c == nil {
 		return nil
