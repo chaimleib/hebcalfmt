@@ -33,14 +33,14 @@ const (
 
 func (t RangeType) String() string {
 	switch t {
-	case RangeTypeDay:
-		return "DAY"
-	case RangeTypeMonth:
-		return "MONTH"
-	case RangeTypeToday:
-		return "TODAY"
 	case RangeTypeYear:
 		return "YEAR"
+	case RangeTypeMonth:
+		return "MONTH"
+	case RangeTypeDay:
+		return "DAY"
+	case RangeTypeToday:
+		return "TODAY"
 	default:
 		return fmt.Sprintf("UNKNOWN(%d)", t)
 	}
