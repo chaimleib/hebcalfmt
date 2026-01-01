@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"log"
 	"log/slog"
-	"os"
 	"strings"
 	"time"
 
@@ -214,7 +213,13 @@ var Default = Config{
 // it then populates `ConfigSource` with `configPath`.
 // NOTE: This does not populate DateRange.
 func FromFile(configPath string) (*Config, error) {
-	f, err := os.Open(configPath)
+	fileSystem, err := DefaultFS()
+	if err != nil {
+		slog.Error("failed to initialize DefaultFS", "error", err)
+		return nil, fmt.Errorf("failed to initialize DefaultFS: %w", err)
+	}
+
+	f, err := fileSystem.Open(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("config file could not be read: %w", err)
 	}
