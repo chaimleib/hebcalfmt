@@ -13,7 +13,8 @@ import (
 	"github.com/hebcal/hdate"
 )
 
-var ErrUnreachable = errors.New("unreachable")
+// ErrUnreachable means that there is a coding defect if returned.
+var ErrUnreachable = errors.New("unreachable code")
 
 // RangeType marks how long the requested DateRange should be.
 // This is passed to classic hebcal to select calendar lengths

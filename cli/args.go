@@ -19,8 +19,8 @@ var (
 	// or a list operation was requested.
 	ErrDone = errors.New("done")
 
-	// ErrUnreachable means that there is a coding defect.
-	ErrUnreachable = errors.New("unreachable")
+	// ErrUnreachable means that there is a coding defect if returned.
+	ErrUnreachable = errors.New("unreachable code")
 
 	// ErrUsage means that CLI arguments were invalid,
 	// and the usage message should be displayed.

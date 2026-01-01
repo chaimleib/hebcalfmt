@@ -22,6 +22,7 @@ import (
 	"github.com/chaimleib/hebcalfmt/hcfiles"
 )
 
+// ErrUnreachable means that there is a coding defect if returned.
 var ErrUnreachable = errors.New("unreachable code")
 
 type Config struct {
