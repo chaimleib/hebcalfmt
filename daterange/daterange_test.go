@@ -17,6 +17,11 @@ func date(y int, m time.Month, d int) time.Time {
 	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
 }
 
+func datePtr(y int, m time.Month, d int) *time.Time {
+	t := date(y, m, d)
+	return &t
+}
+
 // hdatesEqual checks to see if the Day, Month and Year all match.
 // It is needed, because the struct also caches the Rata Die date,
 // and that field may or may not be populated.
@@ -68,7 +73,7 @@ func TestSource_IsZero(t *testing.T) {
 		},
 		{
 			Name:  "with FromTime",
-			Input: daterange.Source{FromTime: date(2025, time.January, 1)},
+			Input: daterange.Source{FromTime: datePtr(2025, time.January, 1)},
 			Want:  false,
 		},
 		{
@@ -101,7 +106,7 @@ func TestDateRange_FromTime(t *testing.T) {
 			Name:  "ok",
 			Input: date(2025, time.May, 2),
 			Want: daterange.DateRange{
-				Source:    daterange.Source{FromTime: date(2025, time.May, 2)},
+				Source:    daterange.Source{FromTime: datePtr(2025, time.May, 2)},
 				RangeType: daterange.RangeTypeDay,
 				Day:       2,
 				GregMonth: time.May,
@@ -112,6 +117,7 @@ func TestDateRange_FromTime(t *testing.T) {
 			Name:  "zero time",
 			Input: time.Time{},
 			Want: daterange.DateRange{
+				Source:    daterange.Source{FromTime: new(time.Time)},
 				RangeType: daterange.RangeTypeDay,
 				Day:       1,
 				GregMonth: time.January,
@@ -580,7 +586,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "basic",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: d},
+				Source:    daterange.Source{FromTime: &d},
 				RangeType: daterange.RangeTypeDay,
 				Day:       d.Day(),
 				GregMonth: d.Month(),
@@ -591,7 +597,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "basic today",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: d},
+				Source:    daterange.Source{FromTime: &d},
 				RangeType: daterange.RangeTypeToday,
 				Day:       d.Day(),
 				GregMonth: d.Month(),
@@ -603,7 +609,7 @@ func TestDateRange_Start(t *testing.T) {
 			Name:     "noJulian",
 			NoJulian: true,
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: d},
+				Source:    daterange.Source{FromTime: &d},
 				RangeType: daterange.RangeTypeDay,
 				Day:       d.Day(),
 				GregMonth: d.Month(),
@@ -614,7 +620,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "Hebrew",
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: d},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &d},
 				RangeType:    daterange.RangeTypeDay,
 				IsHebrewDate: true,
 				Day:          hd.Day(),
@@ -627,7 +633,7 @@ func TestDateRange_Start(t *testing.T) {
 			Name:     "Hebrew noJulian",
 			NoJulian: true,
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: d},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &d},
 				RangeType:    daterange.RangeTypeDay,
 				IsHebrewDate: true,
 				Day:          hd.Day(),
@@ -640,7 +646,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "basic month",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: dMonth},
+				Source:    daterange.Source{FromTime: &dMonth},
 				RangeType: daterange.RangeTypeMonth,
 				GregMonth: dMonth.Month(),
 				Year:      dMonth.Year(),
@@ -650,7 +656,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "basic Hebrew month",
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: dMonth},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &dMonth},
 				IsHebrewDate: true,
 				RangeType:    daterange.RangeTypeMonth,
 				HebMonth:     hMonth.Month(),
@@ -662,7 +668,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "basic year",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: dYear},
+				Source:    daterange.Source{FromTime: &dYear},
 				RangeType: daterange.RangeTypeYear,
 				Year:      dYear.Year(),
 			},
@@ -671,7 +677,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "basic Hebrew year",
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: dYear},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &dYear},
 				IsHebrewDate: true,
 				RangeType:    daterange.RangeTypeYear,
 				Year:         hYear.Year(),
@@ -681,7 +687,7 @@ func TestDateRange_Start(t *testing.T) {
 		{
 			Name: "invalid RangeType",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{IsHebrewDate: true, FromTime: dYear},
+				Source:    daterange.Source{IsHebrewDate: true, FromTime: &dYear},
 				RangeType: daterange.RangeType(-1),
 			},
 			Want: hdate.HDate{},
@@ -764,7 +770,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "basic",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: d},
+				Source:    daterange.Source{FromTime: &d},
 				RangeType: daterange.RangeTypeDay,
 				Day:       d.Day(),
 				GregMonth: d.Month(),
@@ -775,7 +781,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "basic today",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: d},
+				Source:    daterange.Source{FromTime: &d},
 				RangeType: daterange.RangeTypeToday,
 				Day:       d.Day(),
 				GregMonth: d.Month(),
@@ -787,7 +793,7 @@ func TestDateRange_End(t *testing.T) {
 			Name:     "noJulian",
 			NoJulian: true,
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: d},
+				Source:    daterange.Source{FromTime: &d},
 				RangeType: daterange.RangeTypeDay,
 				Day:       d.Day(),
 				GregMonth: d.Month(),
@@ -798,7 +804,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "Hebrew",
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: d},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &d},
 				RangeType:    daterange.RangeTypeDay,
 				IsHebrewDate: true,
 				Day:          hd.Day(),
@@ -811,7 +817,7 @@ func TestDateRange_End(t *testing.T) {
 			Name:     "Hebrew noJulian",
 			NoJulian: true,
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: d},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &d},
 				RangeType:    daterange.RangeTypeDay,
 				IsHebrewDate: true,
 				Day:          hd.Day(),
@@ -824,7 +830,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "basic month",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: dMonth},
+				Source:    daterange.Source{FromTime: &dMonth},
 				RangeType: daterange.RangeTypeMonth,
 				GregMonth: dMonth.Month(),
 				Year:      dMonth.Year(),
@@ -834,7 +840,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "basic Hebrew month",
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: dMonth},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &dMonth},
 				IsHebrewDate: true,
 				RangeType:    daterange.RangeTypeMonth,
 				HebMonth:     hMonth.Month(),
@@ -846,7 +852,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "basic year",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{FromTime: dYear},
+				Source:    daterange.Source{FromTime: &dYear},
 				RangeType: daterange.RangeTypeYear,
 				Year:      dYear.Year(),
 			},
@@ -855,7 +861,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "basic Hebrew year",
 			DR: daterange.DateRange{
-				Source:       daterange.Source{IsHebrewDate: true, FromTime: dYear},
+				Source:       daterange.Source{IsHebrewDate: true, FromTime: &dYear},
 				IsHebrewDate: true,
 				RangeType:    daterange.RangeTypeYear,
 				Year:         hYear.Year(),
@@ -865,7 +871,7 @@ func TestDateRange_End(t *testing.T) {
 		{
 			Name: "invalid RangeType",
 			DR: daterange.DateRange{
-				Source:    daterange.Source{IsHebrewDate: true, FromTime: dYear},
+				Source:    daterange.Source{IsHebrewDate: true, FromTime: &dYear},
 				RangeType: daterange.RangeType(-1),
 			},
 			Want: hdate.HDate{},

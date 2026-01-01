@@ -47,18 +47,20 @@ func (t RangeType) String() string {
 }
 
 // Source describes how a [DateRange] was produced.
+// If it was created with [WithArgs], the `Now` field will be set.
+// If with [FromTime], the `FromTime` field will be non-nil.
 type Source struct {
 	Args         []string
 	IsHebrewDate bool
 	Now          time.Time
-	FromTime     time.Time
+	FromTime     *time.Time
 }
 
 // IsZero returns true if the `Now` and `FromTime` fields are both zero.
 // When initialized with [FromArgs] or [FromTime],
 // one of those will be set.
 func (s Source) IsZero() bool {
-	return s.Now.IsZero() && s.FromTime.IsZero()
+	return s.Now.IsZero() && s.FromTime == nil
 }
 
 type DateRange struct {
@@ -75,7 +77,7 @@ type DateRange struct {
 func FromTime(t time.Time) *DateRange {
 	return &DateRange{
 		Source: Source{
-			FromTime: t,
+			FromTime: &t,
 		},
 		RangeType: RangeTypeDay,
 		Day:       t.Day(),

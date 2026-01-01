@@ -16,8 +16,12 @@ func CheckDateRangeSource(t *testing.T, want, got daterange.Source) {
 		t.Errorf("Source.Now's do not match - want:\n%s\ngot:\n%s",
 			want.Now, got.Now)
 	}
-	if want.FromTime != got.FromTime {
-		t.Errorf("Source.FromTime's do not match - want:\n%s\ngot:\n%s",
+	if (want.FromTime == nil) != (got.FromTime == nil) {
+		t.Errorf("Source.FromTime's nilness do not match - want:\n%s\ngot:\n%s",
+			want.FromTime, got.FromTime)
+	} else if want.FromTime != nil && *want.FromTime != *got.FromTime {
+		// either != nil implies the other != nil b/c of prev test
+		t.Errorf("Source.FromTime's values do not match - want:\n%s\ngot:\n%s",
 			want.FromTime, got.FromTime)
 	}
 
