@@ -163,16 +163,16 @@ to also show the days of the week.
 examples/hebcalClassic.tmpl
 ```tmpl
 {{- range hebcal}}
-{{-   .GetDate.Gregorian.Format "01/02/2006 "}}
+{{-   .GetDate.Gregorian.Format "1/2/2006 "}}
 {{-     .Render $.language}}
 {{  end}}
 ```
 
 ```bash
 $ hebcalfmt examples/hebcalClassic.tmpl
-01/01/2025 Chanukah: 8 Candles
-01/01/2025 Rosh Chodesh Tevet
-01/02/2025 Chanukah: 8th Day
+1/1/2025 Chanukah: 8 Candles
+1/1/2025 Rosh Chodesh Tevet
+1/2/2025 Chanukah: 8th Day
 ...
 12/21/2025 Chanukah: 8 Candles
 12/21/2025 Rosh Chodesh Tevet
@@ -184,22 +184,22 @@ $ hebcalfmt -c <(echo '{"today": true}') examples/hebcalClassic.tmpl
 12/18/2025 Chanukah: 5 Candles
 
 $ hebcalfmt examples/hebcalClassic.tmpl Tishrei 5787
-09/12/2026 Rosh Hashana 5787
-09/13/2026 Rosh Hashana II
-09/14/2026 Tzom Gedaliah
-09/19/2026 Shabbat Shuva
-09/20/2026 Erev Yom Kippur
-09/21/2026 Yom Kippur
-09/25/2026 Erev Sukkot
-09/26/2026 Sukkot I
-09/27/2026 Sukkot II
-09/28/2026 Sukkot III (CH''M)
-09/29/2026 Sukkot IV (CH''M)
-09/30/2026 Sukkot V (CH''M)
-10/01/2026 Sukkot VI (CH''M)
-10/02/2026 Sukkot VII (Hoshana Raba)
-10/03/2026 Shmini Atzeret
-10/04/2026 Simchat Torah
+9/12/2026 Rosh Hashana 5787
+9/13/2026 Rosh Hashana II
+9/14/2026 Tzom Gedaliah
+9/19/2026 Shabbat Shuva
+9/20/2026 Erev Yom Kippur
+9/21/2026 Yom Kippur
+9/25/2026 Erev Sukkot
+9/26/2026 Sukkot I
+9/27/2026 Sukkot II
+9/28/2026 Sukkot III (CH''M)
+9/29/2026 Sukkot IV (CH''M)
+9/30/2026 Sukkot V (CH''M)
+10/1/2026 Sukkot VI (CH''M)
+10/2/2026 Sukkot VII (Hoshana Raba)
+10/3/2026 Shmini Atzeret
+10/4/2026 Simchat Torah
 10/11/2026 Rosh Chodesh Cheshvan
 ```
 
