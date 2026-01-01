@@ -228,21 +228,13 @@ func FromReader(r io.Reader, configPath string) (*Config, error) {
 
 	cfg.ConfigSource = configPath
 
-	// prep for accessing secondary files
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("failed to Getwd: %w", err)
-	}
-	cfg.FS = os.DirFS(cwd)
-
 	return &cfg, nil
 }
 
 // Normalize returns a version of itself with canonicalized values.
 func (c Config) Normalize() (*Config, error) {
 	// work on a copy
-	result0 := c
-	result := &result0
+	result := c
 
 	// Language
 	lang, err := c.normalizeLanguage()
@@ -251,11 +243,11 @@ func (c Config) Normalize() (*Config, error) {
 	}
 	result.Language = lang
 
-	return result, nil
+	return &result, nil
 }
 
 // CalOptions builds a [hebcal.CalOptions] from a [Config].
-func (c Config) CalOptions() (*hebcal.CalOptions, error) {
+func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 	cOpts := new(hebcal.CalOptions)
 
 	cOpts.NoJulian = c.NoJulian
@@ -316,6 +308,15 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	// HavdalahMins default
 	if cOpts.CandleLighting && cOpts.HavdalahDeg == 0 && cOpts.HavdalahMins == 0 {
 		cOpts.HavdalahMins = 72
+	}
+
+	// prep for accessing secondary files
+	if c.FS == nil {
+		c.FS, err = DefaultFS()
+		if err != nil {
+			slog.Error("failed to initialize DefaultFS", "error", err)
+			return nil, fmt.Errorf("failed to initialize DefaultFS: %w", err)
+		}
 	}
 
 	// Read secondary files
