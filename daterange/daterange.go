@@ -56,9 +56,9 @@ type Source struct {
 	FromTime     *time.Time
 }
 
-// IsZero returns true if the `Now` and `FromTime` fields are both zero.
-// When initialized with [FromArgs] or [FromTime],
-// one of those will be set.
+// IsZero returns true if the user did not provide a date besides `Now`
+// to set up the `DateRange`.
+// This can happen if, when run from the CLI, no date was specified.
 func (s Source) IsZero() bool {
 	return s.Now.IsZero() && s.FromTime == nil
 }

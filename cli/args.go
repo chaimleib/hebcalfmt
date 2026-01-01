@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/spf13/pflag"
 
@@ -161,11 +160,18 @@ func loadConfigOrDefault(fpath string) (*config.Config, error) {
 	return cfg, nil
 }
 
-// processArgs takes the args remaining after flags have been removed,
-// and returns the resulting template path and date range.
+// processArgs takes the `args` remaining after flags have been removed,
+// reads certain fields in `cfg`,
+// and returns the resulting template path.
+// It sets cfg.DateRange.
 //
 // If the is a problem with arguments provided,
 // a wrapped [ErrUsage] will be returned.
+//
+// The following fields are read from `cfg`:
+//   - IsHebrewYear
+//   - Now
+//   - Today
 func processArgs(
 	args []string,
 	cfg *config.Config,
@@ -180,26 +186,6 @@ func processArgs(
 		return "", fmt.Errorf("%w: %w", ErrUsage, err)
 	}
 	cfg.DateRange = dr
-
-	// This will be the idea of now for the entire program run.
-	// It uses the computer's timezone for our idea of "now",
-	// rather than the city's timezone.
-	// If a date/time in a different timezone is required,
-	// that function should require a timezone argument,
-	// rather than rely on the timezone embedded in this variable.
-	//
-	// NOTE: Even though this system is less consistent logically,
-	// and, e.g., a computer in Phoenix will use the date in Phoenix
-	// when calculating results for New York where it is already the next day,
-	// this program is written for humans.
-	// Humans would get confused if, e.g.,
-	// results for Jan. 1 next year get generated
-	// when for them it is still Dec. 31, and they didn't specify the date:
-	//   hebcalfmt examples/hebcalClassic.tmpl
-	// For those wanting full consistency, they should specify a timezone
-	// in the template or on the CLI. For example:
-	//   TZ=America/New_York hebcalfmt examples/hebcalClassic.tmpl
-	cfg.Now = time.Now()
 
 	if cfg.Today && cfg.DateRange.Source.IsZero() {
 		cfg.DateRange = daterange.FromTime(cfg.Now)
