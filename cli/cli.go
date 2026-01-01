@@ -46,6 +46,13 @@ func Run() int {
 
 	fs := NewFlags()
 	cfg, err := processFlags(fs, os.Args[1:])
+	if errors.Is(err, ErrDone) {
+		return 0
+	}
+	if err != nil {
+		log.Println(err)
+		return 1
+	}
 
 	// cfg.Now will be the idea of now for the entire program run.
 	// It uses the computer's timezone for our idea of "now",
@@ -66,14 +73,6 @@ func Run() int {
 	// in the template or on the CLI. For example:
 	//   TZ=America/New_York hebcalfmt examples/hebcalClassic.tmpl
 	cfg.Now = time.Now()
-
-	if errors.Is(err, ErrDone) {
-		return 0
-	}
-	if err != nil {
-		log.Println(err)
-		return 1
-	}
 
 	tmplPath, err := processArgs(fs.Args(), cfg)
 	if errors.Is(err, ErrUsage) {
