@@ -25,12 +25,16 @@ import (
 // ErrUnreachable means that there is a coding defect if returned.
 var ErrUnreachable = errors.New("unreachable code")
 
+// Config defines the format of the config.json file.
+// It also stores program values generated at runtime;
+// these are annotated with `json:"-"`
+// to distinguish them from other fields expected in the JSON.
 type Config struct {
 	// ConfigSource names the file which produced this struct.
 	ConfigSource string `json:"-"`
 
 	// DateRange specifies the span of the calendrical data
-	// which Hebcal classic should produce.
+	// which hebcal should produce.
 	// This normally gets parsed from CLI arguments.
 	DateRange *daterange.DateRange `json:"-"`
 
@@ -41,7 +45,7 @@ type Config struct {
 	// FS controls where secondary files are loaded from.
 	// If replaced, it can allow access to internet-hosted files
 	// compiled-in resources, or stubbing out the default FS for testing.
-	// If nil, use os.DirFS() starting from the current working directory.
+	// If nil, use [os.DirFS] starting from the current working directory.
 	FS fs.FS `json:"-"`
 
 	// Language sets the output language.
@@ -50,11 +54,12 @@ type Config struct {
 	Language string `json:"language"`
 
 	// City sets geographical coordinates and a timezone for zmanim.
+	// Available options are in [zmanim.AllCities].
+	//
 	// If no such city is in the internal database, we will error
-	// unless Geo and TimeZoneID are both set.
-	// If those are set, City will have a user-defined name for the city.
-	// Available options are in zmanim.AllCities().
-	// Default: New York
+	// unless `Geo` and `Timezone` are both set.
+	// If those are set, `City` will be used as the name for the city.
+	// Default: [DefaultCity]
 	City string `json:"city"`
 
 	// Geo specifies geographic coordinates for calculating zmanim.
@@ -71,12 +76,12 @@ type Config struct {
 	// Shiurim lists daily learning schedules to be displayed.
 	// Avalable options:
 	//
-	// - daf-yomi
-	// - mishna-yomi
-	// - nach-yomi
-	// - yerushalmi (defaults to Vilna edition)
-	// - yerushalmi:vilna
-	// - yerushalmi:schottenstein
+	// - `daf-yomi`
+	// - `mishna-yomi`
+	// - `nach-yomi`
+	// - `yerushalmi` (defaults to Vilna edition)
+	// - `yerushalmi:vilna`
+	// - `yerushalmi:schottenstein`
 	Shiurim []string `json:"shiurim"`
 
 	// Today makes the hebcal calendar functions only list information
@@ -197,13 +202,16 @@ type Config struct {
 	YahrzeitsFile string `json:"yahrzeits_file"`
 }
 
+// Default holds the default values for [Config].
+// It imitates hebcal.
 var Default = Config{
 	CandleLightingMins: 18,
 	NumYears:           1,
 }
 
-// FromFile parses configPath into a config as JSON.
-// For the sake of debugging, it then populates ConfigSource with configPath.
+// FromFile parses the file at `configPath` into a [Config] as JSON.
+// For the sake of debugging,
+// it then populates `ConfigSource` with `configPath`.
 // NOTE: This does not populate DateRange.
 func FromFile(configPath string) (*Config, error) {
 	f, err := os.Open(configPath)
@@ -215,8 +223,9 @@ func FromFile(configPath string) (*Config, error) {
 	return FromReader(f, configPath)
 }
 
-// FromReader parses the io.Reader into a config as JSON.
-// For the sake of debugging, it then populates ConfigSource with configPath.
+// FromReader parses an [io.Reader] into a [Config] as JSON.
+// For the sake of debugging,
+// it then populates `ConfigSource` with `configPath`.
 func FromReader(r io.Reader, configPath string) (*Config, error) {
 	cfg := Default
 	if err := json.NewDecoder(r).Decode(&cfg); err != nil {
@@ -233,12 +242,16 @@ func FromReader(r io.Reader, configPath string) (*Config, error) {
 }
 
 // Normalize returns a version of itself with canonicalized values.
+//
+// # `Language`
+// An error gets returned if the selected `Language` is unknown.
+// Otherwise, it defaults the `Language` field if unset or lowercases it,
 func (c Config) Normalize() (*Config, error) {
 	// work on a copy
 	result := c
 
 	// Language
-	lang, err := c.normalizeLanguage()
+	lang, err := NormalizeLanguage(c.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -287,23 +300,23 @@ func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 		cOpts.CandleLighting = true
 	}
 
-	if err := c.setDateRange(cOpts); err != nil {
+	if err := c.SetDateRange(cOpts); err != nil {
 		return nil, err
 	}
 
 	// YerushalmiYomi, YershushalmiEdition, MishnaYomi, DafYomi, NachYomi
-	if err := c.setShiurim(cOpts, c.Shiurim); err != nil {
+	if err := SetShiurim(cOpts, c.Shiurim); err != nil {
 		return nil, err
 	}
 
 	// AddHebrewDates, Omer, IsHebrewYear
 	if c.Today {
-		c.setToday(cOpts)
+		SetToday(cOpts)
 	}
 
 	// Mask
 	if c.ChagOnly {
-		c.setChagOnly(cOpts)
+		SetChagOnly(cOpts)
 	}
 
 	// HavdalahMins default
@@ -322,7 +335,7 @@ func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 
 	// Read secondary files
 	// UserEvents
-	err = parseFile(
+	err = ParseFile(
 		c.FS,
 		c.EventsFile,
 		hcfiles.ParseEvents,
@@ -333,7 +346,7 @@ func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 	}
 
 	// Yahrzeits
-	err = parseFile(
+	err = ParseFile(
 		c.FS,
 		c.YahrzeitsFile,
 		hcfiles.ParseYahrzeits,
@@ -346,7 +359,19 @@ func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 	return cOpts, nil
 }
 
-func (c Config) setDateRange(cOpts *hebcal.CalOptions) error {
+// SetDateRange validates the `DateRange` of the [Config].
+// If it is valid and consistent with the rest of the Config,
+// it gets copied to the [hebcal.CalOptions],
+// along with other hebcal-like settings corresponding to the `DateRange`.
+// If it is unset, a default is set on the [hebcal.CalOptions],
+// imitating hebcal.
+//
+// It reads the following fields from the Config:
+//   - `DateRange`
+//   - `Now`
+//   - `NumYears`
+//   - `Today`
+func (c Config) SetDateRange(cOpts *hebcal.CalOptions) error {
 	dr := c.DateRange
 
 	if dr == nil {
@@ -452,7 +477,16 @@ func (c Config) setDateRange(cOpts *hebcal.CalOptions) error {
 	return nil
 }
 
-func (c Config) setShiurim(cOpts *hebcal.CalOptions, shiurim []string) error {
+// SetShiurim reads `shiurim`
+// and sets the appropriate options on the [hebcal.CalOptions].
+//
+// Available shiurim values permitted in the list:
+//   - `yerushalmi` `yerushalmi:vilna`
+//   - `yerushalmi:schottenstein`
+//   - `mishna-yomi`
+//   - `daf-yomi`
+//   - `nach-yomi`
+func SetShiurim(cOpts *hebcal.CalOptions, shiurim []string) error {
 	var unknowns []string
 	for _, shiur := range shiurim {
 		switch shiur {
@@ -480,12 +514,15 @@ func (c Config) setShiurim(cOpts *hebcal.CalOptions, shiurim []string) error {
 	return nil
 }
 
-// normalizeLanguage checks that Language is known and returns its lowercase.
-func (c Config) normalizeLanguage() (string, error) {
-	lang := strings.ToLower(c.Language)
-	switch lang {
+// NormalizeLanguage checks that `language` is equal to some known language
+// under case folding, and returns the canonical form from [locales.AllLocales].
+// If language is empty, we return the default language `"en"`.
+// If no valid value is recognized, we return an error.
+func NormalizeLanguage(language string) (string, error) {
+	result := strings.ToLower(language)
+	switch result {
 	case "", "en":
-		break
+		result = "en"
 
 	default:
 		// Some language codes have capitals, like "he-x-NoNikud",
@@ -494,36 +531,44 @@ func (c Config) normalizeLanguage() (string, error) {
 		for _, l := range locales.AllLocales {
 			foldMap[strings.ToLower(l)] = l
 		}
-		canonical, ok := foldMap[lang]
+		canonical, ok := foldMap[result]
 		if !ok {
-			log.Printf("unknown language: %q", c.Language)
+			log.Printf("unknown language: %q", language)
 			log.Println("To show the available languages, run")
 			log.Println("  hebcalfmt --info languages")
-			return "", fmt.Errorf("unknown language: %q", c.Language)
+			return "", fmt.Errorf("unknown language: %q", language)
 		}
-		lang = canonical
+		result = canonical
 	}
 
-	return lang, nil
+	return result, nil
 }
 
 // Location builds data with which to calculate zmanim.
 //
-// If Geo and Timezone are set and valid,
+// If `Geo` and `Timezone` are set and valid,
 // we build a new [zmanim.Location] entry from them.
-// Its CountryCode will be "IL" if IL is set, otherwise "ZZ".
-// If City is also set, we use that as the name,
-// otherwise we will use "User Defined City" like in original hebcal.
+// Its `CountryCode` will be "IL" if `IL` is set, otherwise "ZZ".
+// If `City` is also set, we use that as the name,
+// otherwise we will use "User Defined City" like in hebcal.
 //
-// If City is set and valid, we return its [zmanim.Location] entry.
-// If Timezone is also set and valid,
+// If `City` is set and valid, we return its [zmanim.Location] entry.
+// If `Timezone` is also set and valid,
 // we override the timezone for that city with the one provided,
 // and note the timezone modification as a suffix to its Name.
 //
-// If no Geo or City is set,
-// but CandleLighting, SunriseSunset, or DailyZmanim is set,
-// use New York as the default city, like in classic hebcal.
-func (c *Config) Location() (*zmanim.Location, error) {
+// If no `Geo` or `City` is set,
+// use the [DefaultCity], like in hebcal.
+//
+// The result of this method affects the output of hebcal functions when, e.g.,
+// `CandleLighting`, `SunriseSunset`, or `DailyZmanim` is set.
+//
+// The following fields are read from the Config:
+//   - `City`
+//   - `Geo`
+//   - `IL`
+//   - `Timezone`
+func (c Config) Location() (*zmanim.Location, error) {
 	if c.Timezone != "" {
 		if _, err := time.LoadLocation(c.Timezone); err != nil {
 			return nil, err
@@ -582,18 +627,28 @@ func (c *Config) Location() (*zmanim.Location, error) {
 	return loc, nil
 }
 
-func (c Config) setToday(cOpts *hebcal.CalOptions) {
+// SetToday sets options on [hebcal.CalOptions]
+// which hebcal itself would have set
+// if the -T (--today) flag were set on its CLI,
+// aside from what [(Config).SetDateRange] does already.
+func SetToday(cOpts *hebcal.CalOptions) {
 	cOpts.AddHebrewDates = true
 	cOpts.Omer = true
 	cOpts.IsHebrewYear = false
 }
 
-func (c Config) setChagOnly(cOpts *hebcal.CalOptions) {
+// SetChagOnly sets options on [hebcal.CalOptions]
+// which hebcal itself would have set
+// if the --chag-only flag were set on its CLI.
+// This limits hebcal's output to days when melacha is prohibited.
+func SetChagOnly(cOpts *hebcal.CalOptions) {
 	cOpts.Mask = event.CHAG | event.LIGHT_CANDLES |
 		event.LIGHT_CANDLES_TZEIS | event.YOM_TOV_ENDS
 }
 
-func parseFile[T any](
+// ParseFile opens `fpath` from `fs`, calls `parse` on the file,
+// and saves the result to `target`.
+func ParseFile[T any](
 	fs fs.FS,
 	fpath string,
 	parse func(io.Reader, string) (T, error),
