@@ -12,13 +12,17 @@ import (
 	"github.com/chaimleib/hebcalfmt/templating"
 )
 
+// ProgName affects the messages we display and the default config file path.
 var ProgName = "hebcalfmt"
 
+// InitLogging sets up log and slog for program-wide use.
+// By default, we set log to simply output to stderr with no special formatting.
+// slog is configured to for JSON output with source line numbers.
+//
+// If you replace InitLogging, keep in mind that hebcalfmt uses
+// log for ordinary errors, likely caused externally.
+// slog is for internal errors, likely indicating a bug in hebcalfmt.
 var InitLogging = func() {
-	// slog is for identifying code defects in hebcalfmt or its imports.
-	// I want source file names, line numbers, and probably values to be logged.
-	// In this case, dev-friendliness is more important than user-friendliness.
-	// Hence JSON format.
 	slogger := slog.New(slog.NewJSONHandler(
 		os.Stderr,
 		&slog.HandlerOptions{
@@ -34,6 +38,8 @@ var InitLogging = func() {
 	log.Default().SetPrefix("")
 }
 
+// Run is the entry point for CLI program.
+// It parses CLI flags and arguments and returns an exit code.
 func Run() int {
 	InitLogging()
 

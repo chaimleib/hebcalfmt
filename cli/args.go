@@ -20,14 +20,16 @@ var (
 	// or a list operation was requested.
 	ErrDone = errors.New("done")
 
-	// ErrUnreachableCode means that there is a coding defect.
-	ErrUnreachableCode = errors.New("unreachable code")
+	// ErrUnreachable means that there is a coding defect.
+	ErrUnreachable = errors.New("unreachable")
 
 	// ErrUsage means that CLI arguments were invalid,
 	// and the usage message should be displayed.
 	ErrUsage = errors.New("usage error")
 )
 
+// NewFlags returns a [pflag.FlagSet] configured with the flags
+// used by hebcalfmt.
 func NewFlags() *pflag.FlagSet {
 	fs := pflag.NewFlagSet(ProgName, pflag.ContinueOnError)
 	// opt.SetParameters("[[ month [ day ]] year]")
@@ -71,7 +73,7 @@ func processFlags(
 	if err != nil {
 		slog.Error("failed to get --help flag", "error", err)
 		return nil, fmt.
-			Errorf("%w: get --help: %w", ErrUnreachableCode, err)
+			Errorf("%w: get --help: %w", ErrUnreachable, err)
 	}
 	if help {
 		fmt.Println(usage(fs))
@@ -81,7 +83,7 @@ func processFlags(
 	version, err := fs.GetBool("version")
 	if err != nil {
 		slog.Error("failed to get --version flag", "error", err)
-		return nil, fmt.Errorf("%w: get --version: %w", ErrUnreachableCode, err)
+		return nil, fmt.Errorf("%w: get --version: %w", ErrUnreachable, err)
 	}
 	if version {
 		fmt.Println(versionMessage())
@@ -91,7 +93,7 @@ func processFlags(
 	key, err := fs.GetString("info")
 	if err != nil {
 		slog.Error("failed to get --info option", "error", err)
-		return nil, fmt.Errorf("%w: get --info: %w", ErrUnreachableCode, err)
+		return nil, fmt.Errorf("%w: get --info: %w", ErrUnreachable, err)
 	}
 	if key != "" {
 		info, err := infoString(key, fs)
@@ -105,11 +107,15 @@ func processFlags(
 	return loadConfigFromFlags(fs)
 }
 
+// loadConfigFromFlags reads the --config flag option
+// and loads the config file specified.
+// Otherwise, it loads the default config.
+// Then it calls Normalize on the result.
 func loadConfigFromFlags(fs *pflag.FlagSet) (*config.Config, error) {
 	fpath, err := fs.GetString("config")
 	if err != nil {
 		slog.Error("failed to get --config option", "error", err)
-		return nil, fmt.Errorf("%w: get --config: %w", ErrUnreachableCode, err)
+		return nil, fmt.Errorf("%w: get --config: %w", ErrUnreachable, err)
 	}
 
 	cfg, err := loadConfigOrDefault(fpath)
@@ -128,8 +134,8 @@ func loadConfigFromFlags(fs *pflag.FlagSet) (*config.Config, error) {
 // loadConfigOrDefault reads fpath if not empty.
 // It will error if fpath does not exist.
 //
-// If fpath is empty, default to loading from ~/.config/<ProgName>/config.json,
-// but if that file is not present, return an empty config with no error.
+// If fpath is empty, default to loading from ~/.config/hebcalfmt/config.json,
+// but if that file is not present, return config.Default with no error.
 func loadConfigOrDefault(fpath string) (*config.Config, error) {
 	var suppressMissingConfigErr bool
 
