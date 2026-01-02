@@ -175,7 +175,7 @@ Hebrew: 25 Kislev 5786
 
 This example emulates the classic hebcal program,
 while exposing some internals for you to customize, if you wish.
-For example, you could change the date format to "Mon, 01/02/2025"
+For example, you could change the date format to "Mon, 01/02/2006"
 to also show the days of the week.
 
 examples/hebcalClassic.tmpl
