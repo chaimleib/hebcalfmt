@@ -628,16 +628,16 @@ func (c Config) Location() (*zmanim.Location, error) {
 	if loc == nil {
 		log.Printf("unknown city: %q", c.City)
 		log.Println(
-			"Use a nearby city; or set geo.lat, geo.lon, and timezone.",
-			"To show available cities, run:",
-			"  hebcalfmt --info cities",
+			"Use a nearby city; or add geo.lat, geo.lon, and timezone.",
 		)
+		log.Println("To show available cities, run:")
+		log.Println("  hebcalfmt --info cities")
 		return nil, fmt.Errorf("unknown city: %q", c.City)
 	}
 
 	if loc.TimeZoneId != c.Timezone && c.Timezone != "" {
 		loc.TimeZoneId = c.Timezone
-		loc.Name = fmt.Sprintf("%s (times in timezone %s)", c.City, c.Timezone)
+		loc.Name = fmt.Sprintf("%s (times in timezone %s)", city, c.Timezone)
 	}
 
 	return loc, nil
