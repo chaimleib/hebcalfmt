@@ -532,6 +532,26 @@ func TestCalOptions(t *testing.T) {
 			FailFS: true,
 			Err:    "failed to initialize DefaultFS: test forced failure to init FS",
 		},
+		{
+			Name: "invalid yahrzeit file",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.YahrzeitsFile = "nonexistent.txt"
+				cfg.FS = files
+				return cfg
+			}(),
+			Err: "open nonexistent.txt: file does not exist",
+		},
+		{
+			Name: "invalid event file",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.EventsFile = "nonexistent.txt"
+				cfg.FS = files
+				return cfg
+			}(),
+			Err: "open nonexistent.txt: file does not exist",
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
