@@ -1,6 +1,7 @@
 # hebcalfmt
 
 [![Build Status](https://github.com/chaimleib/hebcalfmt/actions/workflows/go.yml/badge.svg)](https://github.com/chaimleib/hebcalfmt/actions/workflows/go.yml)
+[![coverage](https://raw.githubusercontent.com/chaimleib/hebcalfmt/badges/.badges/master/coverage.svg)](https://raw.githubusercontent.com/chaimleib/hebcalfmt/badges/.badges/master/treemap.svg)
 [![GoDoc](https://pkg.go.dev/badge/github.com/chaimleib/hebcalfmt?status.svg)](https://pkg.go.dev/github.com/chaimleib/hebcalfmt)
 
 Formats [hebcal](https://github.com/hebcal/hebcal) information using

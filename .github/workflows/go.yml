@@ -7,13 +7,47 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+
       - name: Setup Go from go.mod
         uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+
       - run: go version
+
       - run: |
           go test -race -timeout 15s \
-            -coverprofile coverage.out \
+            -coverprofile /tmp/coverage.out \
             ./...
-          
+
+      - name: Coverage treemap
+        run: |
+          go run github.com/nikolaydubina/go-cover-treemap@latest \
+            -percent \
+            -coverprofile /tmp/coverage.out > /tmp/treemap.svg
+
+      - name: Checkout badges
+        uses: actions/checkout@v6
+        with:
+          ref: badges
+
+      - name: Push treemap
+        run: |
+          mkdir -p .badges/${GITHUB_REF_NAME}
+          mv -v /tmp/treemap.svg .badges/${GITHUB_REF_NAME}/treemap.svg
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .badges/
+          git commit -m "treemap: ${GITHUB_REF_NAME} @ ${GITHUB_SHA}" && \
+            git push || true
+
+      - uses: actions/checkout@v6
+
+      - run: mv -v /tmp/coverage.out .
+
+      - name: Coverage badge
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          profile: coverage.out
+          git-token: ${{ github.ref_name == 'master' && secrets.GITHUB_TOKEN || '' }}
+          git-branch: badges
