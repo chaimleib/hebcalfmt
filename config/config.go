@@ -373,6 +373,7 @@ func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 //
 // It reads the following fields from the Config:
 //   - `DateRange`
+//   - `NoJulian`
 //   - `Now`
 //   - `NumYears`
 //   - `Today`
@@ -385,6 +386,10 @@ func (c Config) SetDateRange(cOpts *hebcal.CalOptions) error {
 	}
 
 	cOpts.IsHebrewYear = dr.IsHebrewDate
+
+	if c.NumYears < 1 {
+		return fmt.Errorf("invalid num_years: %d", c.NumYears)
+	}
 
 	if c.NumYears != 1 && dr.RangeType != daterange.RangeTypeYear {
 		return fmt.Errorf(
@@ -458,7 +463,7 @@ func (c Config) SetDateRange(cOpts *hebcal.CalOptions) error {
 
 	// Actually set up the DateRange on the CalOptions.
 	switch dr.RangeType {
-	case daterange.RangeTypeDay:
+	case daterange.RangeTypeDay, daterange.RangeTypeToday:
 		cOpts.AddHebrewDates = true
 		cOpts.Start = dr.Start(c.NoJulian)
 		cOpts.End = cOpts.Start
@@ -469,14 +474,6 @@ func (c Config) SetDateRange(cOpts *hebcal.CalOptions) error {
 
 	case daterange.RangeTypeYear:
 		cOpts.Year = dr.Year
-
-	default:
-		slog.Error("invalid RangeType value", "rangeType", dr.RangeType)
-		return fmt.Errorf(
-			"%w: invalid RangeType value: %v",
-			ErrUnreachable,
-			dr.RangeType,
-		)
 	}
 
 	return nil
