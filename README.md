@@ -230,10 +230,10 @@ examples/events.json
 
 ```bash
 $ hebcalfmt -c examples/events.json examples/hebcalClassic.tmpl 9 1968
-09/24/1968 2nd of Tishrei, 5729
-09/24/1968 Birthday - Ben Ploni (5713)
-09/26/1968 4th of Tishrei, 5729
-09/26/1968 Yahrzeit - Joe Shmo
+9/24/1968 2nd of Tishrei, 5729
+9/24/1968 Birthday - Ben Ploni (5713)
+9/26/1968 4th of Tishrei, 5729
+9/26/1968 Yahrzeit - Joe Shmo
 ```
 
 ## Example: Calculate Mincha times
