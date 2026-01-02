@@ -194,3 +194,65 @@ func TestFromReader(t *testing.T) {
 		})
 	}
 }
+
+func TestNormalize(t *testing.T) {
+	baseWant := func() *config.Config {
+		cfg := config.Default
+		return &cfg
+	}
+
+	cases := []struct {
+		Name string
+		Cfg  *config.Config
+		Want *config.Config
+		Err  string
+		Log  string
+	}{
+		{
+			Name: "empty",
+			Cfg:  new(config.Config),
+			Want: &config.Config{Language: "en"},
+		},
+		{
+			Name: "base config",
+			Cfg:  baseWant(),
+			Want: func() *config.Config {
+				cfg := baseWant()
+				cfg.Language = "en"
+				return cfg
+			}(),
+		},
+		{
+			Name: "language en",
+			Cfg:  &config.Config{Language: "en"},
+			Want: &config.Config{Language: "en"},
+		},
+		{
+			Name: "language ASHKENAZI",
+			Cfg:  &config.Config{Language: "ASHKENAZI"},
+			Want: &config.Config{Language: "ashkenazi"},
+		},
+		{
+			Name: "language invalid",
+			Cfg:  &config.Config{Language: "invalid"},
+			Want: nil,
+			Err:  `unknown language: "invalid"`,
+			Log: strings.TrimSpace(`
+unknown language: "invalid"
+To show the available languages, run
+  hebcalfmt --info languages
+			`),
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			buf := test.TestLogger(t)
+			got, err := c.Cfg.Normalize()
+			test.CheckErr(t, err, c.Err)
+			checkConfig(t, c.Want, got)
+			if c.Log != strings.TrimSpace(buf.String()) {
+				t.Errorf("want logs:\n%s\ngot logs:\n%s", c.Log, buf)
+			}
+		})
+	}
+}
