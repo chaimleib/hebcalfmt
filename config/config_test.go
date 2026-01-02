@@ -3,13 +3,22 @@ package config_test
 import (
 	"errors"
 	"io/fs"
+	"slices"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/hebcal/hdate"
+	"github.com/hebcal/hebcal-go/hebcal"
 
 	"github.com/chaimleib/hebcalfmt/config"
 	"github.com/chaimleib/hebcalfmt/daterange"
 	"github.com/chaimleib/hebcalfmt/test"
 )
+
+func date(y int, m time.Month, d int) time.Time {
+	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+}
 
 func checkConfig(t *testing.T, want, got *config.Config) {
 	t.Helper()
@@ -20,7 +29,6 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 		return
 	}
 
-fields:
 	for _, field := range []struct {
 		Name      string
 		Want, Got any
@@ -33,7 +41,7 @@ fields:
 		{"City", want.City, got.City},
 		{"Geo", want.Geo, got.Geo},
 		{"Timezone", want.Timezone, got.Timezone},
-		// {"Shiurim", want.Shiurim, got.Shiurim}, // TODO: compare string slices
+		{"Shiurim", want.Shiurim, got.Shiurim},
 		{"Today", want.Today, got.Today},
 		{"ChagOnly", want.ChagOnly, got.ChagOnly},
 		{"NoJulian", want.NoJulian, got.NoJulian},
@@ -64,23 +72,108 @@ fields:
 		{"EventsFile", want.EventsFile, got.EventsFile},
 		{"YahrzeitsFile", want.YahrzeitsFile, got.YahrzeitsFile},
 	} {
-		if field.Want != field.Got {
-			switch typedWant := field.Want.(type) {
-			case *daterange.DateRange:
-				if typedWant != nil && field.Got != nil {
-					typedGot := field.Got.(*daterange.DateRange)
-					test.CheckDateRange(t, *typedWant, *typedGot)
-					continue fields
-				}
+		switch typedWant := field.Want.(type) {
+		case *daterange.DateRange:
+			if typedWant != nil && field.Got != nil {
+				typedGot := field.Got.(*daterange.DateRange)
+				test.CheckDateRange(t, *typedWant, *typedGot)
+			}
 
-			case *config.Coordinates:
-				if typedWant != nil && field.Got != nil {
-					typedGot := field.Got.(*config.Coordinates)
-					test.CheckCoordinates(t, typedWant, typedGot)
-					continue fields
-				}
+		case *config.Coordinates:
+			if typedWant != nil && field.Got != nil {
+				typedGot := field.Got.(*config.Coordinates)
+				test.CheckCoordinates(t, typedWant, typedGot)
+			}
 
-			default:
+		case []string:
+			typedGot := field.Got.([]string)
+			if !slices.Equal(typedWant, typedGot) {
+				t.Errorf("%s's do not match - want:\n%v\ngot:\n%v",
+					field.Name, field.Want, field.Got)
+			}
+
+		default:
+			if field.Want != field.Got {
+				t.Errorf("%s's do not match - want:\n%v\ngot:\n%v",
+					field.Name, field.Want, field.Got)
+			}
+		}
+	}
+}
+
+func checkCalOptions(t *testing.T, want, got *hebcal.CalOptions) {
+	t.Helper()
+	if want == nil {
+		if got != nil {
+			t.Errorf("expected nil, got: %#v", got)
+		}
+		return
+	}
+
+	for _, field := range []struct {
+		Name      string
+		Want, Got any
+	}{
+		{"Location", want.Location, got.Location},
+		{"Year", want.Year, got.Year},
+		{"IsHebrewYear", want.IsHebrewYear, got.IsHebrewYear},
+		{"NoJulian", want.NoJulian, got.NoJulian},
+		{"Month", want.Month, got.Month},
+		{"NumYears", want.NumYears, got.NumYears},
+		{"Start", want.Start, got.Start},
+		{"End", want.End, got.End},
+		{"CandleLighting", want.CandleLighting, got.CandleLighting},
+		{"CandleLightingMins", want.CandleLightingMins, got.CandleLightingMins},
+		{"HavdalahMins", want.HavdalahMins, got.HavdalahMins},
+		{"HavdalahDeg", want.HavdalahDeg, got.HavdalahDeg},
+		{"Sedrot", want.Sedrot, got.Sedrot},
+		{"IL", want.IL, got.IL},
+		{"NoMinorFast", want.NoMinorFast, got.NoMinorFast},
+		{"NoModern", want.NoModern, got.NoModern},
+		{"NoRoshChodesh", want.NoRoshChodesh, got.NoRoshChodesh},
+		{"ShabbatMevarchim", want.ShabbatMevarchim, got.ShabbatMevarchim},
+		{"NoSpecialShabbat", want.NoSpecialShabbat, got.NoSpecialShabbat},
+		{"NoHolidays", want.NoHolidays, got.NoHolidays},
+		{"DafYomi", want.DafYomi, got.DafYomi},
+		{"MishnaYomi", want.MishnaYomi, got.MishnaYomi},
+		{"YerushalmiYomi", want.YerushalmiYomi, got.YerushalmiYomi},
+		{"NachYomi", want.NachYomi, got.NachYomi},
+		{"YerushalmiEdition", want.YerushalmiEdition, got.YerushalmiEdition},
+		{"Omer", want.Omer, got.Omer},
+		{"Molad", want.Molad, got.Molad},
+		{"AddHebrewDates", want.AddHebrewDates, got.AddHebrewDates},
+		{"AddHebrewDatesForEvents", want.AddHebrewDatesForEvents, got.AddHebrewDatesForEvents},
+		{"Mask", want.Mask, got.Mask},
+		{"YomKippurKatan", want.YomKippurKatan, got.YomKippurKatan},
+		{"Hour24", want.Hour24, got.Hour24},
+		{"SunriseSunset", want.SunriseSunset, got.SunriseSunset},
+		{"DailyZmanim", want.DailyZmanim, got.DailyZmanim},
+		{"Yahrzeits", want.Yahrzeits, got.Yahrzeits},
+		{"UserEvents", want.UserEvents, got.UserEvents},
+		{"WeeklyAbbreviated", want.WeeklyAbbreviated, got.WeeklyAbbreviated},
+		{"DailySedra", want.DailySedra, got.DailySedra},
+	} {
+		switch typedWant := field.Want.(type) {
+		case []hebcal.UserYahrzeit:
+			typedGot := field.Got.([]hebcal.UserYahrzeit)
+			if !slices.Equal(typedWant, typedGot) {
+				t.Errorf("%s's do not match - want:\n%v\ngot:\n%v",
+					field.Name, field.Want, field.Got)
+			}
+
+		case []hebcal.UserEvent:
+			typedGot := field.Got.([]hebcal.UserEvent)
+			if !slices.Equal(typedWant, typedGot) {
+				t.Errorf("%s's do not match - want:\n%v\ngot:\n%v",
+					field.Name, field.Want, field.Got)
+			}
+
+		case hdate.HDate:
+			typedGot := field.Got.(hdate.HDate)
+			test.CheckHDate(t, field.Name, typedWant, typedGot)
+
+		default:
+			if field.Want != field.Got {
 				t.Errorf("%s's do not match - want:\n%v\ngot:\n%v",
 					field.Name, field.Want, field.Got)
 			}
@@ -138,6 +231,8 @@ func TestFromFile(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
+			test.TestSlogger(t)
+			test.TestLogger(t)
 			if c.FSErr != nil {
 				old := config.DefaultFS
 				t.Cleanup(func() {
@@ -252,6 +347,299 @@ To show the available languages, run
 			checkConfig(t, c.Want, got)
 			if c.Log != strings.TrimSpace(buf.String()) {
 				t.Errorf("want logs:\n%s\ngot logs:\n%s", c.Log, buf)
+			}
+		})
+	}
+}
+
+func TestSetDateRange(t *testing.T) {
+	now := date(2026, 5, 2)
+	cases := []struct {
+		Name string
+		Cfg  *config.Config
+		Want *hebcal.CalOptions
+		Err  string
+	}{
+		{Name: "empty", Cfg: new(config.Config), Want: &hebcal.CalOptions{Year: 1}},
+
+		{
+			Name: "DateRange of today",
+			Cfg: &config.Config{
+				Today:    true,
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Now: now},
+					RangeType: daterange.RangeTypeToday,
+					Year:      2026,
+					GregMonth: time.May,
+					Day:       2,
+				},
+			},
+			Want: &hebcal.CalOptions{
+				Start:          hdate.New(5786, hdate.Iyyar, 15),
+				End:            hdate.New(5786, hdate.Iyyar, 15),
+				AddHebrewDates: true,
+			},
+		},
+
+		{
+			Name: "DateRange of Gregorian year",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Now: now},
+					RangeType: daterange.RangeTypeYear,
+					Year:      2026,
+				},
+			},
+			Want: &hebcal.CalOptions{Year: 2026},
+		},
+		{
+			Name: "DateRange of Gregorian month",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Args: []string{"2", "2030"}, Now: now},
+					RangeType: daterange.RangeTypeMonth,
+					Year:      2030,
+					GregMonth: time.February,
+				},
+			},
+			Want: &hebcal.CalOptions{
+				Start: hdate.New(5790, hdate.Shvat, 28),
+				End:   hdate.New(5790, hdate.Adar1, 25),
+			},
+		},
+		{
+			Name: "DateRange of Gregorian day",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source: daterange.Source{
+						Args: []string{"2", "29", "2032"},
+						Now:  now,
+					},
+					RangeType: daterange.RangeTypeDay,
+					Year:      2032,
+					GregMonth: time.February,
+					Day:       29,
+				},
+			},
+			Want: &hebcal.CalOptions{
+				Start:          hdate.New(5792, hdate.Adar1, 17),
+				End:            hdate.New(5792, hdate.Adar1, 17),
+				AddHebrewDates: true,
+			},
+		},
+
+		{
+			Name: "DateRange of Hebrew year",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:       daterange.Source{Now: now},
+					RangeType:    daterange.RangeTypeYear,
+					Year:         5770,
+					IsHebrewDate: true,
+				},
+			},
+			Want: &hebcal.CalOptions{Year: 5770, IsHebrewYear: true},
+		},
+		{
+			Name: "DateRange of Hebrew month",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source: daterange.Source{
+						Args: []string{"Elul", "5771"},
+						Now:  now,
+					},
+					RangeType:    daterange.RangeTypeMonth,
+					Year:         5771,
+					HebMonth:     hdate.Elul,
+					IsHebrewDate: true,
+				},
+			},
+			Want: &hebcal.CalOptions{
+				Start:        hdate.New(5771, hdate.Elul, 1),
+				End:          hdate.New(5771, hdate.Elul, 29),
+				IsHebrewYear: true,
+			},
+		},
+		{
+			Name: "DateRange of Hebrew day",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source: daterange.Source{
+						Args: []string{"Iyar", "1", "5772"},
+						Now:  now,
+					},
+					RangeType:    daterange.RangeTypeDay,
+					Year:         5772,
+					HebMonth:     hdate.Iyyar,
+					Day:          1,
+					IsHebrewDate: true,
+				},
+			},
+			Want: &hebcal.CalOptions{
+				Start:          hdate.New(5772, hdate.Iyyar, 1),
+				End:            hdate.New(5772, hdate.Iyyar, 1),
+				IsHebrewYear:   true,
+				AddHebrewDates: true,
+			},
+		},
+
+		{
+			Name: "DateRange of year with invalid NumYears",
+			Cfg: &config.Config{
+				NumYears: 0,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Now: now},
+					RangeType: daterange.RangeTypeYear,
+					Year:      2026,
+				},
+			},
+			Err: "invalid num_years: 0",
+		},
+		{
+			Name: "DateRange of month with too many NumYears",
+			Cfg: &config.Config{
+				NumYears: 2,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Args: []string{"2", "2030"}, Now: now},
+					RangeType: daterange.RangeTypeMonth,
+					Year:      2030,
+					GregMonth: time.February,
+				},
+			},
+			Err: "num_years was 2, but the parsed date range spec was DateRange<February 2030>, not just a year",
+		},
+
+		{
+			Name: "DateRange of month with Today flag",
+			Cfg: &config.Config{
+				Today:    true,
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source: daterange.Source{
+						Args: []string{"5", "2026"},
+						Now:  now,
+					},
+					RangeType: daterange.RangeTypeMonth,
+					Year:      2026,
+					GregMonth: time.May,
+				},
+			},
+			Err: "today option works only with single-day calendars, but date range spec was DateRange<May 2026>",
+		},
+
+		{
+			Name: "DateRange of day with missing day",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source: daterange.Source{
+						Args: []string{"2", "2032"},
+						Now:  now,
+					},
+					RangeType: daterange.RangeTypeDay,
+					Year:      2032,
+					GregMonth: time.February,
+				},
+			},
+			Err: `range type is DAY, but the date provided is missing the day of the month: DateRange<0 February 2032>`,
+		},
+		{
+			Name: "DateRange of month with missing month",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Args: []string{"2030"}, Now: now},
+					RangeType: daterange.RangeTypeMonth,
+					Year:      2030,
+				},
+			},
+			Err: `range type is MONTH, but the Gregorian date provided is missing the month: DateRange<%!Month(0) 2030>`,
+		},
+		{
+			Name: "DateRange of year with missing year",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Now: now},
+					RangeType: daterange.RangeTypeYear,
+				},
+			},
+			Err: "range type is YEAR, but the date provided is missing the year: DateRange<0>",
+		},
+
+		{
+			Name: "DateRange of Hebrew year with missing year",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:       daterange.Source{Now: now},
+					RangeType:    daterange.RangeTypeYear,
+					IsHebrewDate: true,
+				},
+			},
+			Err: "range type is YEAR, but the date provided is missing the year: DateRange<0 (Hebrew)>",
+		},
+		{
+			Name: "DateRange of Hebrew month with missing month",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source: daterange.Source{
+						Args: []string{"5771"},
+						Now:  now,
+					},
+					RangeType:    daterange.RangeTypeMonth,
+					Year:         5771,
+					IsHebrewDate: true,
+				},
+			},
+			Err: "range type is MONTH, but the Hebrew date provided is missing the month: DateRange<%!HMonth(0) 5771>",
+		},
+		{
+			Name: "DateRange of Hebrew day with missing day",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source: daterange.Source{
+						Args: []string{"Iyar", "5772"},
+						Now:  now,
+					},
+					RangeType:    daterange.RangeTypeDay,
+					Year:         5772,
+					HebMonth:     hdate.Iyyar,
+					IsHebrewDate: true,
+				},
+			},
+			Err: "range type is DAY, but the date provided is missing the day of the month: DateRange<0 Iyyar 5772>",
+		},
+
+		{
+			Name: "DateRange of unknown RangeType",
+			Cfg: &config.Config{
+				NumYears: 1,
+				DateRange: &daterange.DateRange{
+					Source:    daterange.Source{Now: now},
+					RangeType: -1,
+				},
+			},
+			Err: "unreachable code: invalid RangeType value: UNKNOWN(-1)",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			want := c.Want
+			var got hebcal.CalOptions
+			err := c.Cfg.SetDateRange(&got)
+			test.CheckErr(t, err, c.Err)
+			if c.Err == "" { // otherwise if err, don't care about got
+				checkCalOptions(t, want, &got)
 			}
 		})
 	}
