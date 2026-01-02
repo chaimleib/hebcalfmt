@@ -396,3 +396,15 @@ func (dr DateRange) End(noJulian bool) hdate.HDate {
 		return hdate.HDate{}
 	}
 }
+
+// StartOrToday returns the first day of the DateRange,
+// like [(DateRange).Start], unless [(Source).Defaulted].
+// Where that method defaults to the current year, this one defaults to today.
+func (dr DateRange) StartOrToday(noJulian bool) hdate.HDate {
+	if dr.Source.Defaulted() {
+		fromGregorian := fromGregorianFunc(noJulian)
+		now := dr.Source.Now
+		return fromGregorian(now.Year(), now.Month(), now.Day())
+	}
+	return dr.Start(noJulian)
+}

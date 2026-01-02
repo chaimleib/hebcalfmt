@@ -941,3 +941,83 @@ func TestDateRange_End(t *testing.T) {
 		})
 	}
 }
+
+func TestDateRange_StartOrToday(t *testing.T) {
+	now := date(2025, time.December, 21)
+	hNow := hdate.FromTime(now)
+	d := date(2026, time.May, 3)
+	hd := hdate.FromTime(d)
+	hdMonth := hdate.FromGregorian(d.Year(), d.Month(), 1)
+	hdYear := hdate.FromGregorian(d.Year(), time.January, 1)
+
+	cases := []struct {
+		Name string
+		DR   daterange.DateRange
+		Want hdate.HDate
+	}{
+		{
+			Name: "default today",
+			DR:   daterange.DateRange{Source: daterange.Source{Now: now}},
+			Want: hNow,
+		},
+		{
+			Name: "Args day",
+			DR: daterange.DateRange{
+				Source: daterange.Source{
+					Args: []string{d.Format(time.DateOnly)},
+					Now:  now,
+				},
+				RangeType: daterange.RangeTypeDay,
+				Year:      d.Year(),
+				GregMonth: d.Month(),
+				Day:       d.Day(),
+			},
+			Want: hd,
+		},
+		{
+			Name: "Args month",
+			DR: daterange.DateRange{
+				Source: daterange.Source{
+					Args: []string{"5", "2026"},
+					Now:  now,
+				},
+				RangeType: daterange.RangeTypeMonth,
+				Year:      d.Year(),
+				GregMonth: d.Month(),
+				Day:       1,
+			},
+			Want: hdMonth,
+		},
+		{
+			Name: "Args year",
+			DR: daterange.DateRange{
+				Source: daterange.Source{
+					Args: []string{"2026"},
+					Now:  now,
+				},
+				RangeType: daterange.RangeTypeDay,
+				Year:      d.Year(),
+				GregMonth: time.January,
+				Day:       1,
+			},
+			Want: hdYear,
+		},
+		{
+			Name: "FromTime",
+			DR: daterange.DateRange{
+				Source:    daterange.Source{FromTime: &d},
+				RangeType: daterange.RangeTypeDay,
+				Year:      d.Year(),
+				GregMonth: d.Month(),
+				Day:       d.Day(),
+			},
+			Want: hd,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			got := c.DR.StartOrToday(false)
+			test.CheckHDate(t, "StartOrToday", c.Want, got)
+		})
+	}
+}
