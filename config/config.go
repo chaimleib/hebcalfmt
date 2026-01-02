@@ -671,7 +671,14 @@ func ParseFile[T any](
 	target *T,
 ) error {
 	if fpath == "" {
-		return nil
+		slog.Error(
+			"ParseFile: missing file path",
+			"fpath", fpath,
+			"fs", fs,
+			"parseFunc.signature", fmt.Sprintf("%T", parse),
+			"target.signature", fmt.Sprintf("%T", target),
+		)
+		return errors.New("ParseFile: missing file path")
 	}
 
 	f, err := fs.Open(fpath)

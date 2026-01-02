@@ -2,10 +2,12 @@ package config_test
 
 import (
 	"errors"
+	"io"
 	"io/fs"
 	"slices"
 	"strings"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"github.com/hebcal/hdate"
@@ -953,4 +955,53 @@ func TestSetChagOnly(t *testing.T) {
 	var got hebcal.CalOptions
 	config.SetChagOnly(&got)
 	checkCalOptions(t, &want, &got)
+}
+
+func TestParseFile(t *testing.T) {
+	file := func(s string) *fstest.MapFile {
+		return &fstest.MapFile{Data: []byte(s)}
+	}
+	files := fstest.MapFS{
+		"empty.txt":       file(""),
+		"lineNumbers.txt": file("1\n2\n3"),
+		"test.json":       file(`{"status": "ok"}`),
+		"forceError.txt":  file("force error"),
+	}
+	splitLines := func(r io.Reader, fpath string) ([]string, error) {
+		buf, err := io.ReadAll(r)
+		if err != nil {
+			return nil, err
+		}
+		if string(buf) == "force error" {
+			return nil, errors.New("forced error")
+		}
+		return strings.Split(string(buf), "\n"), nil
+	}
+
+	cases := []struct {
+		Fpath string
+		Want  []string
+		Err   string
+	}{
+		{Fpath: "", Err: "ParseFile: missing file path"},
+		{Fpath: "empty.txt", Want: []string{""}},
+		{Fpath: "forceError.txt", Err: "forced error"},
+		{Fpath: "test.json", Want: []string{`{"status": "ok"}`}},
+		{Fpath: "lineNumbers.txt", Want: strings.Fields("1 2 3")},
+		{
+			Fpath: "nonexistent.txt",
+			Err:   `open nonexistent.txt: file does not exist`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Fpath, func(t *testing.T) {
+			test.TestSlogger(t)
+			var got []string
+			err := config.ParseFile(files, c.Fpath, splitLines, &got)
+			test.CheckErr(t, err, c.Err)
+			if c.Err == "" && !slices.Equal(c.Want, got) {
+				t.Errorf("want: %q\ngot:  %q", c.Want, got)
+			}
+		})
+	}
 }
