@@ -114,6 +114,10 @@ func checkCalOptions(t *testing.T, want, got *hebcal.CalOptions) {
 		}
 		return
 	}
+	if got == nil {
+		t.Errorf("got nil, want: %#v", want)
+		return
+	}
 
 	for _, field := range []struct {
 		Name      string
@@ -159,6 +163,18 @@ func checkCalOptions(t *testing.T, want, got *hebcal.CalOptions) {
 		{"DailySedra", want.DailySedra, got.DailySedra},
 	} {
 		switch typedWant := field.Want.(type) {
+		case *zmanim.Location:
+			typedGot := field.Got.(*zmanim.Location)
+			if (typedWant == nil) != (typedGot == nil) {
+				t.Errorf("%s's do not match - want:\n%#v\ngot:\n%#v",
+					field.Name, field.Want, field.Got)
+			} else if typedWant != nil { // implies && typedGot != nil
+				if *typedWant != *typedGot {
+					t.Errorf("%s's do not match - want:\n%#v\ngot:\n%#v",
+						field.Name, field.Want, field.Got)
+				}
+			}
+
 		case []hebcal.UserYahrzeit:
 			typedGot := field.Got.([]hebcal.UserYahrzeit)
 			if !slices.Equal(typedWant, typedGot) {
@@ -352,6 +368,183 @@ To show the available languages, run
 			checkConfig(t, c.Want, got)
 			if c.Log != strings.TrimSpace(buf.String()) {
 				t.Errorf("want logs:\n%s\ngot logs:\n%s", c.Log, buf)
+			}
+		})
+	}
+}
+
+func TestCalOptions(t *testing.T) {
+	// baseWant := func() *hebcal.CalOptions {
+	// 	opts := hebcal.CalOptions{
+	// 		CandleLightingMins: 18,
+	// 		NumYears: 1,
+	// 	}
+	// 	return &opts
+	// }
+	nyc := &zmanim.Location{
+		Name:        "New York",
+		CountryCode: "US",
+		Latitude:    40.71427,
+		Longitude:   -74.00597,
+		TimeZoneId:  "America/New_York",
+	}
+	failingFS := func() (fs.FS, error) {
+		return nil, errors.New("test forced failure to init FS")
+	}
+	file := func(s string) *fstest.MapFile {
+		return &fstest.MapFile{Data: []byte(s)}
+	}
+	files := fstest.MapFS{
+		"events.txt":    file("Tishrei 2 Birthday - Ben Ploni"),
+		"yahrzeits.txt": file("10 8 1967 Yahrzeit - Joe Shmo"),
+	}
+
+	cases := []struct {
+		Name   string
+		Cfg    config.Config
+		Want   *hebcal.CalOptions
+		FailFS bool
+		Err    string
+	}{
+		{Name: "empty", Want: &hebcal.CalOptions{Year: 1, Location: nyc}},
+		{
+			Name: "explicit city",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.City = "New York"
+				return cfg
+			}(),
+			Want: &hebcal.CalOptions{
+				Year:               1,
+				NumYears:           1,
+				CandleLightingMins: 18,
+				HavdalahMins:       72,
+				CandleLighting:     true,
+				Location:           nyc,
+			},
+		},
+		{
+			Name: "today",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.Today = true
+				return cfg
+			}(),
+			Want: &hebcal.CalOptions{
+				Year:               1,
+				NumYears:           1,
+				CandleLightingMins: 18,
+				Location:           nyc,
+				Omer:               true,
+				AddHebrewDates:     true,
+			},
+		},
+		{
+			Name: "chag-only",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.ChagOnly = true
+				return cfg
+			}(),
+			Want: &hebcal.CalOptions{
+				Year:               1,
+				NumYears:           1,
+				CandleLightingMins: 18,
+				Location:           nyc,
+				Mask: event.CHAG | event.LIGHT_CANDLES |
+					event.LIGHT_CANDLES_TZEIS | event.YOM_TOV_ENDS,
+			},
+		},
+		{
+			Name: "yahrzeit file",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.YahrzeitsFile = "yahrzeits.txt"
+				cfg.FS = files
+				return cfg
+			}(),
+			Want: &hebcal.CalOptions{
+				Year:               1,
+				NumYears:           1,
+				CandleLightingMins: 18,
+				Location:           nyc,
+				Yahrzeits: []hebcal.UserYahrzeit{
+					{
+						Name: "Yahrzeit - Joe Shmo",
+						Date: date(1967, time.October, 8),
+					},
+				},
+			},
+		},
+		{
+			Name: "event file",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.EventsFile = "events.txt"
+				cfg.FS = files
+				return cfg
+			}(),
+			Want: &hebcal.CalOptions{
+				Year:               1,
+				NumYears:           1,
+				CandleLightingMins: 18,
+				Location:           nyc,
+				UserEvents: []hebcal.UserEvent{
+					{
+						Desc:  "Birthday - Ben Ploni",
+						Day:   2,
+						Month: hdate.Tishrei,
+					},
+				},
+			},
+		},
+
+		// Errors
+		{
+			Name: "unknown city",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.City = "Unknown"
+				return cfg
+			}(),
+			Err: `failed to resolve place configs: unknown city: "Unknown"`,
+		},
+		{
+			Name: "invalid DateRange",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.DateRange = new(daterange.DateRange)
+				return cfg
+			}(),
+			Err: "range type is YEAR, but the date provided is missing the year: DateRange<empty>",
+		},
+		{
+			Name: "unknown Shiurim",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.Shiurim = []string{"unknown"}
+				return cfg
+			}(),
+			Err: `unrecognized item(s) in shiurim: ["unknown"]`,
+		},
+		{
+			Name:   "fail fs",
+			FailFS: true,
+			Err:    "failed to initialize DefaultFS: test forced failure to init FS",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			test.TestLogger(t)
+			if c.FailFS {
+				old := config.DefaultFS
+				t.Cleanup(func() { config.DefaultFS = old })
+				config.DefaultFS = failingFS
+			}
+			got, err := c.Cfg.CalOptions()
+			test.CheckErr(t, err, c.Err)
+			if c.Err == "" { // otherwise, don't care
+				checkCalOptions(t, c.Want, got)
 			}
 		})
 	}
