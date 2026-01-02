@@ -493,9 +493,23 @@ func SetShiurim(cOpts *hebcal.CalOptions, shiurim []string) error {
 	for _, shiur := range shiurim {
 		switch shiur {
 		case "yerushalmi", "yerushalmi:vilna":
+			// TODO: allow both for user comparison
+			if cOpts.YerushalmiEdition != 0 &&
+				cOpts.YerushalmiEdition != yerushalmi.Vilna {
+				return errors.New(
+					"shiurim: conflicting yerushalmi edition settings found",
+				)
+			}
 			cOpts.YerushalmiYomi = true
 			cOpts.YerushalmiEdition = yerushalmi.Vilna
 		case "yerushalmi:schottenstein":
+			// TODO: allow both for user comparison
+			if cOpts.YerushalmiEdition != 0 &&
+				cOpts.YerushalmiEdition != yerushalmi.Schottenstein {
+				return errors.New(
+					"shiurim: conflicting yerushalmi edition settings found",
+				)
+			}
 			cOpts.YerushalmiYomi = true
 			cOpts.YerushalmiEdition = yerushalmi.Schottenstein
 		case "mishna-yomi":
