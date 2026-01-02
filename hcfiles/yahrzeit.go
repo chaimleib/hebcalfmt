@@ -3,6 +3,7 @@ package hcfiles
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
@@ -47,7 +48,13 @@ func ParseYahrzeits(
 
 		fields := gregRe.FindStringSubmatch(line)
 		if len(fields) != 5 {
-			lineErr(ErrInvalidFormat)
+			lineErr(
+				fmt.Errorf(
+					"%w: expected 5 capture fields, got %d",
+					ErrInvalidFormat,
+					len(fields),
+				),
+			)
 			continue
 		}
 
@@ -73,7 +80,7 @@ func ParseYahrzeits(
 	}
 
 	if len(errs) != 0 {
-		return nil, errors.Join(errs...)
+		return nil, fmt.Errorf("ParseYahrzeits: %w", errors.Join(errs...))
 	}
 	return entries, nil
 }

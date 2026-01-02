@@ -3,6 +3,7 @@ package hcfiles
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
@@ -44,7 +45,13 @@ func ParseEvents(f io.Reader, fileName string) ([]hebcal.UserEvent, error) {
 
 		fields := hebRe.FindStringSubmatch(line)
 		if len(fields) != 4 {
-			lineErr(ErrInvalidFormat)
+			lineErr(
+				fmt.Errorf(
+					"%w: expected 4 capture fields, got %d",
+					ErrInvalidFormat,
+					len(fields),
+				),
+			)
 			continue
 		}
 
@@ -67,7 +74,7 @@ func ParseEvents(f io.Reader, fileName string) ([]hebcal.UserEvent, error) {
 	}
 
 	if len(errs) != 0 {
-		return nil, errors.Join(errs...)
+		return nil, fmt.Errorf("ParseEvents: %w", errors.Join(errs...))
 	}
 	return entries, nil
 }

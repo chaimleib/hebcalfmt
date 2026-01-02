@@ -2,6 +2,7 @@ package hcfiles_test
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -53,8 +54,11 @@ func TestParseEvents(t *testing.T) {
 		{
 			Name:    "invalid line",
 			Content: "INVALID",
-			WantErr: hcfiles.SyntaxError{
-				Err:        hcfiles.ErrInvalidFormat,
+			WantErr: "ParseEvents: " + hcfiles.SyntaxError{
+				Err: fmt.Errorf(
+					"%w: expected 4 capture fields, got 0",
+					hcfiles.ErrInvalidFormat,
+				),
 				FileName:   fileName,
 				LineNumber: 1,
 			}.Error(),
@@ -63,14 +67,20 @@ func TestParseEvents(t *testing.T) {
 		{
 			Name:    "invalid lines",
 			Content: "INVALID\nWRONG",
-			WantErr: errors.Join(
+			WantErr: "ParseEvents: " + errors.Join(
 				hcfiles.SyntaxError{
-					Err:        hcfiles.ErrInvalidFormat,
+					Err: fmt.Errorf(
+						"%w: expected 4 capture fields, got 0",
+						hcfiles.ErrInvalidFormat,
+					),
 					FileName:   fileName,
 					LineNumber: 1,
 				},
 				hcfiles.SyntaxError{
-					Err:        hcfiles.ErrInvalidFormat,
+					Err: fmt.Errorf(
+						"%w: expected 4 capture fields, got 0",
+						hcfiles.ErrInvalidFormat,
+					),
 					FileName:   fileName,
 					LineNumber: 2,
 				},
@@ -80,7 +90,7 @@ func TestParseEvents(t *testing.T) {
 		{
 			Name:    "invalid month",
 			Content: "13 03 Joe Shmo",
-			WantErr: hcfiles.SyntaxError{
+			WantErr: "ParseEvents: " + hcfiles.SyntaxError{
 				Err:        hcfiles.ErrInvalidMonth,
 				FileName:   fileName,
 				LineNumber: 1,
@@ -90,7 +100,7 @@ func TestParseEvents(t *testing.T) {
 		{
 			Name:    "invalid day",
 			Content: "Cheshvan 32 Joe Shmo",
-			WantErr: hcfiles.SyntaxError{
+			WantErr: "ParseEvents: " + hcfiles.SyntaxError{
 				Err:        hcfiles.ErrInvalidDays,
 				FileName:   fileName,
 				LineNumber: 1,

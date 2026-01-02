@@ -2,6 +2,7 @@ package hcfiles_test
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -54,34 +55,49 @@ func TestParseYahrzeits(t *testing.T) {
 		{
 			Name:    "invalid line",
 			Content: "INVALID",
-			WantErr: hcfiles.SyntaxError{
-				Err:        hcfiles.ErrInvalidFormat,
-				FileName:   fileName,
-				LineNumber: 1,
-			}.Error(),
+			WantErr: fmt.Sprintf(
+				"ParseYahrzeits: %v",
+				hcfiles.SyntaxError{
+					Err: fmt.Errorf(
+						"%w: expected 5 capture fields, got 0",
+						hcfiles.ErrInvalidFormat,
+					),
+					FileName:   fileName,
+					LineNumber: 1,
+				},
+			),
 			Want: nil,
 		},
 		{
 			Name:    "invalid lines",
 			Content: "INVALID\nWRONG",
-			WantErr: errors.Join(
-				hcfiles.SyntaxError{
-					Err:        hcfiles.ErrInvalidFormat,
-					FileName:   fileName,
-					LineNumber: 1,
-				},
-				hcfiles.SyntaxError{
-					Err:        hcfiles.ErrInvalidFormat,
-					FileName:   fileName,
-					LineNumber: 2,
-				},
-			).Error(),
+			WantErr: fmt.Sprintf(
+				"ParseYahrzeits: %v",
+				errors.Join(
+					hcfiles.SyntaxError{
+						Err: fmt.Errorf(
+							"%w: expected 5 capture fields, got 0",
+							hcfiles.ErrInvalidFormat,
+						),
+						FileName:   fileName,
+						LineNumber: 1,
+					},
+					hcfiles.SyntaxError{
+						Err: fmt.Errorf(
+							"%w: expected 5 capture fields, got 0",
+							hcfiles.ErrInvalidFormat,
+						),
+						FileName:   fileName,
+						LineNumber: 2,
+					},
+				),
+			),
 			Want: nil,
 		},
 		{
 			Name:    "invalid month",
 			Content: "13 03 2004 Joe Shmo",
-			WantErr: hcfiles.SyntaxError{
+			WantErr: "ParseYahrzeits: " + hcfiles.SyntaxError{
 				Err:        hcfiles.ErrInvalidMonth,
 				FileName:   fileName,
 				LineNumber: 1,
@@ -91,7 +107,7 @@ func TestParseYahrzeits(t *testing.T) {
 		{
 			Name:    "invalid day",
 			Content: "2 29 2001 Joe Shmo",
-			WantErr: hcfiles.SyntaxError{
+			WantErr: "ParseYahrzeits: " + hcfiles.SyntaxError{
 				Err:        hcfiles.ErrInvalidDays,
 				FileName:   fileName,
 				LineNumber: 1,
