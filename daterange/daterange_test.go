@@ -50,7 +50,7 @@ func TestRangeType_String(t *testing.T) {
 	}
 }
 
-func TestSource_IsZero(t *testing.T) {
+func TestSource_DefaultedNow(t *testing.T) {
 	cases := []struct {
 		Name  string
 		Input daterange.Source
@@ -67,9 +67,10 @@ func TestSource_IsZero(t *testing.T) {
 		},
 		{
 			Name: "with Now",
-			// A non-zero Now is evidence that we were created with FromArgs()..
+			// A non-zero Now is evidence that we were created with FromArgs(),
+			// But with no Args or FromTime, we are DefaultedNow.
 			Input: daterange.Source{Now: date(2025, time.January, 1)},
-			Want:  false,
+			Want:  true,
 		},
 		{
 			Name:  "with FromTime",
@@ -81,14 +82,15 @@ func TestSource_IsZero(t *testing.T) {
 			// Args means a user provided a daterange spec as a slice of strings.
 			// But if so, and we should have been initialized by FromArgs,
 			// and Now should have been set as well.
-			// This is in an inconsistent state.
+			// This is in an inconsistent state,
+			// but with Args we are certainly not DefaultedNow.
 			Input: daterange.Source{Args: []string{"2025"}},
-			Want:  true,
+			Want:  false,
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			got := c.Input.IsZero()
+			got := c.Input.DefaultedNow()
 			if c.Want != got {
 				t.Errorf("unexpected IsZero for %#v: %v", c.Input, got)
 			}
@@ -138,11 +140,13 @@ func TestDateRange_FromTime(t *testing.T) {
 }
 
 func TestDateRange_FromArgs(t *testing.T) {
-	now := time.Date(2025, time.December, 30, 18, 51, 58, 932, time.UTC)
+	defaultNow := time.Date(2025, time.December, 30, 18, 51, 58, 932, time.UTC)
+
 	cases := []struct {
 		Name         string
 		Args         []string
 		IsHebrewDate bool
+		ZeroNow      bool
 		Want         daterange.DateRange
 		Err          string
 	}{
@@ -150,11 +154,11 @@ func TestDateRange_FromArgs(t *testing.T) {
 			Name: "empty args implies current year",
 			Args: nil,
 			Want: daterange.DateRange{
-				Source:    daterange.Source{Args: nil, Now: now},
+				Source:    daterange.Source{Args: nil, Now: defaultNow},
 				RangeType: daterange.RangeTypeYear,
 				Day:       0,
 				GregMonth: 0,
-				Year:      now.Year(),
+				Year:      defaultNow.Year(),
 			},
 		},
 		{
@@ -165,7 +169,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Source: daterange.Source{
 					Args:         nil,
 					IsHebrewDate: true,
-					Now:          now,
+					Now:          defaultNow,
 				},
 				RangeType:    daterange.RangeTypeYear,
 				IsHebrewDate: true,
@@ -178,7 +182,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 			Name: "Gregorian year",
 			Args: []string{"2024"},
 			Want: daterange.DateRange{
-				Source:    daterange.Source{Args: []string{"2024"}, Now: now},
+				Source:    daterange.Source{Args: []string{"2024"}, Now: defaultNow},
 				RangeType: daterange.RangeTypeYear,
 				Day:       0,
 				GregMonth: 0,
@@ -193,7 +197,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Source: daterange.Source{
 					Args:         []string{"5784"},
 					IsHebrewDate: true,
-					Now:          now,
+					Now:          defaultNow,
 				},
 				RangeType:    daterange.RangeTypeYear,
 				IsHebrewDate: true,
@@ -206,13 +210,17 @@ func TestDateRange_FromArgs(t *testing.T) {
 			Name: "Gregorian month",
 			Args: []string{"5", "2024"},
 			Want: daterange.DateRange{
-				Source:    daterange.Source{Args: []string{"5", "2024"}, Now: now},
+				Source: daterange.Source{
+					Args: []string{"5", "2024"},
+					Now:  defaultNow,
+				},
 				RangeType: daterange.RangeTypeMonth,
 				Day:       0,
 				GregMonth: time.May,
 				Year:      2024,
 			},
 		},
+
 		{
 			Name: "invalid Gregorian month spec - bad year",
 			Args: []string{"5", "INVALID"},
@@ -243,7 +251,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Source: daterange.Source{
 					Args:         []string{"Iyar", "5784"},
 					IsHebrewDate: true,
-					Now:          now,
+					Now:          defaultNow,
 				},
 				RangeType:    daterange.RangeTypeMonth,
 				IsHebrewDate: true,
@@ -252,6 +260,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Year:         5784,
 			},
 		},
+
 		{
 			Name:         "Hebrew month forces IsHebrewYear",
 			Args:         []string{"Iyar", "5784"},
@@ -260,7 +269,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Source: daterange.Source{
 					Args:         []string{"Iyar", "5784"},
 					IsHebrewDate: false,
-					Now:          now,
+					Now:          defaultNow,
 				},
 				RangeType:    daterange.RangeTypeMonth,
 				IsHebrewDate: true,
@@ -277,7 +286,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Source: daterange.Source{
 					Args:         []string{"Adar2", "5783"},
 					IsHebrewDate: false,
-					Now:          now,
+					Now:          defaultNow,
 				},
 				RangeType:    daterange.RangeTypeMonth,
 				IsHebrewDate: true,
@@ -294,7 +303,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Source: daterange.Source{
 					Args:         []string{"AdarII", "5784"},
 					IsHebrewDate: true,
-					Now:          now,
+					Now:          defaultNow,
 				},
 				RangeType:    daterange.RangeTypeMonth,
 				IsHebrewDate: true,
@@ -315,11 +324,15 @@ func TestDateRange_FromArgs(t *testing.T) {
 			IsHebrewDate: true,
 			Err:          `unknown Hebrew month: "BADMONTH"`,
 		},
+
 		{
 			Name: "Gregorian day",
 			Args: []string{"5", "2", "2024"},
 			Want: daterange.DateRange{
-				Source:    daterange.Source{Args: []string{"5", "2", "2024"}, Now: now},
+				Source: daterange.Source{
+					Args: []string{"5", "2", "2024"},
+					Now:  defaultNow,
+				},
 				RangeType: daterange.RangeTypeDay,
 				Day:       2,
 				GregMonth: time.May,
@@ -351,11 +364,15 @@ func TestDateRange_FromArgs(t *testing.T) {
 			Args: []string{"BADMONTH", "2", "2024"},
 			Err:  `Gregorian months must be numeric, got "BADMONTH"`,
 		},
+
 		{
 			Name: "Gregorian day - YYYY-MM-DD",
 			Args: []string{"2024-05-02"},
 			Want: daterange.DateRange{
-				Source:    daterange.Source{Args: []string{"2024-05-02"}, Now: now},
+				Source: daterange.Source{
+					Args: []string{"2024-05-02"},
+					Now:  defaultNow,
+				},
 				RangeType: daterange.RangeTypeDay,
 				Day:       2,
 				GregMonth: time.May,
@@ -366,7 +383,10 @@ func TestDateRange_FromArgs(t *testing.T) {
 			Name: "Gregorian day - YYYY-M-D",
 			Args: []string{"2024-5-2"},
 			Want: daterange.DateRange{
-				Source:    daterange.Source{Args: []string{"2024-5-2"}, Now: now},
+				Source: daterange.Source{
+					Args: []string{"2024-5-2"},
+					Now:  defaultNow,
+				},
 				RangeType: daterange.RangeTypeDay,
 				Day:       2,
 				GregMonth: time.May,
@@ -386,7 +406,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Source: daterange.Source{
 					Args:         []string{"Iyar", "2", "5784"},
 					IsHebrewDate: true,
-					Now:          now,
+					Now:          defaultNow,
 				},
 				RangeType:    daterange.RangeTypeDay,
 				IsHebrewDate: true,
@@ -395,6 +415,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				Year:         5784,
 			},
 		},
+
 		{
 			Name:         "invalid Hebrew day - zero day",
 			Args:         []string{"Iyar", "0", "5784"},
@@ -407,14 +428,24 @@ func TestDateRange_FromArgs(t *testing.T) {
 			IsHebrewDate: true,
 			Err:          `invalid day for Iyyar 5784: 31`,
 		},
+
 		{
 			Name: "invalid Args - too many args",
 			Args: []string{"Iyar", "31", "5784", "INVALIDEXTRA"},
 			Err:  `expected at most 3 args for date range spec, got 4`,
 		},
+		{
+			Name:    "invalid zero now",
+			ZeroNow: true,
+			Err:     "daterange.FromArgs: now must not be a zero time",
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
+			now := defaultNow
+			if c.ZeroNow {
+				now = time.Time{}
+			}
 			got, err := daterange.FromArgs(c.Args, c.IsHebrewDate, now)
 			test.CheckErr(t, err, c.Err)
 			if err != nil {

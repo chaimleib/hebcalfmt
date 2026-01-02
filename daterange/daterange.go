@@ -57,11 +57,11 @@ type Source struct {
 	FromTime     *time.Time
 }
 
-// IsZero returns true if the user did not provide a date besides `Now`
+// DefaultedNow returns true if the user did not provide a date besides `Now`
 // to set up the `DateRange`.
 // This can happen if, when run from the CLI, no date was specified.
-func (s Source) IsZero() bool {
-	return s.Now.IsZero() && s.FromTime == nil
+func (s Source) DefaultedNow() bool {
+	return len(s.Args) == 0 && s.FromTime == nil
 }
 
 type DateRange struct {
@@ -284,7 +284,7 @@ func (dr DateRange) String() string {
 }
 
 func (dr DateRange) basicString() string {
-	if dr.Source.IsZero() {
+	if dr.Source.Now.IsZero() && dr.Source.FromTime == nil {
 		return "empty"
 	}
 
