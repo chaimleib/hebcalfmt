@@ -55,9 +55,13 @@ but JSON, and even HTML can be hacked together.
 to delete whitespace in that direction until a file boundary,
 non-whitespace, or another directive. */}}
 
-{{- /* English month label */}}
-{{- $monthDay := timeDate $.now.Year $.now.Month 1 0 0 0 0 $.tz}}
+{{- /* Get month from CLI args like Hebcal, */}}
+{{- /* but defaulting to the current month. */}}
+{{- $d := ($.dateRange.StartOrToday false).Gregorian}}
+{{- $monthDay := timeDate $d.Year $d.Month 1 0 0 0 0 $.tz}}
 {{- $nextMonth := $monthDay.AddDate 0 1 0}}
+
+{{- /* English month label */}}
 {{- $monthDay.Month}} {{$.now.Year}}
 
 {{- /* Hebrew month label(s) */}}
@@ -79,9 +83,9 @@ non-whitespace, or another directive. */}}
 {{repeat (printf "|%s" (repeat "-" $cellWidth)) 7}}|
 
 {{- /* Add blank boxes each weekday until day 1 of the month. */}}
-{{- range 7}}
+{{  range 7}}
 {{-   if eq $monthDay.Weekday .}}{{break}}{{end}}
-{{-   "\n|"}}{{repeat " " $cellWidth}}
+{{-   "|"}}{{repeat " " $cellWidth}}
 {{- end}}
 
 {{- /* Number the cells with the Gregorian and Hebrew days of the month. */}}
@@ -92,20 +96,20 @@ non-whitespace, or another directive. */}}
 {{    if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
 {{-   printf "%2d %2d" $monthDay.Day (hdateFromTime $monthDay).Day}}
 {{-   if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
-{{-   if eq $monthDay.Weekday $.time.Saturday}}
-{{-     "|\n"}}
+{{-   $tomorrow := $monthDay.AddDate 0 0 1}}
+{{-   if eq $monthDay.Weekday $.time.Saturday}}|
+{{-     if $tomorrow.Before $nextMonth}}{{"\n"}}{{end}}
 {{-   end}}
-{{-   $monthDay = $monthDay.AddDate 0 0 1}}
-{{- end}}
+{{-   $monthDay = $tomorrow}}
+{{- end -}}
 
 {{- /* Add blank boxes until the end of the last week. */ -}}
-{{- range 8}}
-{{-   if eq $monthDay.Weekday $.time.Sunday}}
-{{-     "|"}}
-{{-     break}}
+{{- if ne $monthDay.Weekday $.time.Sunday}}|
+{{-   range 8}}
+{{-     if eq $monthDay.Weekday $.time.Sunday}}{{break}}{{end}}
+{{-     repeat " " $cellWidth}}|
+{{-     $monthDay = $monthDay.AddDate 0 0 1}}
 {{-   end}}
-{{-   "|"}}{{repeat " " $cellWidth}}
-{{-   $monthDay = $monthDay.AddDate 0 0 1}}
 {{- end}}
 ```
 
@@ -124,17 +128,30 @@ Kislev - Tevet 5786
 | 21  1 | 22  2 | 23  3 | 24  4 | 25  5 | 26  6 | 27  7 |
 | 28  8 | 29  9 | 30 10 | 31 11 |       |       |       |
 ```
+
+You can also choose a month by specifying on the command line.
+
+```bash
+$ hebcalfmt examples/monthCalendar.tmpl 3 2026
+March 2026
+Adar - Nisan 5786
+
+|  Sun  |  Mon  |  Tue  |  Wed  | Thurs |  Fri  |  Sat  |
+|-------|-------|-------|-------|-------|-------|-------|
+|  1 12 |  2 13 |  3 14 |  4 15 |  5 16 |  6 17 |  7 18 |
+|  8 19 |  9 20 | 10 21 | 11 22 | 12 23 | 13 24 | 14 25 |
+| 15 26 | 16 27 | 17 28 | 18 29 | 19  1 | 20  2 | 21  3 |
+| 22  4 | 23  5 | 24  6 | 25  7 | 26  8 | 27  9 | 28 10 |
+| 29 11 | 30 12 | 31 13 |       |       |       |       |
+```
+
 ## Example: Convert dates between Hebrew and Gregorian
 
 examples/date.tmpl
 ```tmpl
-{{- /* Read date from CLI args, as in classic hebcal, with NoJulian=false. */}}
-{{- $d := $.dateRange.Start false}}
-{{- /* In classic hebcal, no args defaults to just the year. */}}
-{{- /* We want today's full date. */}}
-{{- if $.dateRange.Source.IsZero}}
-{{-   $d = hdateFromTime $.now}}
-{{- end -}}
+{{- /* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
+{{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
+{{- $d := $.dateRange.StartOrToday false -}}
 
 Gregorian: {{$d.Gregorian.Format $.time.DateOnly}}
 Hebrew: {{$d.Day}} {{$d.MonthName $.language}} {{$d.Year}}
@@ -244,7 +261,9 @@ rounded to the quarter hour or five minutes.
 
 examples/mincha.tmpl
 ```tmpl
-{{- $d := timeParse $.time.DateOnly "2025-09-01"}}
+{{- /* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
+{{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
+{{- $d := ($.dateRange.StartOrToday false).Gregorian}}
 {{- $rounding := timeParseDuration "5m"}}
 {{- $advance := timeParseDuration "-15m"}}
 {{- range 14}}
@@ -256,7 +275,7 @@ examples/mincha.tmpl
 ```
 
 ```bash
-$ hebcalfmt examples/mincha.tmpl
+$ hebcalfmt examples/mincha.tmpl 2025-09-01
 Mon Sep 01, 2025: 6:35 PM
 Tue Sep 02, 2025: 6:35 PM
 Wed Sep 03, 2025: 6:35 PM
@@ -367,14 +386,9 @@ based on their `.Flags` or `.Desc` or anything else.
 ```tmpl
 This Shabbat in {{$.location.Name}}:
 
-{{- /* Read date from CLI args, as in classic hebcal, with NoJulian=false. */}}
-{{- $d := $.dateRange.Start false}}
-{{- /* In classic hebcal, no args defaults to just the year. */}}
-{{- /* We want today's full date. */}}
-{{- if $.dateRange.Source.IsZero}}
-{{-   $d = hdateFromTime $.now}}
-{{- end}}
-
+{{  /* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
+{{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
+{{- $d := $.dateRange.StartOrToday false}}
 {{- $timeFormat := "03:04 PM"}}
 
 {{- $d = $d.OnOrAfter $.time.Saturday}}

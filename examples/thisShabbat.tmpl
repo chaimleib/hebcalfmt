@@ -1,13 +1,8 @@
 This Shabbat in {{$.location.Name}}:
 
-{{- /* Read date from CLI args, as in classic hebcal, with NoJulian=false. */}}
-{{- $d := $.dateRange.Start false}}
-{{- /* In classic hebcal, no args defaults to just the year. */}}
-{{- /* We want today's full date. */}}
-{{- if $.dateRange.Source.Defaulted}}
-{{-   $d = hdateFromTime $.now}}
-{{- end}}
-
+{{  /* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
+{{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
+{{- $d := $.dateRange.StartOrToday false}}
 {{- $timeFormat := "03:04 PM"}}
 
 {{- $d = $d.OnOrAfter $.time.Saturday}}

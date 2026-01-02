@@ -1,4 +1,6 @@
-{{- $d := timeParse $.time.DateOnly "2025-09-01"}}
+{{- /* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
+{{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
+{{- $d := ($.dateRange.StartOrToday false).Gregorian}}
 {{- $rounding := timeParseDuration "5m"}}
 {{- $advance := timeParseDuration "-15m"}}
 {{- range 14}}

@@ -2,21 +2,25 @@
 to delete whitespace in that direction until a file boundary,
 non-whitespace, or another directive. */}}
 
-{{- /* English month label */}}
-{{- $monthDay := timeDate $.now.Year $.now.Month 1 0 0 0 0 $.tz}}
+{{- /* Get month from CLI args like Hebcal, */}}
+{{- /* but defaulting to the current month. */}}
+{{- $d := ($.dateRange.StartOrToday false).Gregorian}}
+{{- $monthDay := timeDate $d.Year $d.Month 1 0 0 0 0 $.tz}}
 {{- $nextMonth := $monthDay.AddDate 0 1 0}}
+
+{{- /* English month label */}}
 {{- $monthDay.Month}} {{$.now.Year}}
 
 {{- /* Hebrew month label(s) */}}
 {{- $hdate := hdateFromTime $monthDay}}
 {{- $hdateLast := hdateFromTime ($nextMonth.AddDate 0 0 -1)}}
-{{$hdate.Month}}
+{{$hdate.MonthName $.language}}
 {{- /* If the Hebrew year changes, */}}
 {{- /* show the starting year by the starting month. */}}
 {{- if ne $hdate.Year $hdateLast.Year}} {{$hdate.Year}}{{end}}
 {{- /* If the Hebrew month changes, hyphenate the range. */}}
 {{- if ne $hdateLast.Month $hdate.Month}}
-{{-   " - "}}{{$hdateLast.Month}}
+{{-   " - "}}{{$hdateLast.MonthName $.language}}
 {{- end}}
 {{- " "}}{{$hdateLast.Year}}
 
