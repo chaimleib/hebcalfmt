@@ -1,6 +1,8 @@
 package config_test
 
 import (
+	"errors"
+	"io/fs"
 	"strings"
 	"testing"
 
@@ -86,6 +88,78 @@ fields:
 	}
 }
 
+func TestFromFile(t *testing.T) {
+	baseWant := func(fpath string) *config.Config {
+		cfg := config.Default
+		cfg.ConfigSource = fpath
+		return &cfg
+	}
+
+	cases := []struct {
+		Name  string
+		FSErr error
+		Fpath string
+		Want  func(fpath string) *config.Config
+		Err   string
+	}{
+		{
+			Name:  "invalid empty file",
+			Fpath: "testdata/empty.txt",
+			Want:  nil,
+			Err:   `failed to parse config from "testdata/empty.txt": EOF`,
+		},
+		{
+			Name:  "invalid nonexistent file",
+			Fpath: "testdata/nonexistent.json",
+			Want:  nil,
+			Err:   `config file could not be read: open testdata/nonexistent.json: no such file or directory`,
+		},
+		{
+			Name:  "invalid FS",
+			FSErr: errors.New("test forced DefaultFS to fail"),
+			Fpath: "testdata/emptyObject.json",
+			Want:  nil,
+			Err:   `failed to initialize DefaultFS: test forced DefaultFS to fail`,
+		},
+		{
+			Name:  "empty object",
+			Fpath: "testdata/emptyObject.json",
+			Want:  baseWant,
+		},
+		{
+			Name:  "today config",
+			Fpath: "testdata/today.json",
+			Want: func(fpath string) *config.Config {
+				cfg := baseWant(fpath)
+				cfg.Today = true
+				return cfg
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			if c.FSErr != nil {
+				old := config.DefaultFS
+				t.Cleanup(func() {
+					config.DefaultFS = old
+				})
+				config.DefaultFS = func() (fs.FS, error) {
+					return nil, c.FSErr
+				}
+			}
+
+			got, err := config.FromFile(c.Fpath)
+			var want *config.Config
+			if c.Want != nil {
+				want = c.Want(c.Fpath)
+			}
+
+			test.CheckErr(t, err, c.Err)
+			checkConfig(t, want, got)
+		})
+	}
+}
+
 func TestFromReader(t *testing.T) {
 	const fpath = "testConfig.json"
 
@@ -111,11 +185,12 @@ func TestFromReader(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		r := strings.NewReader(c.Input)
-		got, err := config.FromReader(r, fpath)
+		t.Run(c.Name, func(t *testing.T) {
+			r := strings.NewReader(c.Input)
+			got, err := config.FromReader(r, fpath)
 
-		test.CheckErr(t, err, c.Err)
-		checkConfig(t, c.Want, got)
-
+			test.CheckErr(t, err, c.Err)
+			checkConfig(t, c.Want, got)
+		})
 	}
 }
