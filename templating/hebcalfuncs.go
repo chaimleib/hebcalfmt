@@ -103,8 +103,12 @@ func TimedEvents(
 ) ([]hebcal.TimedEvent, error) {
 	optsCopy := *opts
 	opts = &optsCopy
-	opts.Month = z.Month
-	opts.Year = z.Year
+	if opts.NoJulian {
+		opts.Start = hdate.FromProlepticGregorian(z.Year, z.Month, z.Day)
+	} else {
+		opts.Start = hdate.FromGregorian(z.Year, z.Month, z.Day)
+	}
+	opts.End = opts.Start
 	cal, err := hebcal.HebrewCalendar(opts)
 	if err != nil {
 		return nil, err
