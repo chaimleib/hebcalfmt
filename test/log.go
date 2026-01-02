@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// TestLogger captures the output send to the log package.
+// TestLogger captures the output sent to the log package.
 // If the test fails, the logs are printed.
 // Otherwise, they are suppressed.
 //
