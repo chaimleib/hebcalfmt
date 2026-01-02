@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hdate"
+	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
@@ -931,4 +932,25 @@ To show available cities, run:
 			}
 		})
 	}
+}
+
+func TestSetToday(t *testing.T) {
+	want := hebcal.CalOptions{
+		AddHebrewDates: true,
+		Omer:           true,
+		IsHebrewYear:   false,
+	}
+	var got hebcal.CalOptions
+	config.SetToday(&got)
+	checkCalOptions(t, &want, &got)
+}
+
+func TestSetChagOnly(t *testing.T) {
+	want := hebcal.CalOptions{
+		Mask: event.CHAG | event.LIGHT_CANDLES |
+			event.LIGHT_CANDLES_TZEIS | event.YOM_TOV_ENDS,
+	}
+	var got hebcal.CalOptions
+	config.SetChagOnly(&got)
+	checkCalOptions(t, &want, &got)
 }
