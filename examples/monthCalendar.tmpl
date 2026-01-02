@@ -39,18 +39,18 @@ non-whitespace, or another directive. */}}
 {{    if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
 {{-   printf "%2d %2d" $monthDay.Day (hdateFromTime $monthDay).Day}}
 {{-   if datePartsEqual $monthDay $.now}}*{{else}} {{end}}
-{{-   if eq $monthDay.Weekday $.time.Saturday}}
-{{-     "|\n"}}
+{{-   $tomorrow := $monthDay.AddDate 0 0 1}}
+{{-   if eq $monthDay.Weekday $.time.Saturday}}|
+{{-     if $tomorrow.Before $nextMonth}}{{"\n"}}{{end}}
 {{-   end}}
-{{-   $monthDay = $monthDay.AddDate 0 0 1}}
-{{- end}}
+{{-   $monthDay = $tomorrow}}
+{{- end -}}
 
 {{- /* Add blank boxes until the end of the last week. */ -}}
-{{- range 8}}
-{{-   if eq $monthDay.Weekday $.time.Sunday}}
-{{-     "|"}}
-{{-     break}}
+{{- if ne $monthDay.Weekday $.time.Sunday}}|
+{{-   range 8}}
+{{-     if eq $monthDay.Weekday $.time.Sunday}}{{break}}{{end}}
+{{-     repeat " " $cellWidth}}|
+{{-     $monthDay = $monthDay.AddDate 0 0 1}}
 {{-   end}}
-{{-   "|"}}{{repeat " " $cellWidth}}
-{{-   $monthDay = $monthDay.AddDate 0 0 1}}
 {{- end}}
