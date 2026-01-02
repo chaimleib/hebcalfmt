@@ -57,10 +57,10 @@ type Source struct {
 	FromTime     *time.Time
 }
 
-// DefaultedNow returns true if the user did not provide a date besides `Now`
+// Defaulted returns true if the user did not provide a date besides `Now`
 // to set up the `DateRange`.
 // This can happen if, when run from the CLI, no date was specified.
-func (s Source) DefaultedNow() bool {
+func (s Source) Defaulted() bool {
 	return len(s.Args) == 0 && s.FromTime == nil
 }
 

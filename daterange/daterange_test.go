@@ -50,7 +50,7 @@ func TestRangeType_String(t *testing.T) {
 	}
 }
 
-func TestSource_DefaultedNow(t *testing.T) {
+func TestSource_Defaulted(t *testing.T) {
 	cases := []struct {
 		Name  string
 		Input daterange.Source
@@ -68,7 +68,7 @@ func TestSource_DefaultedNow(t *testing.T) {
 		{
 			Name: "with Now",
 			// A non-zero Now is evidence that we were created with FromArgs(),
-			// But with no Args or FromTime, we are DefaultedNow.
+			// But with no Args or FromTime, we are Defaulted.
 			Input: daterange.Source{Now: date(2025, time.January, 1)},
 			Want:  true,
 		},
@@ -83,16 +83,16 @@ func TestSource_DefaultedNow(t *testing.T) {
 			// But if so, and we should have been initialized by FromArgs,
 			// and Now should have been set as well.
 			// This is in an inconsistent state,
-			// but with Args we are certainly not DefaultedNow.
+			// but with Args we are certainly not Defaulted.
 			Input: daterange.Source{Args: []string{"2025"}},
 			Want:  false,
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			got := c.Input.DefaultedNow()
+			got := c.Input.Defaulted()
 			if c.Want != got {
-				t.Errorf("unexpected IsZero for %#v: %v", c.Input, got)
+				t.Errorf("unexpectedly Defaulted for %#v: %v", c.Input, got)
 			}
 		})
 	}

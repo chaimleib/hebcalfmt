@@ -187,7 +187,7 @@ func processArgs(
 	}
 	cfg.DateRange = dr
 
-	if cfg.Today && cfg.DateRange.Source.DefaultedNow() {
+	if cfg.Today && cfg.DateRange.Source.Defaulted() {
 		cfg.DateRange = daterange.FromTime(cfg.Now)
 	}
 
