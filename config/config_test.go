@@ -11,6 +11,7 @@ import (
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/yerushalmi"
+	"github.com/hebcal/hebcal-go/zmanim"
 
 	"github.com/chaimleib/hebcalfmt/config"
 	"github.com/chaimleib/hebcalfmt/daterange"
@@ -791,6 +792,142 @@ func TestSetShiurim(t *testing.T) {
 			test.CheckErr(t, err, c.Err)
 			if c.Err == "" { // otherwise don't care
 				checkCalOptions(t, c.Want, &got)
+			}
+		})
+	}
+}
+
+func TestConfig_Location(t *testing.T) {
+	cases := []struct {
+		Name string
+		Cfg  config.Config
+		Want *zmanim.Location
+		Err  string
+		Log  string
+	}{
+		{
+			Name: "empty uses default city",
+			Want: &zmanim.Location{
+				Name:        "New York",
+				CountryCode: "US",
+				Latitude:    40.71427,
+				Longitude:   -74.00597,
+				TimeZoneId:  "America/New_York",
+			},
+		},
+		{
+			Name: "custom timezone",
+			Cfg:  config.Config{Timezone: "Asia/Jerusalem"},
+			Want: &zmanim.Location{
+				Name:        "New York (times in timezone Asia/Jerusalem)",
+				CountryCode: "US",
+				Latitude:    40.71427,
+				Longitude:   -74.00597,
+				TimeZoneId:  "Asia/Jerusalem",
+			},
+		},
+		{
+			Name: "named city",
+			Cfg:  config.Config{City: "Denver"},
+			Want: &zmanim.Location{
+				Name:        "Denver",
+				CountryCode: "US",
+				Latitude:    39.73915,
+				Longitude:   -104.9847,
+				TimeZoneId:  "America/Denver",
+			},
+		},
+
+		// Geo
+		{
+			Name: "unnamed Geo",
+			Cfg: config.Config{
+				Timezone: "UTC",
+				Geo:      &config.Coordinates{1.5, 2.5},
+			},
+			Want: &zmanim.Location{
+				Name:        "User Defined City",
+				CountryCode: "ZZ",
+				Latitude:    1.5,
+				Longitude:   2.5,
+				TimeZoneId:  "UTC",
+			},
+		},
+		{
+			Name: "named Geo",
+			Cfg: config.Config{
+				City:     "Global Origin",
+				Timezone: "UTC",
+				Geo:      &config.Coordinates{0, 0},
+			},
+			Want: &zmanim.Location{
+				Name:        "Global Origin",
+				CountryCode: "ZZ",
+				Latitude:    0,
+				Longitude:   0,
+				TimeZoneId:  "UTC",
+			},
+		},
+		{
+			Name: "named Geo in Israel",
+			Cfg: config.Config{
+				City:     "Kotel",
+				Timezone: "Asia/Jerusalem",
+				Geo:      &config.Coordinates{31.7767, 25.2345},
+				IL:       true,
+			},
+			Want: &zmanim.Location{
+				Name:        "Kotel",
+				CountryCode: "IL",
+				Latitude:    31.7767,
+				Longitude:   25.2345,
+				TimeZoneId:  "Asia/Jerusalem",
+			},
+		},
+
+		// Errors
+		{
+			Name: "invalid timezone",
+			Cfg:  config.Config{Timezone: "INVALID"},
+			Err:  "unknown time zone INVALID",
+		},
+		{
+			Name: "geo with missing timezone",
+			Cfg:  config.Config{Geo: new(config.Coordinates)},
+			Err:  "geo is set, but timezone is missing",
+		},
+		{
+			Name: "geo out of bounds",
+			Cfg: config.Config{
+				Geo:      &config.Coordinates{91.0, 0},
+				Timezone: "UTC",
+			},
+			Err: "invalid geo: invalid latitude: 91.000000",
+		},
+		{
+			Name: "unknown city",
+			Cfg:  config.Config{City: "Unknown"},
+			Err:  `unknown city: "Unknown"`,
+			Log: strings.TrimSpace(`
+unknown city: "Unknown"
+Use a nearby city; or add geo.lat, geo.lon, and timezone.
+To show available cities, run:
+  hebcalfmt --info cities
+`),
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			logBuf := test.TestLogger(t)
+			got, err := c.Cfg.Location()
+			test.CheckErr(t, err, c.Err)
+			if c.Err == "" { // otherwise don't care
+				if *c.Want != *got {
+					t.Errorf("want:\n%#v\ngot:\n%#v", c.Want, got)
+				}
+			}
+			if c.Log != "" && c.Log != strings.TrimSpace(logBuf.String()) {
+				t.Errorf("want logs:\n%s\ngot:\n%s", c.Log, logBuf.String())
 			}
 		})
 	}
