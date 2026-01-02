@@ -266,7 +266,7 @@ func (c Config) Normalize() (*Config, error) {
 }
 
 // CalOptions builds a [hebcal.CalOptions] from a [Config].
-func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
+func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	cOpts := new(hebcal.CalOptions)
 
 	cOpts.NoJulian = c.NoJulian
@@ -330,8 +330,9 @@ func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 	}
 
 	// prep for accessing secondary files
+	files := c.FS
 	if c.FS == nil {
-		c.FS, err = DefaultFS()
+		files, err = DefaultFS()
 		if err != nil {
 			slog.Error("failed to initialize DefaultFS", "error", err)
 			return nil, fmt.Errorf("failed to initialize DefaultFS: %w", err)
@@ -340,25 +341,29 @@ func (c *Config) CalOptions() (*hebcal.CalOptions, error) {
 
 	// Read secondary files
 	// UserEvents
-	err = ParseFile(
-		c.FS,
-		c.EventsFile,
-		hcfiles.ParseEvents,
-		&cOpts.UserEvents,
-	)
-	if err != nil {
-		return nil, err
+	if c.EventsFile != "" {
+		err = ParseFile(
+			files,
+			c.EventsFile,
+			hcfiles.ParseEvents,
+			&cOpts.UserEvents,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Yahrzeits
-	err = ParseFile(
-		c.FS,
-		c.YahrzeitsFile,
-		hcfiles.ParseYahrzeits,
-		&cOpts.Yahrzeits,
-	)
-	if err != nil {
-		return nil, err
+	if c.YahrzeitsFile != "" {
+		err = ParseFile(
+			files,
+			c.YahrzeitsFile,
+			hcfiles.ParseYahrzeits,
+			&cOpts.Yahrzeits,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return cOpts, nil
