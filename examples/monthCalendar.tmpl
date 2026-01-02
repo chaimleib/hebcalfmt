@@ -26,9 +26,9 @@ non-whitespace, or another directive. */}}
 {{repeat (printf "|%s" (repeat "-" $cellWidth)) 7}}|
 
 {{- /* Add blank boxes each weekday until day 1 of the month. */}}
-{{- range 7}}
+{{  range 7}}
 {{-   if eq $monthDay.Weekday .}}{{break}}{{end}}
-{{-   "\n|"}}{{repeat " " $cellWidth}}
+{{-   "|"}}{{repeat " " $cellWidth}}
 {{- end}}
 
 {{- /* Number the cells with the Gregorian and Hebrew days of the month. */}}
