@@ -23,10 +23,6 @@ func (fsf FSFunc) Open(fpath string) (fs.File, error) {
 
 // NewFSFunc turns a function that returns a type compatible with [fs.File]
 // into an [fs.FS].
-func NewFSFunc[F fs.File](fn func(string) (F, error)) FSFunc {
-	open := func(fpath string) (f fs.File, err error) {
-		f, err = fn(fpath)
-		return f, err
-	}
-	return FSFunc(open)
+func NewFSFunc[F fs.File](fn func(string) (F, error)) fs.FS {
+	return FSFunc(func(fpath string) (fs.File, error) { return fn(fpath) })
 }
