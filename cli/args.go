@@ -138,18 +138,17 @@ func loadConfigFromFlags(
 // loadConfigOrDefault reads fpath if not empty.
 // It will error if fpath does not exist.
 //
-// If fpath is empty, default to loading from ~/.config/hebcalfmt/config.json,
-// but if that file is not present, return config.Default with no error.
+// Otherwise, if fpath is empty and HOME is set,
+// default to loading from ~/.config/hebcalfmt/config.json.
+//
+// Otherwise return config.Default with no error.
 func loadConfigOrDefault(files fs.FS, fpath string) (*config.Config, error) {
 	var suppressMissingConfigErr bool
 
 	// Try to configure a default configPath if one was not provided
-	if fpath == "" {
+	home := os.Getenv("HOME")
+	if fpath == "" && home != "" {
 		suppressMissingConfigErr = true
-		home := os.Getenv("HOME")
-		if home == "" {
-			return new(config.Config), nil
-		}
 		fpath = filepath.Join(home, ".config", ProgName, "config.json")
 	}
 
