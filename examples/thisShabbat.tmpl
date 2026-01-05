@@ -1,6 +1,6 @@
 This Shabbat in {{$.location.Name}}:
 
-{{  /* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
+{{/* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
 {{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
 {{- $d := $.dateRange.StartOrToday false}}
 {{- $timeFormat := "03:04 PM"}}
@@ -8,7 +8,7 @@ This Shabbat in {{$.location.Name}}:
 {{- $d = $d.OnOrAfter $.time.Saturday}}
 {{- $z := forLocationDate $.location $d.Gregorian}}
 {{- $erev := $d.Prev}}
-{{- $zErev := forLocationDate $.location $erev.Gregorian}}
+{{- $zErev := forLocationDate $.location $erev.Gregorian -}}
 
 Erev Shabbat: {{$erev.Gregorian.Format "Mon Jan 02 2006"}} / {{$erev}}
 {{- range timedEvents $zErev}}
