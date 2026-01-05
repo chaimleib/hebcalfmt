@@ -1,6 +1,7 @@
 package templating
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
@@ -34,7 +35,7 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"hdateDayOnOrBefore":          hdate.DayOnOrBefore,
 
 		// zmanim.Location
-		"lookupCity":  zmanim.LookupCity,
+		"lookupCity":  LookupCity,
 		"allCities":   zmanim.AllCities,
 		"newLocation": zmanim.NewLocation,
 
@@ -75,6 +76,16 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"setNumYears":     SetNumYears(opts),
 		"setIsHebrewYear": SetIsHebrewYear(opts),
 	}
+}
+
+// LookupCity is the same as [zmanim.LookupCity],
+// except that we return an error if no match is found.
+func LookupCity(city string) (*zmanim.Location, error) {
+	l := zmanim.LookupCity(city)
+	if l == nil {
+		return nil, fmt.Errorf("unknown city %q", city)
+	}
+	return l, nil
 }
 
 // AsEvent attempts to convert an [event.CalEvent] interface
