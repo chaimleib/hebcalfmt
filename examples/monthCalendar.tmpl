@@ -9,7 +9,7 @@ non-whitespace, or another directive. */}}
 {{- $nextMonth := $monthDay.AddDate 0 1 0}}
 
 {{- /* English month label */}}
-{{- $monthDay.Month}} {{$.now.Year}}
+{{- $monthDay.Month}} {{$monthDay.Year}}
 
 {{- /* Hebrew month label(s) */}}
 {{- $hdate := hdateFromTime $monthDay}}
