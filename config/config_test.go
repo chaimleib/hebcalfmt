@@ -203,6 +203,11 @@ func checkCalOptions(t *testing.T, want, got *hebcal.CalOptions) {
 }
 
 func TestFromFile(t *testing.T) {
+	files := fstest.MapFS{
+		"empty.txt":        &fstest.MapFile{Data: []byte("")},
+		"emptyObject.json": &fstest.MapFile{Data: []byte("{}")},
+		"today.json":       &fstest.MapFile{Data: []byte(`{"today":true}`)},
+	}
 	baseWant := func(fpath string) *config.Config {
 		cfg := config.Default
 		cfg.ConfigSource = fpath
@@ -218,31 +223,31 @@ func TestFromFile(t *testing.T) {
 	}{
 		{
 			Name:  "invalid empty file",
-			Fpath: "testdata/empty.txt",
+			Fpath: "empty.txt",
 			Want:  nil,
-			Err:   `failed to parse config from "testdata/empty.txt": EOF`,
+			Err:   `failed to parse config from "empty.txt": EOF`,
 		},
 		{
 			Name:  "invalid nonexistent file",
-			Fpath: "testdata/nonexistent.json",
+			Fpath: "nonexistent.json",
 			Want:  nil,
-			Err:   `config file could not be read: open testdata/nonexistent.json: no such file or directory`,
+			Err:   `config file could not be read: open nonexistent.json: file does not exist`,
 		},
 		{
-			Name:  "invalid FS",
-			FSErr: errors.New("test forced DefaultFS to fail"),
-			Fpath: "testdata/emptyObject.json",
+			Name:  "custom FS",
+			FSErr: errors.New("test forced files.Open to fail"),
+			Fpath: "emptyObject.json",
 			Want:  nil,
-			Err:   `failed to initialize DefaultFS: test forced DefaultFS to fail`,
+			Err:   `config file could not be read: test forced files.Open to fail`,
 		},
 		{
 			Name:  "empty object",
-			Fpath: "testdata/emptyObject.json",
+			Fpath: "emptyObject.json",
 			Want:  baseWant,
 		},
 		{
 			Name:  "today config",
-			Fpath: "testdata/today.json",
+			Fpath: "today.json",
 			Want: func(fpath string) *config.Config {
 				cfg := baseWant(fpath)
 				cfg.Today = true
@@ -254,17 +259,16 @@ func TestFromFile(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			test.TestSlogger(t)
 			test.TestLogger(t)
+
+			var files fs.FS = files
 			if c.FSErr != nil {
-				old := config.DefaultFS
-				t.Cleanup(func() {
-					config.DefaultFS = old
-				})
-				config.DefaultFS = func() (fs.FS, error) {
+				openReturnsErr := func(string) (fs.File, error) {
 					return nil, c.FSErr
 				}
+				files = config.FSFunc(openReturnsErr)
 			}
 
-			got, err := config.FromFile(c.Fpath)
+			got, err := config.FromFile(files, c.Fpath)
 			var want *config.Config
 			if c.Want != nil {
 				want = c.Want(c.Fpath)

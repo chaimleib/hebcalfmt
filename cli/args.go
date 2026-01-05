@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -54,10 +55,11 @@ func NewFlags() *pflag.FlagSet {
 // NOTE: Other args like the template file path and the date range spec
 // are processed by processArgs.
 func processFlags(
-	fs *pflag.FlagSet,
+	files fs.FS,
+	flagSet *pflag.FlagSet,
 	args []string,
 ) (*config.Config, error) {
-	if err := fs.Parse(args); err != nil {
+	if err := flagSet.Parse(args); err != nil {
 		return nil, err
 	}
 
@@ -68,18 +70,18 @@ func processFlags(
 	// All of these would indicate coding defects,
 	// in which case I want to know the source file and line number.
 	// slog is set up for this purpose.
-	help, err := fs.GetBool("help")
+	help, err := flagSet.GetBool("help")
 	if err != nil {
 		slog.Error("failed to get --help flag", "error", err)
 		return nil, fmt.
 			Errorf("%w: get --help: %w", ErrUnreachable, err)
 	}
 	if help {
-		fmt.Println(usage(fs))
+		fmt.Println(usage(flagSet))
 		return nil, ErrDone
 	}
 
-	version, err := fs.GetBool("version")
+	version, err := flagSet.GetBool("version")
 	if err != nil {
 		slog.Error("failed to get --version flag", "error", err)
 		return nil, fmt.Errorf("%w: get --version: %w", ErrUnreachable, err)
@@ -89,13 +91,13 @@ func processFlags(
 		return nil, ErrDone
 	}
 
-	key, err := fs.GetString("info")
+	key, err := flagSet.GetString("info")
 	if err != nil {
 		slog.Error("failed to get --info option", "error", err)
 		return nil, fmt.Errorf("%w: get --info: %w", ErrUnreachable, err)
 	}
 	if key != "" {
-		info, err := infoString(key, fs)
+		info, err := infoString(key, flagSet)
 		if err != nil {
 			return nil, err
 		}
@@ -103,21 +105,24 @@ func processFlags(
 		return nil, ErrDone
 	}
 
-	return loadConfigFromFlags(fs)
+	return loadConfigFromFlags(files, flagSet)
 }
 
 // loadConfigFromFlags reads the --config flag option
 // and loads the config file specified.
 // Otherwise, it loads the default config.
 // Then it calls Normalize on the result.
-func loadConfigFromFlags(fs *pflag.FlagSet) (*config.Config, error) {
-	fpath, err := fs.GetString("config")
+func loadConfigFromFlags(
+	files fs.FS,
+	flagSet *pflag.FlagSet,
+) (*config.Config, error) {
+	fpath, err := flagSet.GetString("config")
 	if err != nil {
 		slog.Error("failed to get --config option", "error", err)
 		return nil, fmt.Errorf("%w: get --config: %w", ErrUnreachable, err)
 	}
 
-	cfg, err := loadConfigOrDefault(fpath)
+	cfg, err := loadConfigOrDefault(files, fpath)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +140,7 @@ func loadConfigFromFlags(fs *pflag.FlagSet) (*config.Config, error) {
 //
 // If fpath is empty, default to loading from ~/.config/hebcalfmt/config.json,
 // but if that file is not present, return config.Default with no error.
-func loadConfigOrDefault(fpath string) (*config.Config, error) {
+func loadConfigOrDefault(files fs.FS, fpath string) (*config.Config, error) {
 	var suppressMissingConfigErr bool
 
 	// Try to configure a default configPath if one was not provided
@@ -148,7 +153,7 @@ func loadConfigOrDefault(fpath string) (*config.Config, error) {
 		fpath = filepath.Join(home, ".config", ProgName, "config.json")
 	}
 
-	cfg, err := config.FromFile(fpath)
+	cfg, err := config.FromFile(files, fpath)
 	if suppressMissingConfigErr && errors.Is(err, os.ErrNotExist) {
 		defaultCfg := config.Default
 		return &defaultCfg, nil

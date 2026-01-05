@@ -212,14 +212,8 @@ var Default = Config{
 // For the sake of debugging,
 // it then populates `ConfigSource` with `configPath`.
 // NOTE: This does not populate DateRange.
-func FromFile(configPath string) (*Config, error) {
-	fileSystem, err := DefaultFS()
-	if err != nil {
-		slog.Error("failed to initialize DefaultFS", "error", err)
-		return nil, fmt.Errorf("failed to initialize DefaultFS: %w", err)
-	}
-
-	f, err := fileSystem.Open(configPath)
+func FromFile(files fs.FS, configPath string) (*Config, error) {
+	f, err := files.Open(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("config file could not be read: %w", err)
 	}

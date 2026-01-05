@@ -2,6 +2,8 @@ package cli
 
 import (
 	"errors"
+	"fmt"
+	"io/fs"
 	"log"
 	"log/slog"
 	"os"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/hebcal/hebcal-go/zmanim"
 
+	"github.com/chaimleib/hebcalfmt/config"
 	"github.com/chaimleib/hebcalfmt/templating"
 )
 
@@ -39,57 +42,87 @@ var InitLogging = func() {
 	log.Default().SetPrefix("")
 }
 
-// Run is the entry point for CLI program.
-// It parses CLI flags and arguments and returns an exit code.
+// Run is the entry point for the CLI program.
+// It sets up the program inputs and returns an exit code.
+//
+// Specifically, it configures logging settings,
+// pulls CLI arguments to parse from [os.Args],
+// ensures that filesystem requests get forwarded to [os.Open],
+// and sets the current time from [time.Now].
+//
+// If you need to modify these, take a look at [RunInEnvironment].
 func Run() int {
 	InitLogging()
 
-	fs := NewFlags()
-	cfg, err := processFlags(fs, os.Args[1:])
-	if errors.Is(err, ErrDone) {
-		return 0
+	files, err := config.DefaultFS()
+	if err != nil {
+		slog.Error("failed to initialize DefaultFS", "error", err)
+		return 1
 	}
+
+	err = RunInEnvironment(os.Args[1:], files, time.Now())
 	if err != nil {
 		log.Println(err)
 		return 1
 	}
 
-	// cfg.Now will be the idea of now for the entire program run.
-	// It uses the computer's timezone for our idea of "now",
-	// rather than the city's timezone.
-	// If a date/time in a different timezone is required,
-	// that function should require a timezone argument,
-	// rather than rely on the timezone embedded in this variable.
-	//
-	// NOTE: Even though this system is less consistent logically,
-	// and, e.g., a computer in Phoenix will use the date in Phoenix
-	// when calculating results for New York where it is already the next day,
-	// this program is written for humans.
-	// Humans would get confused if, e.g.,
-	// results for Jan. 1 next year get generated
-	// when for them it is still Dec. 31, and they didn't specify the date:
-	//   hebcalfmt examples/hebcalClassic.tmpl
-	// For those wanting full consistency, they should specify a timezone
-	// in the template or on the CLI. For example:
-	//   TZ=America/New_York hebcalfmt examples/hebcalClassic.tmpl
-	cfg.Now = time.Now()
+	return 0
+}
 
-	tmplPath, err := processArgs(fs.Args(), cfg)
-	if errors.Is(err, ErrUsage) {
-		log.Println(usage(fs))
-		log.Println(err)
-		return 1
-	}
+// RunInEnvironment takes CLI-style args, a filesystem, and the current time,
+// and prints the result of the requested operation.
+//
+// `now` uses the computer's timezone
+// for our idea of "now" and the current date,
+// rather than the configured city's timezone.
+// If a date/time in a different timezone is required,
+// the template should set that specially,
+// rather than rely on the timezone embedded in this variable.
+//
+// NOTE: Even though this behavior is less consistent logically,
+// and, e.g., a computer in Phoenix will use the date in Phoenix
+// when calculating results for New York where it is already the next day,
+// this program is written for humans.
+// Humans would get confused if, e.g.,
+// results for Jan. 1 next year get generated
+// when for them it is still Dec. 31, and they didn't specify the date:
+//
+//	hebcalfmt examples/hebcalClassic.tmpl
+//
+// For those wanting full consistency, they should specify a timezone
+// in the template or on the CLI. For example:
+//
+//	TZ=America/New_York hebcalfmt examples/hebcalClassic.tmpl
+func RunInEnvironment(args []string, files fs.FS, now time.Time) error {
+	flagSet := NewFlags()
+	cfg, err := processFlags(files, flagSet, args)
 	if err != nil {
-		log.Println(err)
-		return 1
+		if errors.Is(err, ErrDone) {
+			return nil
+		}
+		if errors.Is(err, ErrUsage) {
+			log.Println(usage(flagSet))
+		}
+		return err
+	}
+
+	cfg.Now = now
+
+	tmplPath, err := processArgs(flagSet.Args(), cfg)
+	if err != nil {
+		if errors.Is(err, ErrUsage) {
+			log.Println(usage(flagSet))
+		}
+		return err
 	}
 
 	opts, err := cfg.CalOptions()
 	if err != nil {
-		log.Printf("failed to build hebcal options from %s: %v",
+		if errors.Is(err, ErrUsage) {
+			log.Println(usage(flagSet))
+		}
+		return fmt.Errorf("failed to build hebcal options from %s: %w",
 			cfg.ConfigSource, err)
-		return 1
 	}
 
 	z := zmanim.New(opts.Location, cfg.Now)
@@ -101,8 +134,7 @@ func Run() int {
 
 	tmpl, err = templating.ParseFile(tmpl, tmplPath)
 	if err != nil {
-		log.Println(err)
-		return 1
+		return err
 	}
 
 	err = tmpl.Execute(os.Stdout, map[string]any{
@@ -119,9 +151,8 @@ func Run() int {
 		"time":          templating.TimeConsts,
 	})
 	if err != nil {
-		log.Println(err)
-		return 1
+		return err
 	}
 
-	return 0
+	return nil
 }
