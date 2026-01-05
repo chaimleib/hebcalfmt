@@ -78,6 +78,10 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 		{"YahrzeitsFile", want.YahrzeitsFile, got.YahrzeitsFile},
 	} {
 		switch typedWant := field.Want.(type) {
+		case fs.FS:
+			typedGot := field.Got.(fs.FS)
+			test.CheckFS(t, field.Name, typedWant, typedGot)
+
 		case *daterange.DateRange:
 			if typedWant != nil && field.Got != nil {
 				typedGot := field.Got.(*daterange.DateRange)
@@ -211,6 +215,7 @@ func TestFromFile(t *testing.T) {
 	baseWant := func(fpath string) *config.Config {
 		cfg := config.Default
 		cfg.ConfigSource = fpath
+		cfg.FS = files
 		return &cfg
 	}
 
@@ -265,7 +270,7 @@ func TestFromFile(t *testing.T) {
 				openReturnsErr := func(string) (fs.File, error) {
 					return nil, c.FSErr
 				}
-				files = config.FSFunc(openReturnsErr)
+				files = config.NewFSFunc(openReturnsErr)
 			}
 
 			got, err := config.FromFile(files, c.Fpath)
