@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -48,7 +49,8 @@ var InitLogging = func() {
 // Specifically, it configures logging settings,
 // pulls CLI arguments to parse from [os.Args],
 // ensures that filesystem requests get forwarded to [os.Open],
-// and sets the current time from [time.Now].
+// sets the current time from [time.Now],
+// and sets the output writer to [os.Stdout].
 //
 // If you need to modify these, take a look at [RunInEnvironment].
 func Run() int {
@@ -60,7 +62,7 @@ func Run() int {
 		return 1
 	}
 
-	err = RunInEnvironment(os.Args[1:], files, time.Now())
+	err = RunInEnvironment(os.Args[1:], files, time.Now(), os.Stdout)
 	if err != nil {
 		log.Println(err)
 		return 1
@@ -93,7 +95,12 @@ func Run() int {
 // in the template or on the CLI. For example:
 //
 //	TZ=America/New_York hebcalfmt examples/hebcalClassic.tmpl
-func RunInEnvironment(args []string, files fs.FS, now time.Time) error {
+func RunInEnvironment(
+	args []string,
+	files fs.FS,
+	now time.Time,
+	w io.Writer,
+) error {
 	flagSet := NewFlags()
 	cfg, err := processFlags(files, flagSet, args)
 	if err != nil {
@@ -137,7 +144,7 @@ func RunInEnvironment(args []string, files fs.FS, now time.Time) error {
 		return err
 	}
 
-	err = tmpl.Execute(os.Stdout, map[string]any{
+	err = tmpl.Execute(w, map[string]any{
 		"now":           cfg.Now,
 		"nowInLocation": cfg.Now.In(z.TimeZone),
 		"calOptions":    opts,
