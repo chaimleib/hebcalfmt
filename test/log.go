@@ -17,7 +17,7 @@ func TestLogger(t *testing.T) fmt.Stringer {
 	log.SetFlags(0) // suppress timestamps
 	log.SetOutput(&buf)
 	t.Cleanup(func() {
-		if t.Failed() {
+		if t.Failed() && buf.Len() != 0 {
 			t.Log("log output:")
 			t.Log(buf.String())
 		}

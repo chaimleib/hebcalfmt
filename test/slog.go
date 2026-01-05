@@ -46,7 +46,7 @@ func TestSlogger(t *testing.T) fmt.Stringer {
 	slogger := slog.New(handler)
 	slog.SetDefault(slogger)
 	t.Cleanup(func() {
-		if t.Failed() {
+		if t.Failed() && buf.Len() != 0 {
 			t.Log("slog output:")
 			t.Log(buf.String())
 		}
