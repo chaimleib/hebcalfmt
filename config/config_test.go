@@ -81,22 +81,34 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 		{"EventsFile", want.EventsFile, got.EventsFile},
 		{"YahrzeitsFile", want.YahrzeitsFile, got.YahrzeitsFile},
 	} {
+		// In case the type is an interface (doesn't work for pointers),
+		// check for mismatching nilness or matching nils.
+		// If we proceed past both checks,
+		// both are non-nil and castable to the interface type.
+		if (field.Want == nil) != (field.Got == nil) {
+			t.Errorf("%s's did not match - want:\n%#v\ngot:\n%#v",
+				field.Name, field.Want, field.Got)
+			continue
+		} else if field.Want == nil { // implies field.Got == nil b/c of prev check
+			continue
+		}
+
 		switch typedWant := field.Want.(type) {
 		case fs.FS:
-			typedGot := field.Got.(fs.FS)
-			test.CheckFS(t, field.Name, typedWant, typedGot)
+			// assumes field.Got != nil
+			typedGot, ok := field.Got.(fs.FS)
+			if !ok {
+				t.Errorf("%s's types did not match - want:\n%T\ngot:\n%T",
+					field.Name, typedWant, field.Got)
+			} else {
+				test.CheckFS(t, field.Name, typedWant, typedGot)
+			}
 
 		case *daterange.DateRange:
-			if typedWant != nil && field.Got != nil {
-				typedGot := field.Got.(*daterange.DateRange)
-				test.CheckDateRange(t, *typedWant, *typedGot)
-			}
+			test.CheckNilPtrThen(t, test.CheckDateRange, field.Name, typedWant, field.Got)
 
 		case *config.Coordinates:
-			if typedWant != nil && field.Got != nil {
-				typedGot := field.Got.(*config.Coordinates)
-				test.CheckCoordinates(t, typedWant, typedGot)
-			}
+			test.CheckNilPtrThen(t, test.CheckCoordinates, field.Name, typedWant, field.Got)
 
 		case []string:
 			typedGot := field.Got.([]string)
@@ -106,10 +118,7 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 			}
 
 		default:
-			if field.Want != field.Got {
-				t.Errorf("%s's do not match - want:\n%v\ngot:\n%v",
-					field.Name, field.Want, field.Got)
-			}
+			test.CheckComparable(t, field.Name, field.Want, field.Got)
 		}
 	}
 }
@@ -172,16 +181,8 @@ func checkCalOptions(t *testing.T, want, got *hebcal.CalOptions) {
 	} {
 		switch typedWant := field.Want.(type) {
 		case *zmanim.Location:
-			typedGot := field.Got.(*zmanim.Location)
-			if (typedWant == nil) != (typedGot == nil) {
-				t.Errorf("%s's do not match - want:\n%#v\ngot:\n%#v",
-					field.Name, field.Want, field.Got)
-			} else if typedWant != nil { // implies && typedGot != nil
-				if *typedWant != *typedGot {
-					t.Errorf("%s's do not match - want:\n%#v\ngot:\n%#v",
-						field.Name, field.Want, field.Got)
-				}
-			}
+			test.CheckNilPtrThen(t, test.CheckComparable,
+				field.Name, typedWant, field.Got)
 
 		case []hebcal.UserYahrzeit:
 			typedGot := field.Got.([]hebcal.UserYahrzeit)
@@ -202,10 +203,7 @@ func checkCalOptions(t *testing.T, want, got *hebcal.CalOptions) {
 			test.CheckHDate(t, field.Name, typedWant, typedGot)
 
 		default:
-			if field.Want != field.Got {
-				t.Errorf("%s's do not match - want:\n%v\ngot:\n%v",
-					field.Name, field.Want, field.Got)
-			}
+			test.CheckComparable(t, field.Name, field.Want, field.Got)
 		}
 	}
 }

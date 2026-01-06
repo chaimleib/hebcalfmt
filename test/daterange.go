@@ -58,7 +58,7 @@ func CheckDateRangeSource(t *testing.T, want, got daterange.Source) {
 	}
 }
 
-func CheckDateRange(t *testing.T, want, got daterange.DateRange) {
+func CheckDateRange(t *testing.T, name string, want, got daterange.DateRange) {
 	CheckDateRangeSource(t, want.Source, got.Source)
 	for _, field := range []struct {
 		Name      string
@@ -72,8 +72,8 @@ func CheckDateRange(t *testing.T, want, got daterange.DateRange) {
 		{"IsHebrewDate", want.IsHebrewDate, got.IsHebrewDate},
 	} {
 		if field.Want != field.Got {
-			t.Errorf("%s's did not match - want: %v, got: %v",
-				field.Name, field.Want, field.Got)
+			t.Errorf("%s.%s's did not match - want: %v, got: %v",
+				name, field.Name, field.Want, field.Got)
 		}
 	}
 }

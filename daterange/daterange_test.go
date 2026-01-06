@@ -134,7 +134,7 @@ func TestDateRange_FromTime(t *testing.T) {
 				t.Errorf("got unexpected nil from daterange.FromTime()")
 				return
 			}
-			test.CheckDateRange(t, c.Want, *got)
+			test.CheckDateRange(t, "DateRange", c.Want, *got)
 		})
 	}
 }
@@ -463,7 +463,7 @@ func TestDateRange_FromArgs(t *testing.T) {
 				t.Errorf("got unexpected nil from daterange.FromArgs()")
 				return
 			}
-			test.CheckDateRange(t, c.Want, *got)
+			test.CheckDateRange(t, "DateRange", c.Want, *got)
 		})
 	}
 }
