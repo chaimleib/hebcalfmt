@@ -142,6 +142,13 @@ func loadConfigFromFlags(
 // default to loading from ~/.config/hebcalfmt/config.json.
 //
 // Otherwise return config.Default with no error.
+//
+// Paths of secondary files referenced inside the config file
+// will be resolved relative to the [filepath.Dir] of the config file itself.
+// While the current [config.Default] does not reference other files,
+// if that is returned, the FS will resolve relative paths
+// using the default behavior of the FS.
+// Typically that means relative to the current working directory.
 func loadConfigOrDefault(files fs.FS, fpath string) (*config.Config, error) {
 	var suppressMissingConfigErr bool
 

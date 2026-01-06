@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"log"
 	"log/slog"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -209,6 +210,11 @@ var Default = Config{
 }
 
 // FromFile parses the file at `configPath` into a [Config] as JSON.
+// It sets up the FS so that file references are interpreted
+// relative to the configPath and must be local.
+// This means that file references which fail [filepath.IsLocal],
+// i.e., leave the directory tree with abs paths or ..,
+// are not allowed.
 // For the sake of debugging,
 // it then populates `ConfigSource` with `configPath`.
 // NOTE: This does not populate DateRange.
@@ -219,10 +225,19 @@ func FromFile(files fs.FS, configPath string) (*Config, error) {
 	}
 	defer f.Close()
 
-	return FromReader(f, configPath)
+	cfg, err := FromReader(f, configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	baseDir := filepath.Dir(configPath)
+	cfg.FS = WrapFS{BaseDir: baseDir, FS: files}
+
+	return cfg, nil
 }
 
 // FromReader parses an [io.Reader] into a [Config] as JSON.
+// It does not set an FS.
 // For the sake of debugging,
 // it then populates `ConfigSource` with `configPath`.
 func FromReader(r io.Reader, configPath string) (*Config, error) {
@@ -260,6 +275,9 @@ func (c Config) Normalize() (*Config, error) {
 }
 
 // CalOptions builds a [hebcal.CalOptions] from a [Config].
+// If FS is not set, the [DefaultFS] is used
+// and file references are interpreted
+// relative to the current working directory.
 func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	cOpts := new(hebcal.CalOptions)
 
