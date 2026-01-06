@@ -143,6 +143,7 @@ func RunInEnvironment(
 	if err != nil {
 		return err
 	}
+	tmpl.ParseName = tmplPath
 
 	err = tmpl.Execute(w, map[string]any{
 		"now":           cfg.Now,
