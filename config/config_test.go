@@ -33,6 +33,10 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 		}
 		return
 	}
+	if got == nil {
+		t.Errorf("got nil, want: %#v", want)
+		return
+	}
 
 	for _, field := range []struct {
 		Name      string
