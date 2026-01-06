@@ -1,0 +1,5 @@
+{
+  "no_holidays": true,
+  "add_hebrew_dates_for_events": true,
+  "events_file": "../examples/event.txt"
+}
