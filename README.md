@@ -62,18 +62,18 @@ non-whitespace, or another directive. */}}
 {{- $nextMonth := $monthDay.AddDate 0 1 0}}
 
 {{- /* English month label */}}
-{{- $monthDay.Month}} {{$.now.Year}}
+{{- $monthDay.Month}} {{$monthDay.Year}}
 
 {{- /* Hebrew month label(s) */}}
 {{- $hdate := hdateFromTime $monthDay}}
 {{- $hdateLast := hdateFromTime ($nextMonth.AddDate 0 0 -1)}}
-{{$hdate.Month}}
+{{$hdate.MonthName $.language}}
 {{- /* If the Hebrew year changes, */}}
 {{- /* show the starting year by the starting month. */}}
 {{- if ne $hdate.Year $hdateLast.Year}} {{$hdate.Year}}{{end}}
 {{- /* If the Hebrew month changes, hyphenate the range. */}}
 {{- if ne $hdateLast.Month $hdate.Month}}
-{{-   " - "}}{{$hdateLast.Month}}
+{{-   " - "}}{{$hdateLast.MonthName $.language}}
 {{- end}}
 {{- " "}}{{$hdateLast.Year}}
 
@@ -161,11 +161,15 @@ Hebrew: {{$d.Day}} {{$d.MonthName $.language}} {{$d.Year}}
 $ hebcalfmt examples/date.tmpl
 Gregorian: 2025-12-18
 Hebrew: 28 Kislev 5786
+```
 
+```bash
 $ hebcalfmt examples/date.tmpl 12 1 2020
 Gregorian: 2020-12-01
 Hebrew: 15 Kislev 5781
+```
 
+```bash
 $ hebcalfmt examples/date.tmpl Kislev 25 5786
 Gregorian: 2025-12-15
 Hebrew: 25 Kislev 5786
@@ -183,7 +187,7 @@ examples/hebcalClassic.tmpl
 {{- range hebcal}}
 {{-   .GetDate.Gregorian.Format "1/2/2006 "}}
 {{-     .Render $.language}}
-{{  end}}
+{{  end -}}
 ```
 
 ```bash
@@ -196,11 +200,15 @@ $ hebcalfmt examples/hebcalClassic.tmpl
 12/21/2025 Rosh Chodesh Tevet
 12/22/2025 Chanukah: 8th Day
 12/30/2025 Asara B'Tevet
+```
 
+```bash
 $ hebcalfmt -c <(echo '{"today": true}') examples/hebcalClassic.tmpl
 12/18/2025 28th of Kislev, 5786
 12/18/2025 Chanukah: 5 Candles
+```
 
+```bash
 $ hebcalfmt examples/hebcalClassic.tmpl Tishrei 5787
 9/12/2026 Rosh Hashana 5787
 9/13/2026 Rosh Hashana II
@@ -240,8 +248,8 @@ examples/events.json
 {
   "no_holidays": true,
   "add_hebrew_dates_for_events": true,
-  "events_file": "examples/event.txt",
-  "yahrzeits_file": "examples/yahrzeit.txt"
+  "events_file": "event.txt",
+  "yahrzeits_file": "yahrzeit.txt"
 }
 ```
 
@@ -271,7 +279,7 @@ examples/mincha.tmpl
 {{-   $mincha := ($z.Sunset.Add $advance).Truncate $rounding}}
 {{-   $mincha.Format "Mon Jan 02, 2006: 3:04 PM\n"}}
 {{-   $d = $d.AddDate 0 0 1}}
-{{- end}}
+{{- end -}}
 ```
 
 ```bash
@@ -386,7 +394,7 @@ based on their `.Flags` or `.Desc` or anything else.
 ```tmpl
 This Shabbat in {{$.location.Name}}:
 
-{{  /* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
+{{/* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
 {{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
 {{- $d := $.dateRange.StartOrToday false}}
 {{- $timeFormat := "03:04 PM"}}
@@ -394,7 +402,7 @@ This Shabbat in {{$.location.Name}}:
 {{- $d = $d.OnOrAfter $.time.Saturday}}
 {{- $z := forLocationDate $.location $d.Gregorian}}
 {{- $erev := $d.Prev}}
-{{- $zErev := forLocationDate $.location $erev.Gregorian}}
+{{- $zErev := forLocationDate $.location $erev.Gregorian -}}
 
 Erev Shabbat: {{$erev.Gregorian.Format "Mon Jan 02 2006"}} / {{$erev}}
 {{- range timedEvents $zErev}}
