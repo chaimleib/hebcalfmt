@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"log/slog"
 	"os"
@@ -58,6 +59,7 @@ func processFlags(
 	files fs.FS,
 	flagSet *pflag.FlagSet,
 	args []string,
+	w io.Writer,
 ) (*config.Config, error) {
 	if err := flagSet.Parse(args); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrUsage, err)
@@ -77,7 +79,7 @@ func processFlags(
 			Errorf("%w: get --help: %w", ErrUnreachable, err)
 	}
 	if help {
-		fmt.Println(usage(flagSet))
+		fmt.Fprintln(w, usage(flagSet))
 		return nil, ErrDone
 	}
 
@@ -87,7 +89,7 @@ func processFlags(
 		return nil, fmt.Errorf("%w: get --version: %w", ErrUnreachable, err)
 	}
 	if version {
-		fmt.Println(versionMessage())
+		fmt.Fprintln(w, versionMessage())
 		return nil, ErrDone
 	}
 
@@ -101,7 +103,7 @@ func processFlags(
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(info)
+		fmt.Fprintln(w, info)
 		return nil, ErrDone
 	}
 

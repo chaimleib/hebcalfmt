@@ -102,7 +102,7 @@ func RunInEnvironment(
 	w io.Writer,
 ) error {
 	flagSet := NewFlags()
-	cfg, err := processFlags(files, flagSet, args)
+	cfg, err := processFlags(files, flagSet, args, w)
 	if err != nil {
 		if errors.Is(err, ErrDone) {
 			return nil
