@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -217,7 +218,10 @@ func TestFromFile(t *testing.T) {
 	baseWant := func(fpath string) *config.Config {
 		cfg := config.Default
 		cfg.ConfigSource = fpath
-		cfg.FS = files
+		cfg.FS = config.WrapFS{
+			BaseDir: filepath.Dir(fpath),
+			FS:      files,
+		}
 		return &cfg
 	}
 
