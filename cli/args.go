@@ -60,7 +60,7 @@ func processFlags(
 	args []string,
 ) (*config.Config, error) {
 	if err := flagSet.Parse(args); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %w", ErrUsage, err)
 	}
 
 	// pflag would return an error if
