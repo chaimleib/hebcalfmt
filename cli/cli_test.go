@@ -167,7 +167,7 @@ To show the available languages, run
 				args = strings.Fields(c.Args)
 			}
 			var buf bytes.Buffer
-			logBuf := test.TestLogger(t)
+			logBuf := test.Logger(t)
 			err := cli.RunInEnvironment(args, files, now, &buf)
 			test.CheckErr(t, err, c.Err)
 

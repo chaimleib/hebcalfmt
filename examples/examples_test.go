@@ -274,7 +274,7 @@ func TestExamples_Date(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			logBuf := test.TestLogger(t)
+			logBuf := test.Logger(t)
 			args := []string{fpath}
 			if c.Args != "" {
 				args = append(args, strings.Fields(c.Args)...)

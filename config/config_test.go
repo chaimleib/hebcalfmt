@@ -265,7 +265,7 @@ func TestFromFile(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
 			test.TestSlogger(t)
-			test.TestLogger(t)
+			test.Logger(t)
 
 			var files fs.FS = files
 			if c.FSErr != nil {
@@ -373,7 +373,7 @@ To show the available languages, run
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			buf := test.TestLogger(t)
+			buf := test.Logger(t)
 			got, err := c.Cfg.Normalize()
 			test.CheckErr(t, err, c.Err)
 			checkConfig(t, c.Want, got)
@@ -566,7 +566,7 @@ func TestCalOptions(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			test.TestLogger(t)
+			test.Logger(t)
 			if c.FailFS {
 				old := config.DefaultFS
 				t.Cleanup(func() { config.DefaultFS = old })
@@ -1145,7 +1145,7 @@ To show available cities, run:
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			logBuf := test.TestLogger(t)
+			logBuf := test.Logger(t)
 			got, err := c.Cfg.Location()
 			test.CheckErr(t, err, c.Err)
 			if c.Err == "" { // otherwise don't care

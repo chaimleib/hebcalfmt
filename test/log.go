@@ -4,15 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"testing"
 )
 
-// TestLogger captures the output sent to the log package.
+// Logger captures the output sent to the log package.
 // If the test fails, the logs are printed.
 // Otherwise, they are suppressed.
 //
 // It returns the buffer in case the logged output needs to be checked.
-func TestLogger(t *testing.T) fmt.Stringer {
+func Logger(t Test) fmt.Stringer {
 	var buf bytes.Buffer
 	log.SetFlags(0) // suppress timestamps
 	log.SetOutput(&buf)
