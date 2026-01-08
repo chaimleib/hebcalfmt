@@ -1,7 +1,10 @@
 package config_test
 
 import (
+	"fmt"
 	"io"
+	"io/fs"
+	"os"
 	"testing"
 	"testing/fstest"
 
@@ -56,6 +59,50 @@ func TestFSFunc(t *testing.T) {
 
 	if string(buf) != want {
 		t.Errorf("want: %q, got: %q", want, string(buf))
+	}
+}
+
+func TestFSFunc_Format(t *testing.T) {
+	const (
+		fpath = "hi.txt"
+		want  = "hi"
+	)
+	mapFS := fstest.MapFS{
+		fpath: &fstest.MapFile{Data: []byte(want)},
+	}
+	cases := []struct {
+		Name string
+		FS   fs.FS
+		Want string
+	}{
+		{
+			Name: "nil",
+			FS:   config.FSFunc{},
+			Want: "FSFunc[<nil>]",
+		},
+		{
+			Name: "mapFS",
+			FS:   config.NewFSFunc(mapFS.Open),
+			Want: "FSFunc[testing/fstest.MapFS.Open-fm]",
+		},
+		{
+			Name: "os.Open",
+			FS:   config.NewFSFunc(os.Open),
+			Want: "FSFunc[os.Open]",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			test.CheckString(t, "%v", c.Want, fmt.Sprintf("%v", c.FS), test.WantEqual)
+			test.CheckString(
+				t,
+				"%#v",
+				c.Want,
+				fmt.Sprintf("%#v", c.FS),
+				test.WantEqual,
+			)
+			test.CheckString(t, "%s", c.Want, fmt.Sprintf("%s", c.FS), test.WantEqual)
+		})
 	}
 }
 

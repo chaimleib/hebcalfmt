@@ -8,7 +8,7 @@ import (
 type WantMode int
 
 const (
-	WantFullMatch WantMode = iota
+	WantEqual WantMode = iota
 	WantPrefix
 	WantContains
 )
