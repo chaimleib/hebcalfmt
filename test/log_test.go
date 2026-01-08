@@ -2,7 +2,6 @@ package test_test
 
 import (
 	"log"
-	"os"
 	"testing"
 
 	"github.com/chaimleib/hebcalfmt/test"
@@ -31,14 +30,6 @@ func TestLogger(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
 			mockT := NewMockT(t)
-
-			oldLogFlags := log.Default().Flags()
-			oldLogPrefix := log.Default().Prefix()
-			defer func() {
-				log.SetFlags(oldLogFlags)
-				log.SetPrefix(oldLogPrefix)
-				log.SetOutput(os.Stderr)
-			}()
 
 			got := test.Logger(mockT)
 			c.Actions(mockT)
