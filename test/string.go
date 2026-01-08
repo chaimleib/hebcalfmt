@@ -1,0 +1,36 @@
+package test
+
+import (
+	"strings"
+	"testing"
+)
+
+type WantMode int
+
+const (
+	WantFullMatch WantMode = iota
+	WantPrefix
+	WantContains
+)
+
+func CheckString(t *testing.T, name, want, got string, mode WantMode) {
+	switch mode {
+	case WantPrefix:
+		if !strings.HasPrefix(got, want) {
+			t.Errorf("%s did not match prefix - want:\n%s\ngot:\n%s",
+				name, want, got)
+		}
+
+	case WantContains:
+		if !strings.Contains(got, want) {
+			t.Errorf("%s did not contain string - want:\n%s\ngot:\n%s",
+				name, want, got)
+		}
+
+	default:
+		if want != got {
+			t.Errorf("%s did not match - want:\n%s\ngot:\n%s",
+				name, want, got)
+		}
+	}
+}
