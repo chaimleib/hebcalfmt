@@ -1,18 +1,26 @@
 package templating
 
 import (
+	"io"
+	"io/fs"
 	"maps"
-	"os"
 	"text/template"
 
 	"github.com/hebcal/hebcal-go/hebcal"
 )
 
 func ParseFile(
+	files fs.FS,
 	tmpl *template.Template,
 	fpath string,
 ) (*template.Template, error) {
-	buf, err := os.ReadFile(fpath)
+	f, err := files.Open(fpath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	buf, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}

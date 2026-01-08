@@ -136,7 +136,7 @@ func RunInEnvironment(
 	tmpl := template.New(tmplPath)
 	tmpl = templating.SetFuncMap(tmpl, opts)
 
-	tmpl, err = templating.ParseFile(tmpl, tmplPath)
+	tmpl, err = templating.ParseFile(files, tmpl, tmplPath)
 	if err != nil {
 		return err
 	}
