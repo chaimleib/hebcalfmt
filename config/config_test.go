@@ -264,7 +264,7 @@ func TestFromFile(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			test.TestSlogger(t)
+			test.Slogger(t)
 			test.Logger(t)
 
 			var files fs.FS = files
@@ -1219,7 +1219,7 @@ func TestParseFile(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Fpath, func(t *testing.T) {
-			test.TestSlogger(t)
+			test.Slogger(t)
 			var got []string
 			err := config.ParseFile(files, c.Fpath, splitLines, &got)
 			test.CheckErr(t, err, c.Err)
