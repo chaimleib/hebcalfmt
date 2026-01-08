@@ -34,7 +34,20 @@ func (fsf FSFunc) Format(state fmt.State, verb rune) {
 	if fsf.name == "" {
 		name = "<nil>"
 	}
-	fmt.Fprintf(state, "FSFunc[%s]", name)
+	vFormats := map[rune]string{
+		'+': "FSFunc[fn:%s]",
+		'#': "config.FSFunc{fn: %v}",
+	}
+	format := "FSFunc[%s]"
+	if verb == 'v' {
+		for r, specialForm := range vFormats {
+			if state.Flag(int(r)) {
+				format = specialForm
+				break
+			}
+		}
+	}
+	fmt.Fprintf(state, format, name)
 }
 
 // NewFSFunc turns a function that returns a type compatible with [fs.File]

@@ -73,35 +73,50 @@ func TestFSFunc_Format(t *testing.T) {
 	cases := []struct {
 		Name string
 		FS   fs.FS
-		Want string
+		Want map[string]string
 	}{
 		{
 			Name: "nil",
 			FS:   config.FSFunc{},
-			Want: "FSFunc[<nil>]",
+			Want: map[string]string{
+				"%s":  "FSFunc[<nil>]",
+				"%v":  "FSFunc[<nil>]",
+				"%+v": "FSFunc[fn:<nil>]",
+				"%#v": "config.FSFunc{fn: <nil>}",
+			},
 		},
 		{
 			Name: "mapFS",
 			FS:   config.NewFSFunc(mapFS.Open),
-			Want: "FSFunc[testing/fstest.MapFS.Open-fm]",
+			Want: map[string]string{
+				"%s":  "FSFunc[testing/fstest.MapFS.Open-fm]",
+				"%v":  "FSFunc[testing/fstest.MapFS.Open-fm]",
+				"%+v": "FSFunc[fn:testing/fstest.MapFS.Open-fm]",
+				"%#v": "config.FSFunc{fn: testing/fstest.MapFS.Open-fm}",
+			},
 		},
 		{
 			Name: "os.Open",
 			FS:   config.NewFSFunc(os.Open),
-			Want: "FSFunc[os.Open]",
+			Want: map[string]string{
+				"%s":  "FSFunc[os.Open]",
+				"%v":  "FSFunc[os.Open]",
+				"%+v": "FSFunc[fn:os.Open]",
+				"%#v": "config.FSFunc{fn: os.Open}",
+			},
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			test.CheckString(t, "%v", c.Want, fmt.Sprintf("%v", c.FS), test.WantEqual)
-			test.CheckString(
-				t,
-				"%#v",
-				c.Want,
-				fmt.Sprintf("%#v", c.FS),
-				test.WantEqual,
-			)
-			test.CheckString(t, "%s", c.Want, fmt.Sprintf("%s", c.FS), test.WantEqual)
+			for format, want := range c.Want {
+				test.CheckString(
+					t,
+					format,
+					want,
+					fmt.Sprintf(format, c.FS),
+					test.WantEqual,
+				)
+			}
 		})
 	}
 }
