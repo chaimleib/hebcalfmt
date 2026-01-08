@@ -1,12 +1,10 @@
 package test
 
 import (
-	"testing"
-
 	"github.com/chaimleib/hebcalfmt/daterange"
 )
 
-func CheckDateRangeSource(t *testing.T, want, got daterange.Source) {
+func CheckDateRangeSource(t Test, want, got daterange.Source) {
 	// Check the simple fields.
 	if want.IsHebrewDate != got.IsHebrewDate {
 		t.Errorf("Source.IsHebrewDate's do not match - want: %v, got: %v",
@@ -58,7 +56,7 @@ func CheckDateRangeSource(t *testing.T, want, got daterange.Source) {
 	}
 }
 
-func CheckDateRange(t *testing.T, name string, want, got daterange.DateRange) {
+func CheckDateRange(t Test, name string, want, got daterange.DateRange) {
 	CheckDateRangeSource(t, want.Source, got.Source)
 	for _, field := range []struct {
 		Name      string

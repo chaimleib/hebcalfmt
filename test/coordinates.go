@@ -1,13 +1,11 @@
 package test
 
 import (
-	"testing"
-
 	"github.com/chaimleib/hebcalfmt/config"
 )
 
 func CheckCoordinates(
-	t *testing.T,
+	t Test,
 	name string,
 	want, got config.Coordinates,
 ) {

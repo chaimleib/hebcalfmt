@@ -1,27 +1,33 @@
 package test
 
-import (
-	"testing"
-)
+// Test is a mock for testing.T.
+type Test interface {
+	Errorf(string, ...any)
+	Helper()
+}
 
-func CheckErr(t *testing.T, got error, wantErr string) {
+func CheckErr(t Test, got error, wantErr string) {
 	t.Helper()
 
 	if wantErr == "" {
 		if got != nil {
-			t.Errorf("want nil err, got %q", got.Error())
+			t.Errorf("want nil err, got:\n%s", got.Error())
 		}
 		return
 	}
 
 	if got == nil {
-		t.Errorf("got nil err, want %q", wantErr)
+		t.Errorf("got nil err, want:\n%s", wantErr)
 		return
 	}
 	if got.Error() != wantErr {
-		t.Errorf("got wrong err:\n%q\nwant:\n%q", got.Error(), wantErr)
+		t.Errorf("got wrong err:\n%v\nwant:\n%s", got, wantErr)
 	}
 }
+
+// CheckerFunc is a type for generic test helper functions
+// which compare want with got.
+type CheckerFunc[T any] func(t Test, name string, want, got T)
 
 // CheckNilPtrThen returns true only if both want and got are not nil.
 // It fails the test only if the nilness is inconsistent.
@@ -31,8 +37,8 @@ func CheckErr(t *testing.T, got error, wantErr string) {
 //
 //	CheckNilPtrThen(t, CheckDateRange, field.Name, typedWant, field.Got)
 func CheckNilPtrThen[T any](
-	t *testing.T,
-	checker func(t *testing.T, name string, want, got T),
+	t Test,
+	checker CheckerFunc[T],
 	name string,
 	typedWant *T,
 	got any,
@@ -43,15 +49,22 @@ func CheckNilPtrThen[T any](
 		t.Errorf("%s's types did not match - want:\n%T\ngot:\n%T",
 			name, typedWant, got)
 	} else if (typedWant == nil) != (typedGot == nil) {
-		t.Errorf("%s's did not match - want:\n%#v\ngot:\n%#v",
-			name, typedWant, typedGot)
+		if typedWant == nil {
+			t.Errorf("%s's did not match - want:\n(%T)(nil)\ngot pointer to:\n%#v",
+				name, typedWant, *typedGot)
+		} else {
+			t.Errorf("%s's did not match - want pointer to:\n%#v\ngot:\n(%T)(nil)",
+				name, *typedWant, typedGot)
+		}
 	} else if typedWant != nil { // implies got != nil b/c of prev check
 		checker(t, name, *typedWant, *typedGot)
 	}
 }
 
+var _ CheckerFunc[int] = CheckComparable[int]
+
 func CheckComparable[T comparable](
-	t *testing.T,
+	t Test,
 	name string,
 	want, got T,
 ) {
