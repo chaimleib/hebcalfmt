@@ -133,7 +133,7 @@ func RunInEnvironment(
 
 	// Set up the Template's FuncMap.
 	// This must be done before parsing the file.
-	tmpl := new(template.Template)
+	tmpl := template.New(tmplPath)
 	tmpl = templating.SetFuncMap(tmpl, opts)
 
 	tmpl, err = templating.ParseFile(tmpl, tmplPath)

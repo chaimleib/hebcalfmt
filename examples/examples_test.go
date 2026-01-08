@@ -804,12 +804,12 @@ A halachic hour is 1h9m51s.
 		{
 			Name: "invalid date",
 			Date: "bad date",
-			Err:  `template: customZmanim.tmpl:6:31: executing "" at <timeParse $.time.DateOnly .>: error calling timeParse: parsing time "bad date" as "2006-01-02": cannot parse "bad date" as "2006"`,
+			Err:  `template: customZmanim.tmpl:6:31: executing "customZmanim.tmpl" at <timeParse $.time.DateOnly .>: error calling timeParse: parsing time "bad date" as "2006-01-02": cannot parse "bad date" as "2006"`,
 		},
 		{
 			Name: "invalid city",
 			City: "Bad City",
-			Err:  `template: customZmanim.tmpl:3:12: executing "" at <lookupCity $city>: error calling lookupCity: unknown city "Bad City"`,
+			Err:  `template: customZmanim.tmpl:3:12: executing "customZmanim.tmpl" at <lookupCity $city>: error calling lookupCity: unknown city "Bad City"`,
 		},
 	}
 	for _, c := range cases {
