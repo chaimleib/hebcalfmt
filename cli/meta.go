@@ -16,8 +16,9 @@ func usage(fs *pflag.FlagSet) string {
 				ProgName,
 			),
 			fmt.Sprintf(
-				"  %s { --info | -i } { cities | default-city | languages }",
+				"  %s { --info | -i }[=]{ %s }",
 				ProgName,
+				strings.Join(InfoKeys, " | "),
 			),
 			fmt.Sprintf("  %s [ -h | --help | --version ]", ProgName),
 			"",

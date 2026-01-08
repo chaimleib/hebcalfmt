@@ -15,7 +15,7 @@ import (
 	"github.com/chaimleib/hebcalfmt/config"
 )
 
-var infoKeys = []string{
+var InfoKeys = []string{
 	"cities",
 	"default-city",
 	"languages",
@@ -34,12 +34,12 @@ func infoString(key string, fs *pflag.FlagSet) (string, error) {
 
 	case "":
 		log.Println("the --info=key option is missing a key")
-		log.Printf("Available options: %q", infoKeys)
+		log.Printf("Available options: %q", InfoKeys)
 		return "", errors.New("the --info=key option is missing a key")
 
 	default:
 		log.Printf("unrecognized key for --info flag: %q", key)
-		log.Printf("Available options: %q", infoKeys)
+		log.Printf("Available options: %q", InfoKeys)
 		log.Println(usage(fs))
 		return "", fmt.Errorf("unrecognized key for --info flag: %q", key)
 	}
