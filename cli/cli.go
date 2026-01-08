@@ -125,9 +125,6 @@ func RunInEnvironment(
 
 	opts, err := cfg.CalOptions()
 	if err != nil {
-		if errors.Is(err, ErrUsage) {
-			log.Println(usage(flagSet))
-		}
 		return fmt.Errorf("failed to build hebcal options from %s: %w",
 			cfg.ConfigSource, err)
 	}

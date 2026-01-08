@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"slices"
@@ -31,11 +30,6 @@ func infoString(key string, fs *pflag.FlagSet) (string, error) {
 
 	case "languages":
 		return strings.Join(sortedLanguages(), "\n"), nil
-
-	case "":
-		log.Println("the --info=key option is missing a key")
-		log.Printf("Available options: %q", InfoKeys)
-		return "", errors.New("the --info=key option is missing a key")
 
 	default:
 		log.Printf("unrecognized key for --info flag: %q", key)
