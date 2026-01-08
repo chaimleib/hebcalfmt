@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"testing"
 
 	"github.com/chaimleib/hebcalfmt/test"
@@ -14,23 +15,47 @@ var (
 	ErrTestErr    = errors.New("test err")
 )
 
-// DUT is a mock for testing.T.
-// It stands for Device Under Test, a term from electronics engineering.
-type DUT struct {
-	buf    bytes.Buffer
-	failed bool
+// MockT is a mock for testing.T.
+type MockT struct {
+	buf      bytes.Buffer
+	failed   bool
+	cleanups []func()
 }
 
-var _ test.Test = (*DUT)(nil)
+var (
+	_ test.Test = (*MockT)(nil)
+	_ io.Closer = (*MockT)(nil)
+)
 
-func (dut *DUT) Errorf(format string, args ...any) {
-	dut.failed = true
-	fmt.Fprintf(&dut.buf, format, args...)
-	fmt.Fprintln(&dut.buf)
+func NewMockT(t *testing.T) *MockT {
+	mt := new(MockT)
+	t.Cleanup(func() { mt.Close() })
+	return mt
 }
 
-func (dut *DUT) Helper()      {}
-func (dut *DUT) Failed() bool { return dut.failed }
+func (mockT *MockT) Errorf(format string, args ...any) {
+	mockT.failed = true
+	fmt.Fprintf(&mockT.buf, format, args...)
+	fmt.Fprintln(&mockT.buf)
+}
+
+func (mockT *MockT) Log(args ...any) {
+	fmt.Fprintln(&mockT.buf, args...)
+}
+func (mockT *MockT) Helper()      {}
+func (mockT *MockT) Fail()        { mockT.failed = true }
+func (mockT *MockT) Failed() bool { return mockT.failed }
+
+func (mockT *MockT) Cleanup(f func()) {
+	mockT.cleanups = append(mockT.cleanups, f)
+}
+
+func (mockT *MockT) Close() error {
+	for _, cleanup := range mockT.cleanups {
+		cleanup()
+	}
+	return nil
+}
 
 func TestCheckErr(t *testing.T) {
 	cases := []struct {
@@ -74,16 +99,16 @@ never seen
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
 			// DUT = Device Under Test, a term from electronics engineering
-			var dut DUT
-			test.CheckErr(&dut, c.GotInput, c.WantInput)
-			if c.Failed != dut.Failed() {
+			mockT := NewMockT(t)
+			test.CheckErr(mockT, c.GotInput, c.WantInput)
+			if c.Failed != mockT.Failed() {
 				t.Errorf(
 					"c.Failed is %v, but dut.Failed() is %v",
 					c.Failed,
-					dut.Failed(),
+					mockT.Failed(),
 				)
 			}
-			if gotLogs := dut.buf.String(); c.Want != gotLogs {
+			if gotLogs := mockT.buf.String(); c.Want != gotLogs {
 				t.Errorf("logs do not match - want:\n%s\ngot:\n%s", c.Want, gotLogs)
 			}
 		})
@@ -186,28 +211,28 @@ got:
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			var dut DUT
+			mockT := NewMockT(t)
 			switch typedWant := c.WantInput.(type) {
 			case *int:
-				test.CheckNilPtrThen(&dut, test.CheckComparable, fieldName, typedWant, c.GotInput)
+				test.CheckNilPtrThen(mockT, test.CheckComparable, fieldName, typedWant, c.GotInput)
 
 			case *string:
-				test.CheckNilPtrThen(&dut, test.CheckComparable, fieldName, typedWant, c.GotInput)
+				test.CheckNilPtrThen(mockT, test.CheckComparable, fieldName, typedWant, c.GotInput)
 
 			case *any:
-				test.CheckNilPtrThen(&dut, test.CheckComparable, fieldName, typedWant, c.GotInput)
+				test.CheckNilPtrThen(mockT, test.CheckComparable, fieldName, typedWant, c.GotInput)
 
 			default:
 				t.Fatalf("unknown input type: %T", c.WantInput)
 			}
-			if c.Failed != dut.Failed() {
+			if c.Failed != mockT.Failed() {
 				t.Errorf(
 					"c.Failed is %v, but dut.Failed() is %v",
 					c.Failed,
-					dut.Failed(),
+					mockT.Failed(),
 				)
 			}
-			if gotLogs := dut.buf.String(); c.Want != gotLogs {
+			if gotLogs := mockT.buf.String(); c.Want != gotLogs {
 				t.Errorf("logs do not match - want:\n%s\ngot:\n%s", c.Want, gotLogs)
 			}
 		})
@@ -270,27 +295,27 @@ got:
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			var dut DUT
+			mockT := NewMockT(t)
 			switch typedWant := c.WantInput.(type) {
 			case int:
 				typedGot := c.GotInput.(int)
-				test.CheckComparable(&dut, fieldName, typedWant, typedGot)
+				test.CheckComparable(mockT, fieldName, typedWant, typedGot)
 
 			case string:
 				typedGot := c.GotInput.(string)
-				test.CheckComparable(&dut, fieldName, typedWant, typedGot)
+				test.CheckComparable(mockT, fieldName, typedWant, typedGot)
 
 			default:
-				test.CheckComparable(&dut, fieldName, c.WantInput, c.GotInput)
+				test.CheckComparable(mockT, fieldName, c.WantInput, c.GotInput)
 			}
-			if c.Failed != dut.Failed() {
+			if c.Failed != mockT.Failed() {
 				t.Errorf(
 					"c.Failed is %v, but dut.Failed() is %v",
 					c.Failed,
-					dut.Failed(),
+					mockT.Failed(),
 				)
 			}
-			if gotLogs := dut.buf.String(); c.Want != gotLogs {
+			if gotLogs := mockT.buf.String(); c.Want != gotLogs {
 				t.Errorf("logs do not match - want:\n%s\ngot:\n%s", c.Want, gotLogs)
 			}
 		})

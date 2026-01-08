@@ -1,10 +1,20 @@
 package test
 
+import (
+	"testing"
+)
+
 // Test is a mock for testing.T.
 type Test interface {
 	Errorf(string, ...any)
+	Log(...any)
+	Fail()
+	Failed() bool
 	Helper()
+	Cleanup(func())
 }
+
+var _ Test = (*testing.T)(nil)
 
 func CheckErr(t Test, got error, wantErr string) {
 	t.Helper()
