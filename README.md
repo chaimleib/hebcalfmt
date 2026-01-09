@@ -167,9 +167,26 @@ Hebrew: 25 Kislev 5786
 ## Example: Classic Hebcal
 
 This example emulates the classic hebcal program,
-while exposing some internals for you to customize, if you wish.
-For example, you could change the date format to "Mon, 01/02/2006"
+while exposing some internals for you to customize.
+For example, you could change the date format to `"Mon, 01/02/2006 "`
 to also show the days of the week.
+
+<details>
+  <summary>About the whitespace</summary>
+
+The trailing space in the date format string separates the date
+from the event's `.Render` string.
+This date with trailing space is joined to the next line,
+because the `{{- ` token, which begins the next template action,
+deletes preceding whitespace until a non-whitespace character.
+In other words,
+the whitespace deleter stops when it reaches an action,
+non-whitespace outside an action, or the beginning or end of the file.
+
+That is why, for style, the `.Render` action is indented.
+It does not appear on a separate line; rather, it is joined to the previous.
+
+</details>
 
 examples/hebcalClassic.tmpl
 ```tmpl
