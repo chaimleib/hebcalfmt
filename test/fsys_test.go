@@ -20,7 +20,6 @@ func TestCheckFS(t *testing.T) {
 		FS:      fsFunc,
 	}
 	wrapFSCopy := wrapFS
-	_ = osFS
 
 	cases := []struct {
 		Name      string
@@ -33,7 +32,7 @@ func TestCheckFS(t *testing.T) {
 			Name:      "os.DirFS vs nil",
 			WantInput: osFS,
 			GotInput:  nil,
-			Want: `FS's did not match - want:
+			Want: `FS's nilness did not match - want:
 some/path
 got:
 <nil>
@@ -43,7 +42,7 @@ got:
 			Name:      "nil vs mapFS",
 			WantInput: nil,
 			GotInput:  mapFS,
-			Want: `FS's did not match - want:
+			Want: `FS's nilness did not match - want:
 <nil>
 got:
 map[stub.txt:<nil>]
@@ -53,9 +52,9 @@ map[stub.txt:<nil>]
 			Name:      "fsFunc vs mapFS",
 			WantInput: fsFunc,
 			GotInput:  mapFS,
-			Want: `FS's types did not match -
-  want fsys.FSFunc:
-FSFunc[os.Open]
+			Want: `FS's did not match -
+  want fsys.fsFunc:
+fsFunc[os.Open]
   got  fstest.MapFS:
 map[stub.txt:<nil>]
 `,
@@ -64,8 +63,8 @@ map[stub.txt:<nil>]
 			Name:      "wrapFS vs nil",
 			WantInput: wrapFS,
 			GotInput:  nil,
-			Want: `FS's did not match - want:
-WrapFS[FSFunc[os.Open] other/path]
+			Want: `FS's nilness did not match - want:
+WrapFS[fsFunc[os.Open] other/path]
 got:
 <nil>
 `,

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"sync/atomic"
 )
 
 // DefaultFS returns a new [fs.FS] for accessing the local filesystem.
@@ -17,52 +18,72 @@ var DefaultFS = LocalFS
 // Unlike [os.DirFS], this proxy can return a wrapped [os.ErrNotExist].
 func LocalFS() (fs.FS, error) { return NewFSFunc(os.Open), nil }
 
-// FSFunc turns a function that returns [fs.File]s into an [fs.FS].
-type FSFunc struct {
-	fn   func(string) (fs.File, error)
+// fsFunc turns a function that returns [fs.File]s into an [fs.FS].
+type fsFunc struct {
+	fn func(string) (fs.File, error)
+
+	// name is displayed when formatting an fsFunc.
+	// This must be saved before it gets wrapped in a closure.
 	name string
+
+	// id is for checking equality by unique ID.
+	id uint64
 }
 
-var _ fs.FS = (*FSFunc)(nil)
+var fsFuncLastID atomic.Uint64
+
+var _ fs.FS = (*fsFunc)(nil)
 
 // NewFSFunc turns a function that returns a type compatible with [fs.File]
 // into an [fs.FS].
 func NewFSFunc[F fs.File](fn func(string) (F, error)) fs.FS {
+	if fn == nil {
+		// All nil fsFuncs compare equal.
+		// Empty values can be useful for the type info.
+		return fsFunc{}
+	}
+
 	funcPtr := reflect.ValueOf(fn).Pointer()
 	funcName := runtime.FuncForPC(funcPtr).Name()
-	return FSFunc{
+	return fsFunc{
 		fn: func(fpath string) (fs.File, error) {
 			return fn(fpath)
 		},
 		name: funcName,
+		id:   fsFuncLastID.Add(1),
 	}
 }
 
-func (fsf FSFunc) Open(fpath string) (fs.File, error) {
+func (fsf fsFunc) Open(fpath string) (fs.File, error) {
 	return fsf.fn(fpath)
 }
 
-func (fsf FSFunc) Equal(other FSFunc) bool {
-	myPtr := reflect.ValueOf(fsf.fn).Pointer()
-	otherPtr := reflect.ValueOf(other.fn).Pointer()
-	return myPtr == otherPtr
+// Equal returns whether other is the same instance of fsFunc.
+// Every invocation of NewFSFunc produces an instance with a new id.
+func (fsf fsFunc) Equal(other any) bool {
+	typedOther, ok := other.(fsFunc)
+	if !ok {
+		return false
+	}
+	return fsf.id == typedOther.id
 }
 
-func (fsf FSFunc) Format(state fmt.State, verb rune) {
+func (fsf fsFunc) Format(state fmt.State, verb rune) {
 	name := fsf.name
-	if fsf.name == "" {
+	if fsf.id == 0 {
 		name = "<nil>"
 	}
 	vFormats := map[rune]string{
-		'+': "FSFunc[fn:%s]",
-		'#': "fsys.FSFunc{fn: %v}",
+		'+': "fsFunc[fn:%s id:0x%04x]",
+		'#': "fsys.fsFunc{fn: %v, id: 0x%04x}",
 	}
-	format := "FSFunc[%s]"
+	format := "fsFunc[%s]"
 	if verb == 'v' {
 		for r, specialForm := range vFormats {
 			if state.Flag(int(r)) {
 				format = specialForm
-				break
+				fmt.Fprintf(state, format, name, fsf.id)
+				return
 			}
 		}
 	}
@@ -72,6 +93,20 @@ func (fsf FSFunc) Format(state fmt.State, verb rune) {
 type WrapFS struct {
 	FS      fs.FS
 	BaseDir string
+}
+
+// Equal returns true if the types are the same,
+// the BaseDirs are the same, and the FS fields are equal under FSEqual.
+func (w WrapFS) Equal(other any) bool {
+	typedOther, ok := other.(WrapFS)
+	if !ok {
+		return false
+	}
+	if w.BaseDir != typedOther.BaseDir {
+		return false
+	}
+
+	return Equal(w.FS, typedOther.FS)
 }
 
 func (w WrapFS) Open(fpath string) (fs.File, error) {
@@ -105,4 +140,36 @@ func (w WrapFS) Format(state fmt.State, verb rune) {
 		}
 	}
 	fmt.Fprintf(state, format, w.FS, w.BaseDir)
+}
+
+func Equal(a, b fs.FS) bool {
+	if a == nil && b == nil {
+		return true
+	} else if (a == nil) || (b == nil) {
+		return false
+	}
+
+	type Equaler interface{ Equal(any) bool }
+
+	switch a := a.(type) {
+	case Equaler:
+		return a.Equal(b)
+
+	// case fstest.MapFS:
+	// 	b, ok := b.(fstest.MapFS)
+	// 	return ok && maps.Equal(a, b)
+	//
+	default:
+		aVal := reflect.ValueOf(a)
+		bVal := reflect.ValueOf(b)
+		if aVal.Comparable() && bVal.Comparable() {
+			return a == b
+		}
+		aType := aVal.Type()
+		if aType != bVal.Type() {
+			return false
+		}
+
+		return reflect.DeepEqual(a, b)
+	}
 }

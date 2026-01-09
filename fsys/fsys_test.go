@@ -62,6 +62,19 @@ func TestFSFunc(t *testing.T) {
 	}
 }
 
+type Match struct {
+	Value string
+	Mode  test.WantMode
+}
+
+func str(s string) Match {
+	return Match{Value: s}
+}
+
+func rgx(s string) Match {
+	return Match{Value: s, Mode: test.WantRegexp}
+}
+
 func TestFSFunc_Format(t *testing.T) {
 	const (
 		fpath = "hi.txt"
@@ -73,36 +86,40 @@ func TestFSFunc_Format(t *testing.T) {
 	cases := []struct {
 		Name string
 		FS   fs.FS
-		Want map[string]string
+		Want map[string]Match
 	}{
 		{
 			Name: "nil",
-			FS:   fsys.FSFunc{},
-			Want: map[string]string{
-				"%s":  "FSFunc[<nil>]",
-				"%v":  "FSFunc[<nil>]",
-				"%+v": "FSFunc[fn:<nil>]",
-				"%#v": "fsys.FSFunc{fn: <nil>}",
+			FS:   fsys.NewFSFunc[fs.File](nil),
+			Want: map[string]Match{
+				"%s":  str("fsFunc[<nil>]"),
+				"%v":  str("fsFunc[<nil>]"),
+				"%+v": str("fsFunc[fn:<nil> id:0x0000]"),
+				"%#v": str("fsys.fsFunc{fn: <nil>, id: 0x0000}"),
 			},
 		},
 		{
 			Name: "mapFS",
 			FS:   fsys.NewFSFunc(mapFS.Open),
-			Want: map[string]string{
-				"%s":  "FSFunc[testing/fstest.MapFS.Open-fm]",
-				"%v":  "FSFunc[testing/fstest.MapFS.Open-fm]",
-				"%+v": "FSFunc[fn:testing/fstest.MapFS.Open-fm]",
-				"%#v": "fsys.FSFunc{fn: testing/fstest.MapFS.Open-fm}",
+			Want: map[string]Match{
+				"%s": str("fsFunc[testing/fstest.MapFS.Open-fm]"),
+				"%v": str("fsFunc[testing/fstest.MapFS.Open-fm]"),
+				"%+v": rgx(
+					`fsFunc\[fn:testing/fstest\.MapFS\.Open-fm id:0x[0-9a-f]{4}\]`,
+				),
+				"%#v": rgx(
+					`fsys\.fsFunc\{fn: testing/fstest\.MapFS\.Open-fm, id: 0x[0-9a-f]{4}\}`,
+				),
 			},
 		},
 		{
 			Name: "os.Open",
 			FS:   fsys.NewFSFunc(os.Open),
-			Want: map[string]string{
-				"%s":  "FSFunc[os.Open]",
-				"%v":  "FSFunc[os.Open]",
-				"%+v": "FSFunc[fn:os.Open]",
-				"%#v": "fsys.FSFunc{fn: os.Open}",
+			Want: map[string]Match{
+				"%s":  str("fsFunc[os.Open]"),
+				"%v":  str("fsFunc[os.Open]"),
+				"%+v": rgx(`fsFunc\[fn:os\.Open id:0x[0-9a-f]{4}\]`),
+				"%#v": rgx(`fsys\.fsFunc\{fn: os\.Open, id: 0x[0-9a-f]{4}\}`),
 			},
 		},
 	}
@@ -112,9 +129,9 @@ func TestFSFunc_Format(t *testing.T) {
 				test.CheckString(
 					t,
 					format,
-					want,
+					want.Value,
 					fmt.Sprintf(format, c.FS),
-					test.WantEqual,
+					want.Mode,
 				)
 			}
 		})
@@ -167,27 +184,87 @@ func TestWrapFS(t *testing.T) {
 	}
 }
 
-func TestWrapFS_Format(t *testing.T) {
-	const (
-		fpath = "hi.txt"
-		want  = "hi"
-	)
+func TestWrapFS_Equal(t *testing.T) {
 	mapFS := fstest.MapFS{
-		fpath: &fstest.MapFile{Data: []byte(want)},
+		"hi.txt": &fstest.MapFile{Data: []byte("hi")},
+	}
+	osOpen := fsys.NewFSFunc(os.Open)
+
+	cases := []struct {
+		Name string
+		A    fsys.WrapFS
+		B    fs.FS
+		Want bool
+	}{
+		{
+			Name: "empties",
+			A:    fsys.WrapFS{},
+			B:    fsys.WrapFS{},
+			Want: true,
+		},
+		{
+			Name: "empty vs nil",
+			A:    fsys.WrapFS{},
+			B:    nil,
+			Want: false,
+		},
+		{
+			Name: "empty vs wrapped mapFS",
+			A:    fsys.WrapFS{},
+			B: fsys.WrapFS{
+				FS:      fsys.NewFSFunc(mapFS.Open),
+				BaseDir: "other/path",
+			},
+			Want: false,
+		},
+		{
+			Name: "wrapped os.Opens",
+			A:    fsys.WrapFS{FS: osOpen, BaseDir: "."},
+			B:    fsys.WrapFS{FS: osOpen, BaseDir: "."},
+			Want: true,
+		},
+		{
+			Name: "wrapped os.Open vs os.Open",
+			A:    fsys.WrapFS{FS: osOpen, BaseDir: "."},
+			B:    osOpen,
+			Want: false,
+		},
+		{
+			Name: "wrapped os.Open vs empty",
+			A:    fsys.WrapFS{FS: osOpen, BaseDir: "."},
+			B:    fsys.WrapFS{},
+			Want: false,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			got := c.A.Equal(c.B)
+			if got != c.Want {
+				t.Errorf("want: %v, got %v", c.Want, got)
+				t.Log("A", c.A)
+				t.Log("B", c.B)
+			}
+		})
+	}
+}
+
+func TestWrapFS_Format(t *testing.T) {
+	mapFS := fstest.MapFS{
+		"hi.txt": &fstest.MapFile{Data: []byte("hi")},
 	}
 	cases := []struct {
 		Name string
 		FS   fs.FS
-		Want map[string]string
+		Want map[string]Match
 	}{
 		{
 			Name: "nil",
 			FS:   fsys.WrapFS{},
-			Want: map[string]string{
-				"%s":  "WrapFS[<nil> ]",
-				"%v":  "WrapFS[<nil> ]",
-				"%+v": "WrapFS[FS:<nil> BaseDir:]",
-				"%#v": `fsys.WrapFS{FS: <nil>, BaseDir: ""}`,
+			Want: map[string]Match{
+				"%s":  str("WrapFS[<nil> ]"),
+				"%v":  str("WrapFS[<nil> ]"),
+				"%+v": str("WrapFS[FS:<nil> BaseDir:]"),
+				"%#v": str(`fsys.WrapFS{FS: <nil>, BaseDir: ""}`),
 			},
 		},
 		{
@@ -196,21 +273,29 @@ func TestWrapFS_Format(t *testing.T) {
 				FS:      fsys.NewFSFunc(mapFS.Open),
 				BaseDir: "other/path",
 			},
-			Want: map[string]string{
-				"%s":  "WrapFS[FSFunc[testing/fstest.MapFS.Open-fm] other/path]",
-				"%v":  "WrapFS[FSFunc[testing/fstest.MapFS.Open-fm] other/path]",
-				"%+v": "WrapFS[FS:FSFunc[fn:testing/fstest.MapFS.Open-fm] BaseDir:other/path]",
-				"%#v": `fsys.WrapFS{FS: fsys.FSFunc{fn: testing/fstest.MapFS.Open-fm}, BaseDir: "other/path"}`,
+			Want: map[string]Match{
+				"%s": str("WrapFS[fsFunc[testing/fstest.MapFS.Open-fm] other/path]"),
+				"%v": str("WrapFS[fsFunc[testing/fstest.MapFS.Open-fm] other/path]"),
+				"%+v": rgx(
+					`WrapFS\[FS:fsFunc\[fn:testing/fstest\.MapFS\.Open-fm id:0x[0-9a-f]{4}\] BaseDir:other/path\]`,
+				),
+				"%#v": rgx(
+					`fsys\.WrapFS\{FS: fsys\.fsFunc\{fn: testing/fstest\.MapFS\.Open-fm, id: 0x[0-9a-f]{4}\}, BaseDir: "other/path"\}`,
+				),
 			},
 		},
 		{
 			Name: "os.Open",
 			FS:   fsys.WrapFS{FS: fsys.NewFSFunc(os.Open), BaseDir: "."},
-			Want: map[string]string{
-				"%s":  "WrapFS[FSFunc[os.Open] .]",
-				"%v":  "WrapFS[FSFunc[os.Open] .]",
-				"%+v": "WrapFS[FS:FSFunc[fn:os.Open] BaseDir:.]",
-				"%#v": `fsys.WrapFS{FS: fsys.FSFunc{fn: os.Open}, BaseDir: "."}`,
+			Want: map[string]Match{
+				"%s": str("WrapFS[fsFunc[os.Open] .]"),
+				"%v": str("WrapFS[fsFunc[os.Open] .]"),
+				"%+v": rgx(
+					`WrapFS\[FS:fsFunc\[fn:os\.Open id:0x[0-9a-f]{4}\] BaseDir:\.\]`,
+				),
+				"%#v": rgx(
+					`fsys\.WrapFS\{FS: fsys\.fsFunc\{fn: os\.Open, id: 0x[0-9a-f]{4}\}, BaseDir: "\."\}`,
+				),
 			},
 		},
 	}
@@ -220,10 +305,68 @@ func TestWrapFS_Format(t *testing.T) {
 				test.CheckString(
 					t,
 					format,
-					want,
+					want.Value,
 					fmt.Sprintf(format, c.FS),
-					test.WantEqual,
+					want.Mode,
 				)
+			}
+		})
+	}
+}
+
+func TestFSEqual(t *testing.T) {
+	mapFS := fstest.MapFS{
+		"hi.txt": &fstest.MapFile{Data: []byte("hi")},
+	}
+	var emptyWrapFS fsys.WrapFS
+	wrapMap := fsys.WrapFS{FS: mapFS, BaseDir: "other/path"}
+	wrapMap2 := fsys.WrapFS{FS: mapFS, BaseDir: "other/path"}
+	osOpen := fsys.NewFSFunc(os.Open)
+	osOpen2 := fsys.NewFSFunc(os.Open)
+	wrapOpen := fsys.WrapFS{FS: osOpen, BaseDir: "."}
+	wrapOpen2 := fsys.WrapFS{FS: osOpen2, BaseDir: "."}
+	dirFS := os.DirFS("/usr")
+	dirFS2 := os.DirFS("/usr")
+	sub, err := fs.Sub(dirFS, "bin")
+	if err != nil {
+		t.Error("init sub:", err)
+	}
+	sub2, err := fs.Sub(dirFS, "bin")
+	if err != nil {
+		t.Error("init sub2:", err)
+	}
+
+	cases := []struct {
+		Name string
+		A, B fs.FS
+		Want bool
+	}{
+		{Name: "nils", Want: true},
+		{Name: "osOpens", A: osOpen, B: osOpen, Want: true},
+		// TODO: find a way to fix this?
+		{Name: "osOpen vs osOpen2", A: osOpen, B: osOpen2, Want: false},
+		// TODO: find a way to fix this?
+		{Name: "wrapOpen vs wrapOpen2", A: wrapOpen, B: wrapOpen2, Want: false},
+		{Name: "osOpen vs nil", A: osOpen, B: nil, Want: false},
+		{Name: "osOpen vs empty wrapFS", A: osOpen, B: emptyWrapFS, Want: false},
+		{Name: "mapFSes", A: mapFS, B: mapFS, Want: true},
+		{Name: "wrapFSes", A: wrapMap, B: wrapMap, Want: true},
+		{Name: "wrapMap vs wrapMap2", A: wrapMap, B: wrapMap2, Want: true},
+		{Name: "wrapOpens", A: wrapOpen, B: wrapOpen, Want: true},
+		{Name: "dirFSes", A: dirFS, B: dirFS, Want: true},
+		{Name: "dirFS vs dirFS2", A: dirFS, B: dirFS2, Want: true},
+		{Name: "subs", A: sub, B: sub, Want: true},
+		// TODO: fix this?
+		{Name: "sub vs sub2", A: sub, B: sub2, Want: false},
+		{Name: "mapFS vs osOpen", A: mapFS, B: osOpen, Want: false},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			got := fsys.Equal(c.A, c.B)
+			if c.Want != got {
+				t.Errorf("want: %v, got %v", c.Want, got)
+				t.Log("A", c.A)
+				t.Log("B", c.B)
 			}
 		})
 	}
