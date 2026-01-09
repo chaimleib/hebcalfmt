@@ -6,16 +6,16 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/chaimleib/hebcalfmt/config"
+	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/test"
 )
 
 func TestCheckFS(t *testing.T) {
 	const fieldName = "FS"
-	fsFunc := config.NewFSFunc(os.Open)
+	fsFunc := fsys.NewFSFunc(os.Open)
 	osFS := os.DirFS("some/path")
 	mapFS := fstest.MapFS{"stub.txt": nil}
-	wrapFS := config.WrapFS{
+	wrapFS := fsys.WrapFS{
 		BaseDir: "other/path",
 		FS:      fsFunc,
 	}
@@ -54,7 +54,7 @@ map[stub.txt:<nil>]
 			WantInput: fsFunc,
 			GotInput:  mapFS,
 			Want: `FS's types did not match -
-  want config.FSFunc:
+  want fsys.FSFunc:
 FSFunc[os.Open]
   got  fstest.MapFS:
 map[stub.txt:<nil>]

@@ -1,4 +1,4 @@
-package config
+package fsys
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"runtime"
 )
 
-// DefaultFS returns a new [fs.FS] for use in loading configuration files.
+// DefaultFS returns a new [fs.FS] for accessing the local filesystem.
 var DefaultFS = LocalFS
 
 // LocalFS returns a new [fs.FS] that relays `Open()` calls to [os.Open].
@@ -55,7 +55,7 @@ func (fsf FSFunc) Format(state fmt.State, verb rune) {
 	}
 	vFormats := map[rune]string{
 		'+': "FSFunc[fn:%s]",
-		'#': "config.FSFunc{fn: %v}",
+		'#': "fsys.FSFunc{fn: %v}",
 	}
 	format := "FSFunc[%s]"
 	if verb == 'v' {
@@ -77,7 +77,8 @@ type WrapFS struct {
 func (w WrapFS) Open(fpath string) (fs.File, error) {
 	if !filepath.IsLocal(fpath) {
 		return nil, fmt.Errorf(
-			"attempted access outside of the config file's directory tree: open %s",
+			"attempted access outside of the BaseDir %s: open %s",
+			w.BaseDir,
 			fpath,
 		)
 	}
@@ -92,7 +93,7 @@ func (w WrapFS) Open(fpath string) (fs.File, error) {
 func (w WrapFS) Format(state fmt.State, verb rune) {
 	vFormats := map[rune]string{
 		'+': "WrapFS[FS:%+v BaseDir:%s]",
-		'#': "config.WrapFS{FS: %#v, BaseDir: %q}",
+		'#': "fsys.WrapFS{FS: %#v, BaseDir: %q}",
 	}
 	format := "WrapFS[%v %s]"
 	if verb == 'v' {

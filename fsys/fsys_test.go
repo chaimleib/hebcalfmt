@@ -1,4 +1,4 @@
-package config_test
+package fsys_test
 
 import (
 	"fmt"
@@ -8,12 +8,12 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/chaimleib/hebcalfmt/config"
+	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/test"
 )
 
 func TestLocalFS(t *testing.T) {
-	fileSystem, err := config.LocalFS()
+	fileSystem, err := fsys.LocalFS()
 	if err != nil {
 		t.Errorf("failed to load LocalFS: %v", err)
 		return
@@ -45,7 +45,7 @@ func TestFSFunc(t *testing.T) {
 	testFS := fstest.MapFS{
 		fpath: &fstest.MapFile{Data: []byte(want)},
 	}
-	fileSystem := config.NewFSFunc(testFS.Open)
+	fileSystem := fsys.NewFSFunc(testFS.Open)
 	f, err := fileSystem.Open(fpath)
 	if err != nil {
 		t.Errorf("failed to open %s: %v", fpath, err)
@@ -77,32 +77,32 @@ func TestFSFunc_Format(t *testing.T) {
 	}{
 		{
 			Name: "nil",
-			FS:   config.FSFunc{},
+			FS:   fsys.FSFunc{},
 			Want: map[string]string{
 				"%s":  "FSFunc[<nil>]",
 				"%v":  "FSFunc[<nil>]",
 				"%+v": "FSFunc[fn:<nil>]",
-				"%#v": "config.FSFunc{fn: <nil>}",
+				"%#v": "fsys.FSFunc{fn: <nil>}",
 			},
 		},
 		{
 			Name: "mapFS",
-			FS:   config.NewFSFunc(mapFS.Open),
+			FS:   fsys.NewFSFunc(mapFS.Open),
 			Want: map[string]string{
 				"%s":  "FSFunc[testing/fstest.MapFS.Open-fm]",
 				"%v":  "FSFunc[testing/fstest.MapFS.Open-fm]",
 				"%+v": "FSFunc[fn:testing/fstest.MapFS.Open-fm]",
-				"%#v": "config.FSFunc{fn: testing/fstest.MapFS.Open-fm}",
+				"%#v": "fsys.FSFunc{fn: testing/fstest.MapFS.Open-fm}",
 			},
 		},
 		{
 			Name: "os.Open",
-			FS:   config.NewFSFunc(os.Open),
+			FS:   fsys.NewFSFunc(os.Open),
 			Want: map[string]string{
 				"%s":  "FSFunc[os.Open]",
 				"%v":  "FSFunc[os.Open]",
 				"%+v": "FSFunc[fn:os.Open]",
-				"%#v": "config.FSFunc{fn: os.Open}",
+				"%#v": "fsys.FSFunc{fn: os.Open}",
 			},
 		},
 	}
@@ -139,12 +139,12 @@ func TestWrapFS(t *testing.T) {
 			Name:    "double dots",
 			Sub:     "sub",
 			Fpath:   "../sub/hi.txt",
-			OpenErr: "attempted access outside of the config file's directory tree: open ../sub/hi.txt",
+			OpenErr: "attempted access outside of the BaseDir sub: open ../sub/hi.txt",
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			wfs := config.WrapFS{BaseDir: c.Sub, FS: testFS}
+			wfs := fsys.WrapFS{BaseDir: c.Sub, FS: testFS}
 
 			f, err := wfs.Open(c.Fpath)
 			test.CheckErr(t, err, c.OpenErr)
@@ -182,35 +182,35 @@ func TestWrapFS_Format(t *testing.T) {
 	}{
 		{
 			Name: "nil",
-			FS:   config.WrapFS{},
+			FS:   fsys.WrapFS{},
 			Want: map[string]string{
 				"%s":  "WrapFS[<nil> ]",
 				"%v":  "WrapFS[<nil> ]",
 				"%+v": "WrapFS[FS:<nil> BaseDir:]",
-				"%#v": `config.WrapFS{FS: <nil>, BaseDir: ""}`,
+				"%#v": `fsys.WrapFS{FS: <nil>, BaseDir: ""}`,
 			},
 		},
 		{
 			Name: "mapFS",
-			FS: config.WrapFS{
-				FS:      config.NewFSFunc(mapFS.Open),
+			FS: fsys.WrapFS{
+				FS:      fsys.NewFSFunc(mapFS.Open),
 				BaseDir: "other/path",
 			},
 			Want: map[string]string{
 				"%s":  "WrapFS[FSFunc[testing/fstest.MapFS.Open-fm] other/path]",
 				"%v":  "WrapFS[FSFunc[testing/fstest.MapFS.Open-fm] other/path]",
 				"%+v": "WrapFS[FS:FSFunc[fn:testing/fstest.MapFS.Open-fm] BaseDir:other/path]",
-				"%#v": `config.WrapFS{FS: config.FSFunc{fn: testing/fstest.MapFS.Open-fm}, BaseDir: "other/path"}`,
+				"%#v": `fsys.WrapFS{FS: fsys.FSFunc{fn: testing/fstest.MapFS.Open-fm}, BaseDir: "other/path"}`,
 			},
 		},
 		{
 			Name: "os.Open",
-			FS:   config.WrapFS{FS: config.NewFSFunc(os.Open), BaseDir: "."},
+			FS:   fsys.WrapFS{FS: fsys.NewFSFunc(os.Open), BaseDir: "."},
 			Want: map[string]string{
 				"%s":  "WrapFS[FSFunc[os.Open] .]",
 				"%v":  "WrapFS[FSFunc[os.Open] .]",
 				"%+v": "WrapFS[FS:FSFunc[fn:os.Open] BaseDir:.]",
-				"%#v": `config.WrapFS{FS: config.FSFunc{fn: os.Open}, BaseDir: "."}`,
+				"%#v": `fsys.WrapFS{FS: fsys.FSFunc{fn: os.Open}, BaseDir: "."}`,
 			},
 		},
 	}

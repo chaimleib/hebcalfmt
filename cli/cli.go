@@ -13,7 +13,7 @@ import (
 
 	"github.com/hebcal/hebcal-go/zmanim"
 
-	"github.com/chaimleib/hebcalfmt/config"
+	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/templating"
 )
 
@@ -56,7 +56,7 @@ var InitLogging = func() {
 func Run() int {
 	InitLogging()
 
-	files, err := config.DefaultFS()
+	files, err := fsys.DefaultFS()
 	if err != nil {
 		slog.Error("failed to initialize DefaultFS", "error", err)
 		return 1

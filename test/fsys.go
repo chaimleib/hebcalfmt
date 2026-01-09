@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing/fstest"
 
-	"github.com/chaimleib/hebcalfmt/config"
+	"github.com/chaimleib/hebcalfmt/fsys"
 )
 
 func CheckFS(t Test, name string, want, got fs.FS) {
@@ -20,10 +20,10 @@ func CheckFS(t Test, name string, want, got fs.FS) {
 		return
 	}
 	switch typedWant := want.(type) {
-	case config.FSFunc:
+	case fsys.FSFunc:
 		CheckFSMatchThen(t, name, CheckFSFunc, typedWant, got)
 
-	case config.WrapFS:
+	case fsys.WrapFS:
 		CheckFSMatchThen(t, name, CheckWrapFS, typedWant, got)
 
 	case fstest.MapFS:
@@ -57,7 +57,7 @@ func CheckFSMatchThen[T any](
 	checker(t, name, want, typedGot)
 }
 
-func CheckFSFunc(t Test, name string, want, got config.FSFunc) {
+func CheckFSFunc(t Test, name string, want, got fsys.FSFunc) {
 	t.Helper()
 	if !want.Equal(got) {
 		t.Errorf("%s's did not match - want:\n%v\ngot:\n%v",
@@ -65,7 +65,7 @@ func CheckFSFunc(t Test, name string, want, got config.FSFunc) {
 	}
 }
 
-func CheckWrapFS(t Test, name string, want, got config.WrapFS) {
+func CheckWrapFS(t Test, name string, want, got fsys.WrapFS) {
 	t.Helper()
 	for _, field := range []struct {
 		Name      string
