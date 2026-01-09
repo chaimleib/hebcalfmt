@@ -15,7 +15,13 @@ the [Go Template language](https://pkg.go.dev/text/template).
 go install github.com/chaimleib/hebcalfmt
 ```
 
-## Example: Show today's date
+## Examples
+
+Some things you can do with `hebcalfmt`.
+These examples are tested automatically every time we push a change to GitHub,
+so that this README and the examples/ folder stay updated and in-sync.
+
+### Show today's date
 
 examples/today.tmpl
 ```tmpl
@@ -29,7 +35,7 @@ Today: 2025-12-14
 Hebrew: 24 Kislev 5786
 ```
 
-## Example: Show this month's calendar with Hebrew dates
+### Show this month's calendar with Hebrew dates
 
 The control flow in the Go templating language is so powerful
 that you can program your own calendar in it.
@@ -134,7 +140,7 @@ Adar - Nisan 5786
 | 29 11 | 30 12 | 31 13 |       |       |       |       |
 ```
 
-## Example: Convert dates between Hebrew and Gregorian
+### Convert dates between Hebrew and Gregorian
 
 examples/date.tmpl
 ```tmpl
@@ -164,7 +170,7 @@ Gregorian: 2025-12-15
 Hebrew: 25 Kislev 5786
 ```
 
-## Example: Classic Hebcal
+### Classic Hebcal
 
 This example emulates the classic hebcal program,
 while exposing some internals for you to customize.
@@ -267,7 +273,7 @@ $ hebcalfmt -c examples/events.json examples/hebcalClassic.tmpl 9 1968
 9/26/1968 Yahrzeit - Joe Shmo
 ```
 
-## Example: Calculate Mincha times
+### Calculate Mincha times
 
 Some shuls adjust when Mincha begins
 so that it always starts at least 15 minutes before sunset,
@@ -306,7 +312,7 @@ Sat Sep 13, 2025: 6:20 PM
 Sun Sep 14, 2025: 6:20 PM
 ```
 
-## Example: Custom zmanim for a configurable day and city
+### Custom zmanim for a configurable day and city
 
 Although `$.z`, `$.location`, `$.now`, and `$.tz` are provided for convenience,
 you aren't limited to using preconfigured values.
@@ -383,7 +389,7 @@ A halachic hour is 49m31s.
 16:44:58: 12 halachic hours
 ```
 
-## Example: Show zmanim for this Shabbos
+### Show zmanim for this Shabbos
 
 Showing zmanim for upcoming days is also possible,
 since you have the power to do arithmetic with times and durations.
