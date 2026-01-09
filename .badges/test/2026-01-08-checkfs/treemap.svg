@@ -296,9 +296,9 @@
 <text 
 	data-notex="1" 
 	text-anchor="start"
-	transform="translate(44.000000,416.626549) scale(0.988848)"
+	transform="translate(44.000000,416.626549) scale(0.836718)"
 	style="font-family: Open Sans, verdana, arial, sans-serif !important; font-size: 12px; fill: rgb(0, 0, 0); fill-opacity: 1.00; white-space: pre;" 
-	data-math="N">fs.go 47.8%</text>
+	data-math="N">fsys.go 47.8%</text>
 		
 </g>
 
