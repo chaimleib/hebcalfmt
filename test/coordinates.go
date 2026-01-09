@@ -17,7 +17,7 @@ func CheckCoordinates(
 	}
 
 	if want.Lon != got.Lon {
-		t.Errorf("%s.Lon's do not match - want: %v, got: %v",
+		t.Errorf("%s.Lon's did not match - want: %v, got: %v",
 			name, want.Lon, got.Lon)
 	}
 }
