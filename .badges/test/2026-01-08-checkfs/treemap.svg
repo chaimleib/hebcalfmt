@@ -64,9 +64,9 @@
 <text 
 	data-notex="1" 
 	text-anchor="start"
-	transform="translate(851.043640,385.613559) scale(0.917685)"
+	transform="translate(851.043640,385.613559) scale(0.815720)"
 	style="font-family: Open Sans, verdana, arial, sans-serif !important; font-size: 12px; fill: rgb(0, 0, 0); fill-opacity: 1.00; white-space: pre;" 
-	data-math="N">fsys/fs.go 90.6%</text>
+	data-math="N">fsys/fsys.go 90.6%</text>
 		
 </g>
 
