@@ -64,8 +64,8 @@ func NewFSFunc[F fs.File](fn func(string) (F, error)) fs.FS {
 }
 
 type WrapFS struct {
-	BaseDir string
 	FS      fs.FS
+	BaseDir string
 }
 
 func (w WrapFS) Open(fpath string) (fs.File, error) {
@@ -81,4 +81,21 @@ func (w WrapFS) Open(fpath string) (fs.File, error) {
 	// but internet-based FSes and so on are likely to break if given backslashes.
 	resolved := path.Join(w.BaseDir, fpath)
 	return w.FS.Open(resolved)
+}
+
+func (w WrapFS) Format(state fmt.State, verb rune) {
+	vFormats := map[rune]string{
+		'+': "WrapFS[FS:%+v BaseDir:%s]",
+		'#': "config.WrapFS{FS: %#v, BaseDir: %q}",
+	}
+	format := "WrapFS[%v %s]"
+	if verb == 'v' {
+		for r, specialForm := range vFormats {
+			if state.Flag(int(r)) {
+				format = specialForm
+				break
+			}
+		}
+	}
+	fmt.Fprintf(state, format, w.FS, w.BaseDir)
 }

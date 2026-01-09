@@ -166,3 +166,65 @@ func TestWrapFS(t *testing.T) {
 		})
 	}
 }
+
+func TestWrapFS_Format(t *testing.T) {
+	const (
+		fpath = "hi.txt"
+		want  = "hi"
+	)
+	mapFS := fstest.MapFS{
+		fpath: &fstest.MapFile{Data: []byte(want)},
+	}
+	cases := []struct {
+		Name string
+		FS   fs.FS
+		Want map[string]string
+	}{
+		{
+			Name: "nil",
+			FS:   config.WrapFS{},
+			Want: map[string]string{
+				"%s":  "WrapFS[<nil> ]",
+				"%v":  "WrapFS[<nil> ]",
+				"%+v": "WrapFS[FS:<nil> BaseDir:]",
+				"%#v": `config.WrapFS{FS: <nil>, BaseDir: ""}`,
+			},
+		},
+		{
+			Name: "mapFS",
+			FS: config.WrapFS{
+				FS:      config.NewFSFunc(mapFS.Open),
+				BaseDir: "other/path",
+			},
+			Want: map[string]string{
+				"%s":  "WrapFS[FSFunc[testing/fstest.MapFS.Open-fm] other/path]",
+				"%v":  "WrapFS[FSFunc[testing/fstest.MapFS.Open-fm] other/path]",
+				"%+v": "WrapFS[FS:FSFunc[fn:testing/fstest.MapFS.Open-fm] BaseDir:other/path]",
+				"%#v": `config.WrapFS{FS: config.FSFunc{fn: testing/fstest.MapFS.Open-fm}, BaseDir: "other/path"}`,
+			},
+		},
+		{
+			Name: "os.Open",
+			FS:   config.WrapFS{FS: config.NewFSFunc(os.Open), BaseDir: "."},
+			Want: map[string]string{
+				"%s":  "WrapFS[FSFunc[os.Open] .]",
+				"%v":  "WrapFS[FSFunc[os.Open] .]",
+				"%+v": "WrapFS[FS:FSFunc[fn:os.Open] BaseDir:.]",
+				"%#v": `config.WrapFS{FS: config.FSFunc{fn: os.Open}, BaseDir: "."}`,
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			for format, want := range c.Want {
+				test.CheckString(
+					t,
+					format,
+					want,
+					fmt.Sprintf(format, c.FS),
+					test.WantEqual,
+				)
+			}
+		})
+	}
+}
