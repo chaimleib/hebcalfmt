@@ -4,7 +4,9 @@
 [![coverage](https://raw.githubusercontent.com/chaimleib/hebcalfmt/badges/.badges/master/coverage.svg)](https://raw.githubusercontent.com/chaimleib/hebcalfmt/badges/.badges/master/treemap.svg)
 [![GoDoc](https://pkg.go.dev/badge/github.com/chaimleib/hebcalfmt?status.svg)](https://pkg.go.dev/github.com/chaimleib/hebcalfmt)
 
-Formats [hebcal](https://github.com/hebcal/hebcal) information using
+Make your Hebrew calendar yours.
+
+Format [hebcal](https://github.com/hebcal/hebcal) dates and zmanim using
 the [Go Template language](https://pkg.go.dev/text/template).
 
 ## Install
