@@ -19,6 +19,7 @@ import (
 
 	"github.com/chaimleib/hebcalfmt/config"
 	"github.com/chaimleib/hebcalfmt/daterange"
+	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/test"
 )
 
@@ -218,7 +219,7 @@ func TestFromFile(t *testing.T) {
 	baseWant := func(fpath string) *config.Config {
 		cfg := config.Default
 		cfg.ConfigSource = fpath
-		cfg.FS = config.WrapFS{
+		cfg.FS = fsys.WrapFS{
 			BaseDir: filepath.Dir(fpath),
 			FS:      files,
 		}
@@ -276,7 +277,7 @@ func TestFromFile(t *testing.T) {
 				openReturnsErr := func(string) (fs.File, error) {
 					return nil, c.FSErr
 				}
-				files = config.NewFSFunc(openReturnsErr)
+				files = fsys.NewFSFunc(openReturnsErr)
 			}
 
 			got, err := config.FromFile(files, c.Fpath)
@@ -572,9 +573,9 @@ func TestCalOptions(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			test.Logger(t)
 			if c.FailFS {
-				old := config.DefaultFS
-				t.Cleanup(func() { config.DefaultFS = old })
-				config.DefaultFS = failingFS
+				old := fsys.DefaultFS
+				t.Cleanup(func() { fsys.DefaultFS = old })
+				fsys.DefaultFS = failingFS
 			}
 			got, err := c.Cfg.CalOptions()
 			test.CheckErr(t, err, c.Err)

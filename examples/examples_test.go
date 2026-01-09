@@ -8,14 +8,14 @@ import (
 	"time"
 
 	"github.com/chaimleib/hebcalfmt/cli"
-	"github.com/chaimleib/hebcalfmt/config"
+	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/test"
 )
 
 func setupExample(t *testing.T) (fs.FS, time.Time) {
 	cli.InitLogging()
 
-	files, err := config.DefaultFS()
+	files, err := fsys.DefaultFS()
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -454,7 +454,7 @@ func TestExamples_HebcalClassic(t *testing.T) {
 		{
 			Name: "invalid events file path",
 			Args: "--config invalidEvents.json 9 1968",
-			Err:  "failed to build hebcal options from invalidEvents.json: attempted access outside of the config file's directory tree: open ../examples/event.txt",
+			Err:  "failed to build hebcal options from invalidEvents.json: attempted access outside of the BaseDir .: open ../examples/event.txt",
 		},
 	}
 	for _, c := range cases {

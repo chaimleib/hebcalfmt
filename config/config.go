@@ -19,6 +19,7 @@ import (
 	"github.com/hebcal/hebcal-go/zmanim"
 
 	"github.com/chaimleib/hebcalfmt/daterange"
+	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/hcfiles"
 )
 
@@ -231,7 +232,7 @@ func FromFile(files fs.FS, configPath string) (*Config, error) {
 	}
 
 	baseDir := filepath.Dir(configPath)
-	cfg.FS = WrapFS{BaseDir: baseDir, FS: files}
+	cfg.FS = fsys.WrapFS{BaseDir: baseDir, FS: files}
 
 	return cfg, nil
 }
@@ -344,7 +345,7 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	// prep for accessing secondary files
 	files := c.FS
 	if c.FS == nil {
-		files, err = DefaultFS()
+		files, err = fsys.DefaultFS()
 		if err != nil {
 			slog.Error("failed to initialize DefaultFS", "error", err)
 			return nil, fmt.Errorf("failed to initialize DefaultFS: %w", err)
