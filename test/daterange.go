@@ -30,7 +30,7 @@ func CheckDateRangeSource(t Test, want, got daterange.Source) {
 		t.Errorf("length of Source.Args does not match - want: %d, got: %d",
 			len(want.Args), len(got.Args))
 	} else if wantArgsNil != gotArgsNil {
-		t.Errorf("nil-ness of Source.Args does not match - want.Source.Args==nil: %v, got.Source.Args==nil: %v",
+		t.Errorf("Source.Args's nilness do not match - want==nil: %v, got==nil: %v",
 			wantArgsNil, gotArgsNil)
 	}
 	var i, j int
