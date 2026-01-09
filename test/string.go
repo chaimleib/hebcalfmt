@@ -3,7 +3,6 @@ package test
 import (
 	"regexp"
 	"strings"
-	"testing"
 )
 
 type WantMode int
@@ -15,7 +14,7 @@ const (
 	WantRegexp
 )
 
-func CheckString(t *testing.T, name, want, got string, mode WantMode) {
+func CheckString(t Test, name, want, got string, mode WantMode) {
 	t.Helper()
 	switch mode {
 	case WantPrefix:
