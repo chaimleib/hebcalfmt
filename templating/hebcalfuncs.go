@@ -65,8 +65,8 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"asUserEvent":    AsEvent[event.UserEvent],
 
 		// timedEvents returns a slice of [hebcal.TimedEvent]
-		"timedEvents": func(z *zmanim.Zmanim) ([]hebcal.TimedEvent, error) {
-			return TimedEvents(opts, z)
+		"timedEvents": func() ([]hebcal.TimedEvent, error) {
+			return TimedEvents(opts)
 		},
 
 		// Modifying opts from a template
@@ -108,18 +108,7 @@ func AsEvent[T event.CalEvent](e event.CalEvent) *T {
 //
 // Unlike Hebcal, results are sorted by time, and certain ties are broken
 // by putting Havdalah first and Candle lighting last.
-func TimedEvents(
-	opts *hebcal.CalOptions,
-	z *zmanim.Zmanim,
-) ([]hebcal.TimedEvent, error) {
-	optsCopy := *opts
-	opts = &optsCopy
-	if opts.NoJulian {
-		opts.Start = hdate.FromProlepticGregorian(z.Year, z.Month, z.Day)
-	} else {
-		opts.Start = hdate.FromGregorian(z.Year, z.Month, z.Day)
-	}
-	opts.End = opts.Start
+func TimedEvents(opts *hebcal.CalOptions) ([]hebcal.TimedEvent, error) {
 	cal, err := hebcal.HebrewCalendar(opts)
 	if err != nil {
 		return nil, err
@@ -127,15 +116,9 @@ func TimedEvents(
 
 	var results []hebcal.TimedEvent
 	for _, evt := range cal {
-		d := evt.GetDate().Gregorian()
-		if d.Day() != z.Day {
-			continue
+		if timedEv, ok := evt.(hebcal.TimedEvent); ok {
+			results = append(results, timedEv)
 		}
-		timedEv, ok := evt.(hebcal.TimedEvent)
-		if !ok {
-			continue
-		}
-		results = append(results, timedEv)
 	}
 
 	sort.Slice(results, func(i, j int) bool {

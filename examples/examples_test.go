@@ -659,14 +659,14 @@ Shabbat: Sat May 18 2024 / 10 Iyyar 5784
 `,
 		},
 		{
-			Name: "different date",
+			Name: "different date, single-digit day",
 			Args: "8 1 2024",
 			Want: `This Shabbat in Phoenix:
 
-Erev Shabbat: Fri Aug 02 2024 / 27 Tammuz 5784
+Erev Shabbat: Fri Aug 2 2024 / 27 Tammuz 5784
 07:09 PM: Candle lighting
 
-Shabbat: Sat Aug 03 2024 / 28 Tammuz 5784
+Shabbat: Sat Aug 3 2024 / 28 Tammuz 5784
 04:19 AM: Alot haShachar
 04:45 AM: Misheyakir
 04:53 AM: Misheyakir Machmir
