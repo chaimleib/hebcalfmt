@@ -4,14 +4,13 @@ This Shabbat in {{$.location.Name}}:
 
 {{/* Read date from CLI args, in hebcal format, with NoJulian=false. */}}
 {{- /* Unlike hebcal, default to today's full date, instead of the year. */}}
-{{- /* Then get the Shabbos for this week. */}}
-{{- $shabbos := ($.dateRange.StartOrToday false).OnOrAfter $.time.Saturday}}
-{{- $erev := $shabbos.Prev -}}
+{{- /* Then get the Shabbat for this week. */}}
+{{- $shabbat := ($.dateRange.StartOrToday false).OnOrAfter $.time.Saturday}}
+{{- $erev := $shabbat.Prev -}}
 
 Erev Shabbat: {{$erev.Gregorian.Format $dateFormat}} / {{$erev}}
 {{- /* Set up hebcal.CalOptions to get zmanim for $erev. */}}
-{{- setStart $erev}}{{setEnd $erev}}
-{{- range timedEvents}}
+{{- range timedEvents $erev}}
 {{- /* Skip normal zmanim, only show candlelighting. */}}
 {{-   if eq .Flags $.event.ZMANIM}}
 {{-     continue}}
@@ -19,10 +18,9 @@ Erev Shabbat: {{$erev.Gregorian.Format $dateFormat}} / {{$erev}}
 {{    .EventTime.Format $timeFormat}}: {{.Desc}}
 {{- end}}
 
-Shabbat: {{$shabbos.Gregorian.Format $dateFormat}} / {{$shabbos}}
-{{- /* Set up hebcal.CalOptions to get zmanim for $shabbos. */}}
-{{- setStart $shabbos}}{{setEnd $shabbos}}
-{{- range timedEvents}}
+Shabbat: {{$shabbat.Gregorian.Format $dateFormat}} / {{$shabbat}}
+{{- /* Set up hebcal.CalOptions to get zmanim for $shabbat. */}}
+{{- range timedEvents $shabbat}}
 {{-   if eq .Desc "Tzeit HaKochavim"}}{{/* redundant, so skip */}}
 {{-     continue}}
 {{-   end}}

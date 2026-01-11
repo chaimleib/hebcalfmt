@@ -53,9 +53,7 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		// hebcal returns a slice of [event.CalEvent].
 		// Underlying types of that interface can be recovered
 		// using as<Kind>Event functions.
-		"hebcal": func() ([]event.CalEvent, error) {
-			return hebcal.HebrewCalendar(opts)
-		},
+		"hebcal": Hebcal(opts),
 
 		// as<Type>Event converts [event.CalEvent]s to struct types.
 		// It returns nil if it fails.
@@ -65,11 +63,10 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"asUserEvent":    AsEvent[event.UserEvent],
 
 		// timedEvents returns a slice of [hebcal.TimedEvent]
-		"timedEvents": func() ([]hebcal.TimedEvent, error) {
-			return TimedEvents(opts)
-		},
+		"timedEvents": TimedEvents(opts),
 
 		// Modifying opts from a template
+		"setDates":        SetDates(opts),
 		"setStart":        SetStart(opts),
 		"setEnd":          SetEnd(opts),
 		"setYear":         SetYear(opts),
@@ -99,6 +96,63 @@ func AsEvent[T event.CalEvent](e event.CalEvent) *T {
 	return nil
 }
 
+// SetDates configures the opts with the provided dates.
+// If no dates are provided, it does nothing.
+// If one date is provided, it sets both opts.Start and opts.End
+// to select that single date.
+// If two dates, it checks that the first date is before the second,
+// and sets opts.Start with the first and opts.End with the second.
+// If more dates are provided, we return an error.
+func SetDates(opts *hebcal.CalOptions) func(dates ...hdate.HDate) (any, error) {
+	return func(dates ...hdate.HDate) (any, error) {
+		switch len(dates) {
+		case 0:
+			// pass
+
+		case 1:
+			SetStart(opts)(dates[0])
+			SetEnd(opts)(dates[0])
+
+		case 2:
+			start, startGreg := dates[0], dates[0].Gregorian()
+			end, endGreg := dates[1], dates[1].Gregorian()
+			if startGreg.After(endGreg) {
+				return "", fmt.Errorf(
+					"first date must be before second, got %s/%s, %s/%s",
+					start, startGreg.Format(time.DateOnly),
+					end, endGreg.Format(time.DateOnly),
+				)
+			}
+			SetStart(opts)(start)
+			SetEnd(opts)(end)
+
+		default:
+			return "", fmt.Errorf("expected 0-2 dates, got %d", len(dates))
+		}
+
+		return "", nil
+	}
+}
+
+// Hebcal returns a slice of event.CalEvent like the original hebcal program.
+// If no dates are provided, it uses the hebcal.CalOptions
+// to select a date range.
+// If one date is provided, only the events for that day are returned.
+// If two dates, all the events between them are returned,
+// including those on the end date.
+func Hebcal(
+	opts *hebcal.CalOptions,
+) func(dates ...hdate.HDate) ([]event.CalEvent, error) {
+	return func(dates ...hdate.HDate) ([]event.CalEvent, error) {
+		optsCopy := *opts
+		opts := &optsCopy
+		if _, err := SetDates(opts)(dates...); err != nil {
+			return nil, err
+		}
+		return hebcal.HebrewCalendar(opts)
+	}
+}
+
 // TimedEvents uses the given opts and returns just the [event.CalEvent]s
 // which are [hebcal.TimedEvent]s.
 // This is an easy way to pull zmanim from Hebcal,
@@ -108,36 +162,52 @@ func AsEvent[T event.CalEvent](e event.CalEvent) *T {
 //
 // Unlike Hebcal, results are sorted by time, and certain ties are broken
 // by putting Havdalah first and Candle lighting last.
-func TimedEvents(opts *hebcal.CalOptions) ([]hebcal.TimedEvent, error) {
-	cal, err := hebcal.HebrewCalendar(opts)
-	if err != nil {
-		return nil, err
-	}
-
-	var results []hebcal.TimedEvent
-	for _, evt := range cal {
-		if timedEv, ok := evt.(hebcal.TimedEvent); ok {
-			results = append(results, timedEv)
+//
+// If no dates are provided, it uses the hebcal.CalOptions
+// to select a date range.
+// If one date is provided, only the events for that day are returned.
+// If two dates, all the events between them are returned,
+// including those on the end date.
+func TimedEvents(
+	opts *hebcal.CalOptions,
+) func(dates ...hdate.HDate) ([]hebcal.TimedEvent, error) {
+	return func(dates ...hdate.HDate) ([]hebcal.TimedEvent, error) {
+		optsCopy := *opts
+		opts := &optsCopy
+		if _, err := SetDates(opts)(dates...); err != nil {
+			return nil, err
 		}
-	}
 
-	sort.Slice(results, func(i, j int) bool {
-		if results[i].EventTime.Equal(results[j].EventTime) {
-			if results[i].Desc == "Havdalah" {
-				return true
-			} else if results[j].Desc == "Havdalah" {
-				return false
-			}
-			if results[i].Desc == "Candle lighting" {
-				return false
-			} else if results[j].Desc == "Candle lighting" {
-				return true
+		cal, err := hebcal.HebrewCalendar(opts)
+		if err != nil {
+			return nil, err
+		}
+
+		var results []hebcal.TimedEvent
+		for _, evt := range cal {
+			if timedEv, ok := evt.(hebcal.TimedEvent); ok {
+				results = append(results, timedEv)
 			}
 		}
-		return results[i].EventTime.Before(results[j].EventTime)
-	})
 
-	return results, nil
+		sort.Slice(results, func(i, j int) bool {
+			if results[i].EventTime.Equal(results[j].EventTime) {
+				if results[i].Desc == "Havdalah" {
+					return true
+				} else if results[j].Desc == "Havdalah" {
+					return false
+				}
+				if results[i].Desc == "Candle lighting" {
+					return false
+				} else if results[j].Desc == "Candle lighting" {
+					return true
+				}
+			}
+			return results[i].EventTime.Before(results[j].EventTime)
+		})
+
+		return results, nil
+	}
 }
 
 // SetStart tells template functions like hebcal and timedEvents the date
