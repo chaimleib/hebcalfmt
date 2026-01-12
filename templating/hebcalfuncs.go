@@ -11,17 +11,17 @@ import (
 
 func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 	return map[string]any{
-		// hebcal returns a slice of [event.CalEvent].
-		// Underlying types of that interface can be recovered
-		// using as<Kind>Event functions.
-		"hebcal": Hebcal(opts),
-
 		// as<Type>Event converts [event.CalEvent]s to struct types.
 		// It returns nil if it fails.
 		"asHolidayEvent": AsEvent[event.HolidayEvent],
 		"asOmerEvent":    AsEvent[omer.OmerEvent],
 		"asTimedEvent":   AsEvent[hebcal.TimedEvent],
 		"asUserEvent":    AsEvent[event.UserEvent],
+
+		// hebcal returns a slice of [event.CalEvent].
+		// Underlying types of that interface can be recovered
+		// using as<Kind>Event functions.
+		"hebcal": Hebcal(opts),
 
 		// timedEvents returns a slice of [hebcal.TimedEvent]
 		"timedEvents": TimedEvents(opts),
