@@ -153,6 +153,30 @@ func Hebcal(
 	}
 }
 
+// CompareTimedEvents allows hebcal.TimedEvents to be sorted.
+// When clock times match, ties are broken by prioritizing
+// Havdalah first and Candle lighting last.
+// For example:
+//
+//	sort.Slice(events, CompareTimedEvents(events))
+func CompareTimedEvents(events []hebcal.TimedEvent) func(i, j int) bool {
+	return func(i, j int) bool {
+		if events[i].EventTime.Equal(events[j].EventTime) {
+			if events[i].Desc == "Havdalah" {
+				return true
+			} else if events[j].Desc == "Havdalah" {
+				return false
+			}
+			if events[i].Desc == "Candle lighting" {
+				return false
+			} else if events[j].Desc == "Candle lighting" {
+				return true
+			}
+		}
+		return events[i].EventTime.Before(events[j].EventTime)
+	}
+}
+
 // TimedEvents uses the given opts and returns just the [event.CalEvent]s
 // which are [hebcal.TimedEvent]s.
 // This is an easy way to pull zmanim from Hebcal,
@@ -190,22 +214,7 @@ func TimedEvents(
 			}
 		}
 
-		sort.Slice(results, func(i, j int) bool {
-			if results[i].EventTime.Equal(results[j].EventTime) {
-				if results[i].Desc == "Havdalah" {
-					return true
-				} else if results[j].Desc == "Havdalah" {
-					return false
-				}
-				if results[i].Desc == "Candle lighting" {
-					return false
-				} else if results[j].Desc == "Candle lighting" {
-					return true
-				}
-			}
-			return results[i].EventTime.Before(results[j].EventTime)
-		})
-
+		sort.Slice(results, CompareTimedEvents(results))
 		return results, nil
 	}
 }
