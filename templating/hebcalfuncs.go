@@ -1,7 +1,6 @@
 package templating
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 	"time"
@@ -10,20 +9,10 @@ import (
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/omer"
-	"github.com/hebcal/hebcal-go/zmanim"
 )
 
 func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 	return map[string]any{
-		// zmanim.Location
-		"lookupCity":  LookupCity,
-		"allCities":   zmanim.AllCities,
-		"newLocation": zmanim.NewLocation,
-
-		// zmanim.Zmanim
-		"forDate":         ForDate(opts.Location),
-		"forLocationDate": ForLocationDate,
-
 		// hebcal returns a slice of [event.CalEvent].
 		// Underlying types of that interface can be recovered
 		// using as<Kind>Event functions.
@@ -47,48 +36,6 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"setNumYears":     SetNumYears(opts),
 		"setIsHebrewYear": SetIsHebrewYear(opts),
 	}
-}
-
-func ForDate(loc *zmanim.Location) func(d time.Time) (*zmanim.Zmanim, error) {
-	return func(d time.Time) (*zmanim.Zmanim, error) {
-		if loc == nil {
-			return nil, errors.New("provided location was nil")
-		}
-
-		year, month, day := d.Date()
-		tz, err := time.LoadLocation(loc.TimeZoneId)
-		if err != nil {
-			return nil, err
-		}
-
-		return &zmanim.Zmanim{
-			Location: loc,
-			Year:     year,
-			Month:    month,
-			Day:      day,
-			TimeZone: tz,
-		}, nil
-	}
-}
-
-// ForLocationDate creates a new zmanim.Zmanim object.
-// Unlike zmanim.New which can panic and returns a struct,
-// this constructor returns a struct pointer and an error.
-func ForLocationDate(
-	loc *zmanim.Location,
-	d time.Time,
-) (*zmanim.Zmanim, error) {
-	return ForDate(loc)(d)
-}
-
-// LookupCity is the same as [zmanim.LookupCity],
-// except that we return an error if no match is found.
-func LookupCity(city string) (*zmanim.Location, error) {
-	l := zmanim.LookupCity(city)
-	if l == nil {
-		return nil, fmt.Errorf("unknown city %q", city)
-	}
-	return l, nil
 }
 
 // AsEvent attempts to convert an [event.CalEvent] interface
