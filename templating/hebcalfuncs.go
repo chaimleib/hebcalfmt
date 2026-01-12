@@ -11,30 +11,10 @@ import (
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/omer"
 	"github.com/hebcal/hebcal-go/zmanim"
-
-	"github.com/chaimleib/hebcalfmt/xhdate"
 )
 
 func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 	return map[string]any{
-		// hdate.HDate
-		"hdateEqual":                  xhdate.Equal,
-		"hdateParse":                  xhdate.Parse,
-		"hdateIsLeapYear":             hdate.IsLeapYear,
-		"hdateMonthsInYear":           hdate.MonthsInYear,
-		"hdateDaysInYear":             hdate.DaysInYear,
-		"hdateLongCheshvan":           hdate.LongCheshvan,
-		"hdateShortKislev":            hdate.ShortKislev,
-		"hdateDaysInMonth":            hdate.DaysInMonth,
-		"hdateToRD":                   hdate.ToRD,
-		"hdateNew":                    hdate.New,
-		"hdateFromRD":                 hdate.FromRD,
-		"hdateFromGregorian":          hdate.FromGregorian,
-		"hdateFromProlepticGregorian": hdate.FromProlepticGregorian,
-		"hdateFromTime":               hdate.FromTime,
-		"hdateMonthFromName":          hdate.MonthFromName,
-		"hdateDayOnOrBefore":          hdate.DayOnOrBefore,
-
 		// zmanim.Location
 		"lookupCity":  LookupCity,
 		"allCities":   zmanim.AllCities,

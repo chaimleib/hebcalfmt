@@ -37,6 +37,7 @@ func SetFuncMap(
 ) *template.Template {
 	funcs := make(map[string]any)
 	maps.Insert(funcs, maps.All(HebcalFuncs(opts)))
+	maps.Insert(funcs, maps.All(HDateFuncs))
 	maps.Insert(funcs, maps.All(StringFuncs))
 	maps.Insert(funcs, maps.All(TimeFuncs))
 	maps.Insert(funcs, maps.All(CastFuncs))
