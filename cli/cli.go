@@ -153,6 +153,7 @@ func RunInEnvironment(
 		"z":             &z,
 		"hdate":         templating.HDateConsts,
 		"event":         templating.EventConsts,
+		"sedra":         templating.SedraConsts,
 		"time":          templating.TimeConsts,
 	})
 	if err != nil {
