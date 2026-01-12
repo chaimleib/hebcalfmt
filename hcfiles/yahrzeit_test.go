@@ -120,26 +120,7 @@ func TestParseYahrzeits(t *testing.T) {
 			f := strings.NewReader(c.Content)
 			got, err := hcfiles.ParseYahrzeits(f, fileName)
 			test.CheckErr(t, err, c.WantErr)
-			var i, j int
-			for j = range c.Want {
-				if i >= len(got) {
-					t.Errorf(
-						"unexpected extra item at index %d, skipping rest:\n%v",
-						i,
-						got[i],
-					)
-					break
-				}
-				if c.Want[j] != got[i] {
-					t.Errorf("unexpected item at index %d:\n%v\nwant:\n%v",
-						i, got[i], c.Want[j])
-					// assume other lines will match, so allow line to increment
-				}
-				i++
-			}
-			if len(c.Want) != len(got) {
-				t.Errorf("expected %d results, got %d", len(c.Want), len(got))
-			}
+			test.CheckSlice(t, "yahrzeits", c.Want, got)
 		})
 	}
 }
