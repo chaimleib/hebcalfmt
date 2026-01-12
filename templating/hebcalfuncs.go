@@ -41,10 +41,7 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"newLocation": zmanim.NewLocation,
 
 		// zmanim.Zmanim
-		"forDate": func(t time.Time) *zmanim.Zmanim {
-			result := zmanim.New(opts.Location, t)
-			return &result
-		},
+		"forDate":         ForDate(opts.Location),
 		"forLocationDate": ForLocationDate,
 
 		// hebcal returns a slice of [event.CalEvent].
@@ -72,6 +69,28 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 	}
 }
 
+func ForDate(loc *zmanim.Location) func(d time.Time) (*zmanim.Zmanim, error) {
+	return func(d time.Time) (*zmanim.Zmanim, error) {
+		if loc == nil {
+			return nil, errors.New("provided location was nil")
+		}
+
+		year, month, day := d.Date()
+		tz, err := time.LoadLocation(loc.TimeZoneId)
+		if err != nil {
+			return nil, err
+		}
+
+		return &zmanim.Zmanim{
+			Location: loc,
+			Year:     year,
+			Month:    month,
+			Day:      day,
+			TimeZone: tz,
+		}, nil
+	}
+}
+
 // ForLocationDate creates a new zmanim.Zmanim object.
 // Unlike zmanim.New which can panic and returns a struct,
 // this constructor returns a struct pointer and an error.
@@ -79,23 +98,7 @@ func ForLocationDate(
 	loc *zmanim.Location,
 	d time.Time,
 ) (*zmanim.Zmanim, error) {
-	if loc == nil {
-		return nil, errors.New("provided location was nil")
-	}
-
-	year, month, day := d.Date()
-	tz, err := time.LoadLocation(loc.TimeZoneId)
-	if err != nil {
-		return nil, err
-	}
-
-	return &zmanim.Zmanim{
-		Location: loc,
-		Year:     year,
-		Month:    month,
-		Day:      day,
-		TimeZone: tz,
-	}, nil
+	return ForDate(loc)(d)
 }
 
 // LookupCity is the same as [zmanim.LookupCity],
