@@ -242,6 +242,132 @@ func TestAsEvent(t *testing.T) {
 	}
 }
 
+func TestHebcal(t *testing.T) {
+	hd := hdate.New(5760, hdate.Tishrei, 15)
+	cases := []struct {
+		Name  string
+		Opts  hebcal.CalOptions
+		Dates []hdate.HDate
+		Want  []string
+		Err   string
+	}{
+		{
+			Name:  "too many dates",
+			Dates: []hdate.HDate{hd, hd, hd},
+			Err:   "expected 0-2 dates, got 3",
+		},
+		{
+			Name: "show year",
+			Opts: hebcal.CalOptions{
+				NumYears: 1,
+				Year:     2020,
+			},
+			Want: []string{
+				"2020-01-07 Asara B'Tevet",
+				"2020-01-27 Rosh Chodesh Sh'vat",
+				"2020-02-08 Shabbat Shirah",
+				"2020-02-10 Tu BiShvat",
+				"2020-02-22 Shabbat Shekalim",
+				"2020-02-25 Rosh Chodesh Adar",
+				"2020-02-26 Rosh Chodesh Adar",
+				"2020-03-07 Shabbat Zachor",
+				"2020-03-09 Erev Purim",
+				"2020-03-09 Ta'anit Esther",
+				"2020-03-10 Purim",
+				"2020-03-11 Shushan Purim",
+				"2020-03-14 Shabbat Parah",
+				"2020-03-21 Shabbat HaChodesh",
+				"2020-03-26 Rosh Chodesh Nisan",
+				"2020-04-04 Shabbat HaGadol",
+				"2020-04-04 Yom HaAliyah",
+				"2020-04-08 Erev Pesach",
+				"2020-04-08 Ta'anit Bechorot",
+				"2020-04-09 Pesach I",
+				"2020-04-10 Pesach II",
+				"2020-04-11 Pesach III (CH''M)",
+				"2020-04-12 Pesach IV (CH''M)",
+				"2020-04-13 Pesach V (CH''M)",
+				"2020-04-14 Pesach VI (CH''M)",
+				"2020-04-15 Pesach VII",
+				"2020-04-16 Pesach VIII",
+				"2020-04-21 Yom HaShoah",
+				"2020-04-24 Rosh Chodesh Iyyar",
+				"2020-04-25 Rosh Chodesh Iyyar",
+				"2020-04-28 Yom HaZikaron",
+				"2020-04-29 Yom HaAtzma'ut",
+				"2020-05-08 Pesach Sheni",
+				"2020-05-12 Lag BaOmer",
+				"2020-05-22 Yom Yerushalayim",
+				"2020-05-24 Rosh Chodesh Sivan",
+				"2020-05-28 Erev Shavuot",
+				"2020-05-29 Shavuot I",
+				"2020-05-30 Shavuot II",
+				"2020-06-22 Rosh Chodesh Tammuz",
+				"2020-06-23 Rosh Chodesh Tammuz",
+				"2020-07-09 Tzom Tammuz",
+				"2020-07-22 Rosh Chodesh Av",
+				"2020-07-25 Shabbat Chazon",
+				"2020-07-29 Erev Tish'a B'Av",
+				"2020-07-30 Tish'a B'Av",
+				"2020-08-01 Shabbat Nachamu",
+				"2020-08-05 Tu B'Av",
+				"2020-08-20 Rosh Chodesh Elul",
+				"2020-08-21 Rosh Chodesh Elul",
+				"2020-08-21 Rosh Hashana LaBehemot",
+				"2020-09-12 Leil Selichot",
+				"2020-09-18 Erev Rosh Hashana",
+				"2020-09-19 Rosh Hashana 5781",
+				"2020-09-20 Rosh Hashana II",
+				"2020-09-21 Tzom Gedaliah",
+				"2020-09-26 Shabbat Shuva",
+				"2020-09-27 Erev Yom Kippur",
+				"2020-09-28 Yom Kippur",
+				"2020-10-02 Erev Sukkot",
+				"2020-10-03 Sukkot I",
+				"2020-10-04 Sukkot II",
+				"2020-10-05 Sukkot III (CH''M)",
+				"2020-10-06 Sukkot IV (CH''M)",
+				"2020-10-07 Sukkot V (CH''M)",
+				"2020-10-08 Sukkot VI (CH''M)",
+				"2020-10-09 Sukkot VII (Hoshana Raba)",
+				"2020-10-10 Shmini Atzeret",
+				"2020-10-11 Simchat Torah",
+				"2020-10-18 Rosh Chodesh Cheshvan",
+				"2020-10-19 Rosh Chodesh Cheshvan",
+				"2020-11-16 Sigd",
+				"2020-11-17 Rosh Chodesh Kislev",
+				"2020-12-10 Chanukah: 1 Candle",
+				"2020-12-11 Chanukah: 2 Candles",
+				"2020-12-12 Chanukah: 3 Candles",
+				"2020-12-13 Chanukah: 4 Candles",
+				"2020-12-14 Chanukah: 5 Candles",
+				"2020-12-15 Chanukah: 6 Candles",
+				"2020-12-16 Chag HaBanot",
+				"2020-12-16 Chanukah: 7 Candles",
+				"2020-12-16 Rosh Chodesh Tevet",
+				"2020-12-17 Chanukah: 8 Candles",
+				"2020-12-18 Chanukah: 8th Day",
+				"2020-12-25 Asara B'Tevet",
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			got, err := templating.Hebcal(&c.Opts)(c.Dates...)
+			test.CheckErr(t, err, c.Err)
+			gotStr := make([]string, 0, len(got))
+			for _, event := range got {
+				gotStr = append(gotStr, fmt.Sprintf(
+					"%s %s",
+					event.GetDate().Gregorian().Format(time.DateOnly),
+					event.Render("en"),
+				))
+			}
+			test.CheckSlice(t, "events", c.Want, gotStr)
+		})
+	}
+}
+
 func TestCompareTimedEvents(t *testing.T) {
 	tz, err := time.LoadLocation("US/Central")
 	if err != nil {
