@@ -36,6 +36,7 @@ func SetFuncMap(
 	opts *hebcal.CalOptions,
 ) *template.Template {
 	funcs := make(map[string]any)
+	maps.Insert(funcs, maps.All(CalOptionsFuncs(opts)))
 	maps.Insert(funcs, maps.All(HebcalFuncs(opts)))
 	maps.Insert(funcs, maps.All(ZmanimFuncs(opts)))
 	maps.Insert(funcs, maps.All(HDateFuncs))
