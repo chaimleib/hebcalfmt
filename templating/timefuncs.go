@@ -1,6 +1,9 @@
 package templating
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 var TimeFuncs = map[string]any{
 	// time.Duration
@@ -8,6 +11,8 @@ var TimeFuncs = map[string]any{
 	"timeParseDuration": time.ParseDuration,
 	"timeSince":         time.Since,
 	"timeUntil":         time.Until,
+	"durationDiv":       DurationDiv,
+	"durationMul":       DurationMul,
 
 	// time.Location
 	"timeFixedZone":    time.FixedZone,
@@ -34,4 +39,17 @@ func DatePartsEqual(a, b time.Time) bool {
 	ay, am, ad := a.Date()
 	by, bm, bd := b.Date()
 	return ay == by && am == bm && ad == bd
+}
+
+// DurationDiv divides d by the divisor.
+func DurationDiv(d time.Duration, divisor float64) (time.Duration, error) {
+	if divisor == 0 {
+		return 0, errors.New("divide by zero")
+	}
+	return time.Duration(float64(d) / divisor), nil
+}
+
+// DurationMul multiplies d by the given factor.
+func DurationMul(d time.Duration, factor float64) time.Duration {
+	return time.Duration(float64(d) * factor)
 }
