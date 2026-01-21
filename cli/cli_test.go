@@ -65,7 +65,7 @@ func TestRunInEnvironment(t *testing.T) {
 		},
 		{
 			Args: "--version",
-			Want: fmt.Sprintf("%s version %s\n", cli.ProgName, cli.Version),
+			Want: fmt.Sprintf("%s %s\n", cli.ProgName, cli.Version),
 		},
 		{
 			Args:        "--info",

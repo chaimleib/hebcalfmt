@@ -30,5 +30,5 @@ func usage(fs *pflag.FlagSet) string {
 }
 
 func versionMessage() string {
-	return fmt.Sprintf("%s version %s", ProgName, Version)
+	return fmt.Sprintf("%s %s", ProgName, Version)
 }
