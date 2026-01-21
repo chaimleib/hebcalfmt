@@ -1,11 +1,16 @@
 package templating
 
 import (
+	"fmt"
+	"strings"
+
+	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/sedra"
 )
 
 var SedraFuncs = map[string]any{
-	"sedra": Sedra,
+	"sedra":   Sedra,
+	"parasha": LocalizedParasha,
 }
 
 var sedraCache, sedraCacheIL map[int]sedra.Sedra
@@ -35,4 +40,20 @@ func Sedra(year int, il bool) *sedra.Sedra {
 	}
 
 	return &got
+}
+
+func LocalizedParasha(hd hdate.HDate, il bool, lang string) string {
+	parashat := Translate(lang, "Parashat")
+	parsha := Sedra(hd.Year(), il).Lookup(hd)
+	if parsha.Chag {
+		return fmt.Sprintf("%s hachag", parashat) // TODO: detect which chag
+	}
+	return fmt.Sprintf(
+		"%s %s",
+		parashat,
+		strings.Join(Apply(
+			parsha.Name,
+			func(s string) string { return Translate(lang, s) },
+		), "-"),
+	)
 }
