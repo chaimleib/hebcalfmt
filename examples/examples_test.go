@@ -21,6 +21,10 @@ func setupExample(t *testing.T) (fs.FS, time.Time) {
 		t.FailNow()
 	}
 
+	// Block access to the default config inside ~/.config/... .
+	// If HOME is empty, the program gives up on the default config file.
+	t.Setenv("HOME", "")
+
 	now := time.Date(2024, time.May, 6, 0, 0, 0, 0, time.UTC)
 
 	return files, now

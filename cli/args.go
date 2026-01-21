@@ -137,6 +137,14 @@ func loadConfigFromFlags(
 	return cfg, nil
 }
 
+func DefaultConfigPath() string {
+	home := os.Getenv("HOME")
+	if home == "" {
+		return ""
+	}
+	return filepath.Join(home, ".config", ProgName, "config.json")
+}
+
 // loadConfigOrDefault reads fpath if not empty.
 // It will error if fpath does not exist.
 //
@@ -155,10 +163,14 @@ func loadConfigOrDefault(files fs.FS, fpath string) (*config.Config, error) {
 	var suppressMissingConfigErr bool
 
 	// Try to configure a default configPath if one was not provided
-	home := os.Getenv("HOME")
-	if fpath == "" && home != "" {
-		suppressMissingConfigErr = true
-		fpath = filepath.Join(home, ".config", ProgName, "config.json")
+	if fpath == "" {
+		if defaultConfigPath := DefaultConfigPath(); defaultConfigPath != "" {
+			suppressMissingConfigErr = true
+			fpath = defaultConfigPath
+		} else {
+			defaultCfg := config.Default
+			return &defaultCfg, nil
+		}
 	}
 
 	cfg, err := config.FromFile(files, fpath)
