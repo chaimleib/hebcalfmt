@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hebcal/hebcal-go/hebcal"
+	"github.com/hebcal/hebcal-go/molad"
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
@@ -19,6 +20,9 @@ func ZmanimFuncs(opts *hebcal.CalOptions) map[string]any {
 		// zmanim.Zmanim
 		"forDate":         ForDate(opts.Location),
 		"forLocationDate": ForLocationDate,
+
+		// molad
+		"molad": molad.New,
 	}
 }
 
