@@ -9,6 +9,8 @@ import (
 var HDateFuncs = map[string]any{
 	"hdateEqual":                  xhdate.Equal,
 	"hdateParse":                  xhdate.Parse,
+	"hdateNextMonth":              xhdate.NextMonth,
+	"hdatePrevMonth":              xhdate.PrevMonth,
 	"hdateIsLeapYear":             hdate.IsLeapYear,
 	"hdateMonthsInYear":           hdate.MonthsInYear,
 	"hdateDaysInYear":             hdate.DaysInYear,

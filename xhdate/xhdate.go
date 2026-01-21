@@ -64,3 +64,14 @@ func Parse(s string) (hdate.HDate, error) {
 
 	return hdate.New(year, month, day), nil
 }
+
+// NextMonth returns the first day of the next Hebrew month.
+func NextMonth(hd hdate.HDate) hdate.HDate {
+	daysLeft := hdate.DaysInMonth(hd.Month(), hd.Year()) - hd.Day() + 1
+	return hdate.FromTime(hd.Gregorian().AddDate(0, 0, daysLeft))
+}
+
+// PrevMonth returns the last day of the previous Hebrew month.
+func PrevMonth(hd hdate.HDate) hdate.HDate {
+	return hdate.FromTime(hd.Gregorian().AddDate(0, 0, -hd.Day()))
+}

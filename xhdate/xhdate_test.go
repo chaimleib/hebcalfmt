@@ -120,3 +120,46 @@ func TestParse(t *testing.T) {
 		})
 	}
 }
+
+func TestNextMonth(t *testing.T) {
+	cases := []struct {
+		D    hdate.HDate
+		Want hdate.HDate
+	}{
+		{hdate.New(5550, hdate.Iyyar, 3), hdate.New(5550, hdate.Sivan, 1)},
+		{hdate.New(5550, hdate.Iyyar, 29), hdate.New(5550, hdate.Sivan, 1)},
+		{hdate.New(5550, hdate.Elul, 29), hdate.New(5551, hdate.Tishrei, 1)},
+		{hdate.New(5550, hdate.Adar1, 14), hdate.New(5550, hdate.Nisan, 1)},
+		{hdate.New(5550, hdate.Adar2, 14), hdate.New(5550, hdate.Nisan, 1)},
+		{hdate.New(5551, hdate.Adar1, 14), hdate.New(5551, hdate.Adar2, 1)},
+		{hdate.New(5551, hdate.Adar2, 14), hdate.New(5551, hdate.Nisan, 1)},
+	}
+	for _, c := range cases {
+		t.Run(c.D.String(), func(t *testing.T) {
+			got := xhdate.NextMonth(c.D)
+			test.CheckHDate(t, "next month", c.Want, got)
+		})
+	}
+}
+
+func TestPrevMonth(t *testing.T) {
+	cases := []struct {
+		D    hdate.HDate
+		Want hdate.HDate
+	}{
+		{hdate.New(5550, hdate.Iyyar, 3), hdate.New(5550, hdate.Nisan, 30)},
+		{hdate.New(5550, hdate.Iyyar, 29), hdate.New(5550, hdate.Nisan, 30)},
+		{hdate.New(5550, hdate.Elul, 29), hdate.New(5550, hdate.Av, 30)},
+		{hdate.New(5550, hdate.Tishrei, 15), hdate.New(5549, hdate.Elul, 29)},
+		{hdate.New(5550, hdate.Adar2, 14), hdate.New(5550, hdate.Shvat, 30)},
+		{hdate.New(5550, hdate.Adar1, 14), hdate.New(5550, hdate.Shvat, 30)},
+		{hdate.New(5551, hdate.Adar2, 14), hdate.New(5551, hdate.Adar1, 30)},
+		{hdate.New(5551, hdate.Adar1, 14), hdate.New(5551, hdate.Shvat, 30)},
+	}
+	for _, c := range cases {
+		t.Run(c.D.String(), func(t *testing.T) {
+			got := xhdate.PrevMonth(c.D)
+			test.CheckHDate(t, "prev month", c.Want, got)
+		})
+	}
+}
