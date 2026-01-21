@@ -1,6 +1,10 @@
 package templating
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/hebcal/hebcal-go/locales"
+)
 
 var StringFuncs = map[string]any{
 	"contains":        strings.Contains,
@@ -34,4 +38,21 @@ var StringFuncs = map[string]any{
 	"trimRight":       strings.TrimRight,
 	"trimSpace":       strings.TrimSpace,
 	"trimSuffix":      strings.TrimSuffix,
+
+	"translate": Translate,
+}
+
+func Translate(lang, s string) string {
+	if got, ok := locales.LookupTranslation(s, lang); ok {
+		return got
+	}
+	return s
+}
+
+func Apply(s []string, fn func(string) string) []string {
+	result := make([]string, 0, len(s))
+	for _, item := range s {
+		result = append(result, fn(item))
+	}
+	return result
 }
