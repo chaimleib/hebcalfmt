@@ -751,3 +751,167 @@ func TestTimedEvents(t *testing.T) {
 		})
 	}
 }
+
+func TestEventsByFlags(t *testing.T) {
+	cases := []struct {
+		Name   string
+		Events []event.CalEvent
+		Flags  []event.HolidayFlags
+		Want   []event.CalEvent
+	}{
+		{Name: "empty"},
+		{
+			Name: "empty flags",
+			Events: []event.CalEvent{
+				event.NewHebrewDateEvent(hdate.New(5784, hdate.Tishrei, 1)),
+			},
+		},
+		{
+			Name:  "user event flag",
+			Flags: []event.HolidayFlags{event.USER_EVENT},
+			Events: []event.CalEvent{
+				event.UserEvent{
+					Date: hdate.New(5784, hdate.Tishrei, 1),
+					Desc: "Test UserEvent",
+				},
+				event.NewHebrewDateEvent(hdate.New(5784, hdate.Tishrei, 1)),
+			},
+			Want: []event.CalEvent{
+				event.UserEvent{
+					Date: hdate.New(5784, hdate.Tishrei, 1),
+					Desc: "Test UserEvent",
+				},
+			},
+		},
+		{
+			Name:  "user event and chag flag",
+			Flags: []event.HolidayFlags{event.USER_EVENT, event.CHAG},
+			Events: []event.CalEvent{
+				event.UserEvent{
+					Date: hdate.New(5784, hdate.Tishrei, 1),
+					Desc: "Test UserEvent",
+				},
+				event.NewHebrewDateEvent(hdate.New(5784, hdate.Tishrei, 1)),
+			},
+			Want: []event.CalEvent{
+				event.UserEvent{
+					Date: hdate.New(5784, hdate.Tishrei, 1),
+					Desc: "Test UserEvent",
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			got := templating.EventsByFlags(c.Events, c.Flags...)
+			test.CheckSlice(t, "events", c.Want, got)
+		})
+	}
+}
+
+func TestDayHasFlags(t *testing.T) {
+	cases := []struct {
+		Name  string
+		Opts  *hebcal.CalOptions
+		Date  hdate.HDate
+		Flags []event.HolidayFlags
+		Want  bool
+		Err   string
+	}{
+		{Name: "empty flags on RH", Date: hdate.New(5687, hdate.Tishrei, 1)},
+		{
+			Name:  "chag flag on RH",
+			Date:  hdate.New(5687, hdate.Tishrei, 1),
+			Flags: []event.HolidayFlags{event.CHAG},
+			Want:  true,
+		},
+		{
+			Name:  "user event flag, with a user event",
+			Flags: []event.HolidayFlags{event.USER_EVENT},
+			Date:  hdate.New(5687, hdate.Tishrei, 1),
+			Opts: &hebcal.CalOptions{
+				UserEvents: []hebcal.UserEvent{
+					{
+						Month: hdate.Tishrei,
+						Day:   1,
+						Desc:  "Test UserEvent",
+					},
+				},
+			},
+			Want: true,
+		},
+		{
+			Name:  "user event flag, with empty user events",
+			Flags: []event.HolidayFlags{event.USER_EVENT},
+			Date:  hdate.New(5687, hdate.Tishrei, 1),
+		},
+		{
+			Name:  "user event and chag flag, with empty user events",
+			Flags: []event.HolidayFlags{event.USER_EVENT, event.CHAG},
+			Want:  true,
+		},
+		{
+			Name: "invalid opts",
+			Opts: &hebcal.CalOptions{
+				CandleLighting: true,
+				Location:       nil,
+			},
+			Err: "opts.CandleLighting requires opts.Location",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			opts := c.Opts
+			if opts == nil {
+				opts = new(hebcal.CalOptions)
+			}
+			got, err := templating.DayHasFlags(opts)(c.Date, c.Flags...)
+			test.CheckErr(t, err, c.Err)
+			if c.Want != got {
+				t.Errorf("want: %v got: %v", c.Want, got)
+			}
+		})
+	}
+}
+
+func TestDayIsShabbatOrYomTov(t *testing.T) {
+	cases := []struct {
+		Name string
+		Opts *hebcal.CalOptions
+		Date hdate.HDate
+		Want bool
+		Err  string
+	}{
+		{
+			Name: "RH",
+			Date: hdate.New(5687, hdate.Tishrei, 1),
+			Want: true,
+		},
+		{
+			Name: "Chanukah is not Shabbos or Yom Tov",
+			Date: hdate.New(5687, hdate.Kislev, 25),
+			Want: false,
+		},
+		{
+			Name: "invalid opts",
+			Opts: &hebcal.CalOptions{
+				CandleLighting: true,
+				Location:       nil,
+			},
+			Err: "opts.CandleLighting requires opts.Location",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			opts := c.Opts
+			if opts == nil {
+				opts = new(hebcal.CalOptions)
+			}
+			got, err := templating.DayIsShabbatOrYomTov(opts)(c.Date)
+			test.CheckErr(t, err, c.Err)
+			if c.Want != got {
+				t.Errorf("want: %v got: %v", c.Want, got)
+			}
+		})
+	}
+}

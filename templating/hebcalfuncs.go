@@ -2,6 +2,7 @@ package templating
 
 import (
 	"sort"
+	"time"
 
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/event"
@@ -24,7 +25,11 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"hebcal": Hebcal(opts),
 
 		// timedEvents returns a slice of [hebcal.TimedEvent]
-		"timedEvents": TimedEvents(opts),
+		"timedEvents":   TimedEvents(opts),
+		"eventsByFlags": EventsByFlags,
+
+		"dayHasFlags":          DayHasFlags(opts),
+		"dayIsShabbatOrYomTov": DayIsShabbatOrYomTov(opts),
 	}
 }
 
@@ -121,5 +126,75 @@ func TimedEvents(
 
 		sort.Slice(results, CompareTimedEvents(results))
 		return results, nil
+	}
+}
+
+// EventsByFlags filters the events to just the ones
+// which have any of the given flags set.
+func EventsByFlags(
+	events []event.CalEvent,
+	flags ...event.HolidayFlags,
+) []event.CalEvent {
+	// Combine the flags into a mask.
+	var mask event.HolidayFlags
+	for _, flag := range flags {
+		mask |= flag
+	}
+
+	// Gather the matching events.
+	var results []event.CalEvent
+	for _, e := range events {
+		if e.GetFlags()&mask != 0 {
+			results = append(results, e)
+		}
+	}
+
+	return results
+}
+
+// DayHasFlags returns whether d has any of the given flags set
+// on any of its events.
+func DayHasFlags(
+	opts *hebcal.CalOptions,
+) func(d hdate.HDate, flags ...event.HolidayFlags) (bool, error) {
+	return func(d hdate.HDate, flags ...event.HolidayFlags) (bool, error) {
+		// Combine the flags into a mask.
+		var mask event.HolidayFlags
+		for _, flag := range flags {
+			mask |= flag
+		}
+
+		// Get the events occurring on d.
+		events, err := Hebcal(opts)(d)
+		if err != nil {
+			return false, err
+		}
+
+		// Check the events.
+		for _, e := range events {
+			if e.GetFlags()&mask != 0 {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+}
+
+// DayIsShabbatOrYomTov returns whether melacha is forbidden on the given day.
+// It may be used by logic which determines candle lighting and havdalah times.
+func DayIsShabbatOrYomTov(
+	opts *hebcal.CalOptions,
+) func(d hdate.HDate) (bool, error) {
+	return func(d hdate.HDate) (bool, error) {
+		events, err := Hebcal(opts)(d)
+		if err != nil {
+			return false, err
+		}
+		for _, ev := range events {
+			if ev.GetFlags()&event.CHAG != 0 {
+				return true, nil
+			}
+		}
+		return d.Weekday() == time.Saturday, nil
 	}
 }
