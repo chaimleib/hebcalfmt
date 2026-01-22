@@ -1,6 +1,7 @@
 package templating_test
 
 import (
+	"bytes"
 	"errors"
 	"io/fs"
 	"testing"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/hebcal/hebcal-go/hebcal"
 
+	"github.com/chaimleib/hebcalfmt/config"
 	"github.com/chaimleib/hebcalfmt/templating"
 	"github.com/chaimleib/hebcalfmt/test"
 )
@@ -95,5 +97,65 @@ func TestSetFuncMap(t *testing.T) {
 	}
 	if len(mt.funcs) == 0 {
 		t.Error("expected at least one func in the resulting funcmap")
+	}
+}
+
+func TestBuildData(t *testing.T) {
+	mapFiles := fstest.MapFS{
+		"stub.tmpl":      &fstest.MapFile{Data: []byte("hi")},
+		"invalid.tmpl":   &fstest.MapFile{Data: []byte("{{INVALID")},
+		"readError.tmpl": &fstest.MapFile{},
+	}
+	cases := []struct {
+		Name     string
+		Cfg      *config.Config
+		Files    fs.FS
+		TmplPath string
+		Err      string
+
+		// WantOut is the expected output of executing the template.
+		WantOut string
+
+		// OutErr is the expected err of executing the template.
+		OutErr string
+	}{
+		{Name: "empty tmplPath", Err: "open : file does not exist"},
+		{Name: "stub.tmpl", TmplPath: "stub.tmpl", WantOut: "hi"},
+		{
+			Name: "stub.tmpl with invalid config",
+			Cfg: &config.Config{
+				ConfigSource: "test struct",
+				City:         "Invalid City",
+			},
+			TmplPath: "stub.tmpl",
+			Err:      `failed to build hebcal options from test struct: failed to resolve place configs: unknown city: "Invalid City"`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			test.Logger(t)
+
+			// Default c.Cfg to non-nil
+			cfg := c.Cfg
+			if cfg == nil {
+				cfg = new(config.Config)
+			}
+			// Default c.Files to mapFiles
+			files := c.Files
+			if files == nil {
+				files = mapFiles
+			}
+
+			tmpl, data, err := templating.BuildData(cfg, files, c.TmplPath)
+			test.CheckErr(t, err, c.Err)
+			if c.Err != "" {
+				return
+			}
+
+			var buf bytes.Buffer
+			err = tmpl.Execute(&buf, data)
+			test.CheckErr(t, err, c.OutErr)
+			test.CheckString(t, "output", c.WantOut, buf.String(), test.WantEqual)
+		})
 	}
 }

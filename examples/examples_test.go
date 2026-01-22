@@ -9,6 +9,7 @@ import (
 
 	"github.com/chaimleib/hebcalfmt/cli"
 	"github.com/chaimleib/hebcalfmt/fsys"
+	"github.com/chaimleib/hebcalfmt/templating"
 	"github.com/chaimleib/hebcalfmt/test"
 )
 
@@ -35,7 +36,8 @@ func TestExamples_Today(t *testing.T) {
 	const fpath = "today.tmpl"
 
 	var buf bytes.Buffer
-	err := cli.RunInEnvironment([]string{fpath}, files, now, &buf)
+	err := cli.RunInEnvironment(
+		[]string{fpath}, files, now, templating.BuildData, &buf)
 	if err != nil {
 		t.Error(err)
 	}
@@ -203,7 +205,8 @@ Nisan - Sivan 5782
 
 			var buf bytes.Buffer
 
-			err := cli.RunInEnvironment(args, files, now, &buf)
+			err := cli.RunInEnvironment(
+				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
 			if buf.String() != c.Want {
@@ -286,7 +289,8 @@ func TestExamples_Date(t *testing.T) {
 
 			var buf bytes.Buffer
 
-			err := cli.RunInEnvironment(args, files, now, &buf)
+			err := cli.RunInEnvironment(
+				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
 			if buf.String() != c.Want {
@@ -470,7 +474,8 @@ func TestExamples_HebcalClassic(t *testing.T) {
 
 			var buf bytes.Buffer
 
-			err := cli.RunInEnvironment(args, files, now, &buf)
+			err := cli.RunInEnvironment(
+				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
 			if buf.String() != c.Want {
@@ -538,7 +543,8 @@ Wed Aug 14, 2024: 7:40 PM
 
 			var buf bytes.Buffer
 
-			err := cli.RunInEnvironment(args, files, now, &buf)
+			err := cli.RunInEnvironment(
+				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
 			if buf.String() != c.Want {
@@ -698,7 +704,8 @@ Shabbat: Sat Aug 3 2024 / 28 Tammuz 5784
 
 			var buf bytes.Buffer
 
-			err := cli.RunInEnvironment(args, files, now, &buf)
+			err := cli.RunInEnvironment(
+				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
 			if buf.String() != c.Want {
@@ -828,7 +835,8 @@ A halachic hour is 1h9m51s.
 
 			var buf bytes.Buffer
 
-			err := cli.RunInEnvironment(args, files, now, &buf)
+			err := cli.RunInEnvironment(
+				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
 			if buf.String() != c.Want {

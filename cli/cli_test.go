@@ -11,6 +11,7 @@ import (
 
 	"github.com/chaimleib/hebcalfmt/cli"
 	"github.com/chaimleib/hebcalfmt/config"
+	"github.com/chaimleib/hebcalfmt/templating"
 	"github.com/chaimleib/hebcalfmt/test"
 )
 
@@ -168,7 +169,7 @@ To show the available languages, run
 			}
 			var buf bytes.Buffer
 			logBuf := test.Logger(t)
-			err := cli.RunInEnvironment(args, files, now, &buf)
+			err := cli.RunInEnvironment(args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
 			test.CheckString(t, "output", c.Want, buf.String(), c.WantMode)

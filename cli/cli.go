@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -11,8 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/hebcal/hebcal-go/zmanim"
-
+	"github.com/chaimleib/hebcalfmt/config"
 	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/templating"
 )
@@ -62,7 +60,8 @@ func Run() int {
 		return 1
 	}
 
-	err = RunInEnvironment(os.Args[1:], files, time.Now(), os.Stdout)
+	err = RunInEnvironment(
+		os.Args[1:], files, time.Now(), templating.BuildData, os.Stdout)
 	if err != nil {
 		log.Println(err)
 		return 1
@@ -99,6 +98,11 @@ func RunInEnvironment(
 	args []string,
 	files fs.FS,
 	now time.Time,
+	buildData func(
+		cfg *config.Config,
+		files fs.FS,
+		tmplPath string,
+	) (*template.Template, map[string]any, error),
 	w io.Writer,
 ) error {
 	flagSet := NewFlags()
@@ -123,42 +127,10 @@ func RunInEnvironment(
 		return err
 	}
 
-	opts, err := cfg.CalOptions()
-	if err != nil {
-		return fmt.Errorf("failed to build hebcal options from %s: %w",
-			cfg.ConfigSource, err)
-	}
-
-	z := zmanim.New(opts.Location, cfg.Now)
-
-	// Set up the Template's FuncMap.
-	// This must be done before parsing the file.
-	tmpl := template.New(tmplPath)
-	tmpl = templating.SetFuncMap(tmpl, opts)
-
-	tmpl, err = templating.ParseFile(files, tmpl, tmplPath)
-	if err != nil {
-		return err
-	}
-	tmpl.ParseName = tmplPath
-
-	err = tmpl.Execute(w, map[string]any{
-		"now":           cfg.Now,
-		"nowInLocation": cfg.Now.In(z.TimeZone),
-		"calOptions":    opts,
-		"language":      cfg.Language,
-		"dateRange":     cfg.DateRange,
-		"tz":            z.TimeZone,
-		"location":      opts.Location,
-		"z":             &z,
-		"hdate":         templating.HDateConsts,
-		"event":         templating.EventConsts,
-		"sedra":         templating.SedraConsts,
-		"time":          templating.TimeConsts,
-	})
+	tmpl, tmplData, err := templating.BuildData(cfg, files, tmplPath)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	return tmpl.Execute(w, tmplData)
 }
