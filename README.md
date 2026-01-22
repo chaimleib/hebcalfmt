@@ -199,7 +199,7 @@ the omer, the molad, and the parsha of the week.
 {{- /* Configurations: */ -}}
 {{- /*  - CLI date */ -}}
 {{- /*  - bool cfg.daily_zmanim - enable all zmanim if true */ -}}
-{{- /*  - bool cfg.sunrise_sunset - enable netz and shkia if true */ -}}
+{{- /*  - bool cfg.sunrise_sunset - enable neitz and shkiah if true */ -}}
 {{- /*  - bool cfg.candle_lighting - */ -}}
 {{- /*      enable zmanim for special mitzvos of the day, */ -}}
 {{- /*      like chametz, fasts, candles and havdalah */ -}}
@@ -285,11 +285,11 @@ This {{translate $.language "Shabbat"}} we read
 {{- /* Zmanim calculations are based on */}}
 {{- /* https://www.chabad.org/library/article_cdo/aid/3209349/jewish/About-Our-Zmanim-Calculations.htm */}}
 
-{{- /* $h is halachic hour duration using Netz/Shkiah Amita @1.583 deg. */}}
-{{- $netzAmiti := $z.TimeAtAngle 1.583 true}}
+{{- /* $h is halachic hour duration using Neitz/Shkiah Amita @1.583 deg. */}}
+{{- $neitzAmiti := $z.TimeAtAngle 1.583 true}}
 {{- $shkiahAmitis := $z.TimeAtAngle 1.583 false}}
-{{- $netzTomorrow := $zNext.TimeAtAngle 1.583 true}}
-{{- $h := durationDiv ($shkiahAmitis.Sub $netzAmiti) 12}}
+{{- $neitzTomorrow := $zNext.TimeAtAngle 1.583 true}}
+{{- $h := durationDiv ($shkiahAmitis.Sub $neitzAmiti) 12}}
 {{- $halfH := durationDiv $h 2}}
 
 {{- /* For Mincha Gedolah, choose the greater of 30m or 0.5h after chatzos. */}}
@@ -297,9 +297,9 @@ This {{translate $.language "Shabbat"}} we read
 {{- if lt $halfH $d30m }}
 {{-   $halfH = $d30m}}
 {{- end}}
-{{- $chatzos := $netzAmiti.Add (durationMul $h 6) }}
+{{- $chatzos := $neitzAmiti.Add (durationMul $h 6) }}
 {{- $chatzosLailah := $shkiahAmitis.Add
-  (durationDiv ($netzTomorrow.Sub $shkiahAmitis) 2) }}
+  (durationDiv ($neitzTomorrow.Sub $shkiahAmitis) 2) }}
 
 {{- /* Display today's zmanim. */}}
 
@@ -308,7 +308,7 @@ This {{translate $.language "Shabbat"}} we read
       $.calOptions.DailyZmanim
 }}
 
-{{    ($z.TimeAtAngle 16.9 true).Format $fmt}}: Alot HaShachar
+{{    ($z.TimeAtAngle 16.9 true).Format $fmt}}: Alos HaShachar
         {{- if dayHasFlags $d $.event.MINOR_FAST -}}
           , Fast starts
         {{- end}} (16.9 deg)
@@ -316,26 +316,26 @@ This {{translate $.language "Shabbat"}} we read
 {{- end}}
 
 {{- if or $.calOptions.DailyZmanim $.calOptions.SunriseSunset}}
-{{ ($z.TimeAtAngle 0.833 true).Format $fmt}}: Netz (0.833 deg)
+{{ ($z.TimeAtAngle 0.833 true).Format $fmt}}: Neitz (0.833 deg)
 {{- end}}
 {{- if $.calOptions.DailyZmanim}}
-{{    ($netzAmiti.Add (durationMul $h 3)).Format $fmt}}: Sof Zman Krias Shema
-{{    ($netzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Tefillah
+{{    ($neitzAmiti.Add (durationMul $h 3)).Format $fmt}}: Sof Zman Krias Shema
+{{    ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Tefillah
 {{- end}}
 
 {{- if or $.calOptions.DailyZmanim $.calOptions.CandleLighting}}
 {{- /* Chametz zmanim before Pesach */}}
 {{-   if eq $.time.Saturday (hdateNew $d.Year $.hdate.Nisan 14).Weekday}}
 {{-     if hdateNew $d.Year $.hdate.Nisan 13 | hdateEqual $d}}
-{{        ($netzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
+{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
 {{-     else if hdateNew $d.Year $.hdate.Nisan 14 | hdateEqual $d}}
-{{        ($netzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
-{{        ($netzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Bittul Chametz
+{{        ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
+{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Bittul Chametz
 {{-     end}}
 {{-   else}}
 {{-     if hdateNew $d.Year $.hdate.Nisan 14 | hdateEqual $d}}
-{{        ($netzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
-{{        ($netzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
+{{        ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
+{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
 {{-     end}}
 {{-   end}}
 {{- end}}
@@ -345,7 +345,7 @@ This {{translate $.language "Shabbat"}} we read
 {{    ($chatzos.Add $halfH).Format $fmt}}: Mincha Gedolah
         {{- if le $halfH $d30m }} (floored to 30m past chatzos){{end}}
 {{    ($shkiahAmitis.Add (durationMul $h -2.5)).Format $fmt}}: Mincha Ketanah
-{{    ($shkiahAmitis.Add (durationMul $h -1.25)).Format $fmt}}: Plag Hamincha
+{{    ($shkiahAmitis.Add (durationMul $h -1.25)).Format $fmt}}: Plag HaMincha
 {{- end}}
 
 {{- /* Candle lighting */}}
@@ -388,7 +388,7 @@ This {{translate $.language "Shabbat"}} we read
 
 {{- if $.calOptions.DailyZmanim}}
 {{   ($z.TimeAtAngle 1.583 false).Format $fmt -}}
-       : Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+       : Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
 {{- end}}
 
 {{- /* What should we show for Tzeis? Havdalah? Licht? 3 medium star tzeis? */}}
@@ -432,7 +432,7 @@ This {{translate $.language "Shabbat"}} we read
 
 {{- /* Chatzos lailah - might be after midnight, so show the day of week. */}}
 {{- if $.calOptions.DailyZmanim}}
-{{    $chatzosLailah.Format (printf "%s (Mon)" $fmt) }}: Chatzos Halailah
+{{    $chatzosLailah.Format (printf "%s (Mon)" $fmt) }}: Chatzos HaLailah
 
 A halachic hour is {{ $h.Round $.time.Second}}.
 {{- end}}
@@ -548,7 +548,7 @@ This Shabbos we read Parshas Bo.
 
 06:08:17: Alot HaShachar (16.9 deg)
 06:40:28: Misheyakir (10.2 deg)
-07:26:36: Netz (0.833 deg)
+07:26:36: Neitz (0.833 deg)
 10:02:29: Sof Zman Krias Shema
 10:55:42: Sof Zman Tefillah
 12:42:07: Chatzos

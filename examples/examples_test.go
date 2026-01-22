@@ -324,19 +324,19 @@ Tonight, count the 13th day of the Omer.
 
 This Shabbos we read Parshas Kedoshim.
 
-05:20:20: Alot HaShachar (16.9 deg)
+05:20:20: Alos HaShachar (16.9 deg)
 05:55:49: Misheyakir (10.2 deg)
-06:43:00: Netz (0.833 deg)
+06:43:00: Neitz (0.833 deg)
 10:03:24: Sof Zman Krias Shema
 11:11:27: Sof Zman Tefillah
 13:27:31: Chatzos
 14:01:32: Mincha Gedolah
 17:25:39: Mincha Ketanah
-18:50:42: Plag Hamincha
+18:50:42: Plag HaMincha
 20:12:03: Shkiah (0.833 deg)
-20:15:45: Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+20:15:45: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
 20:37:48: Tzeis (6 deg/3 medium stars)
-01:27:08 (Tue): Chatzos Halailah
+01:27:08 (Tue): Chatzos HaLailah
 
 A halachic hour is 1h8m2s.
 
@@ -355,19 +355,19 @@ The molad for next month, Iyyar, is Wednesday, 30 Nisan 5784 at 11:41 and 8 chal
 
 This Shabbos we read Parshas Bo.
 
-06:08:17: Alot HaShachar (16.9 deg)
+06:08:17: Alos HaShachar (16.9 deg)
 06:40:28: Misheyakir (10.2 deg)
-07:26:36: Netz (0.833 deg)
+07:26:36: Neitz (0.833 deg)
 10:02:29: Sof Zman Krias Shema
 10:55:42: Sof Zman Tefillah
 12:42:07: Chatzos
 13:12:07: Mincha Gedolah (floored to 30m past chatzos)
 15:48:22: Mincha Ketanah
-16:54:53: Plag Hamincha
+16:54:53: Plag HaMincha
 17:57:39: Shkiah (0.833 deg)
-18:01:24: Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+18:01:24: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
 18:23:17: Tzeis (6 deg/3 medium stars)
-00:41:58 (Thu): Chatzos Halailah
+00:41:58 (Thu): Chatzos HaLailah
 
 A halachic hour is 53m13s.
 
