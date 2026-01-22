@@ -449,6 +449,9 @@ They also do not account for atmospheric conditions,
   {{- ""}} local elevation, and local horizon elevations.
 Even sitting down or standing up
   {{- ""}} can change observed sunrise and sunset times by about 10s.
+Note well that this software was released
+  {{- ""}} in the hopes that someone finds it useful,
+  {{- ""}} and with no guarantees about correctness or accuracy.
 {{- end}}
 
 {{- if $.calOptions.Molad}}
@@ -485,7 +488,9 @@ The molad for next month, {{$nextMonth.MonthName $.language}},
 
 </details>
 
-examples/chabad.json
+<details>
+  <summary>examples/chabad.json</summary>
+
 ```json
 {
   "city": "Austin",
@@ -501,6 +506,8 @@ examples/chabad.json
   "havdalah_deg": 8.5
 }
 ```
+
+</details>
 
 <details>
   <summary>examples/chabad-events.txt</summary>
@@ -566,6 +573,7 @@ WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
 They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
 The molad for this month, Sh'vat, is Sunday, 29 Tevet 5786 at 3:06 and 11 chalakim PM.
 ```

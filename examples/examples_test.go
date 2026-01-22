@@ -344,6 +344,7 @@ WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
 They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
 The molad for next month, Iyyar, is Wednesday, 30 Nisan 5784 at 11:41 and 8 chalakim AM.
 `,
@@ -375,6 +376,7 @@ WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
 They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
 The molad for this month, Sh'vat, is Sunday, 29 Tevet 5786 at 3:06 and 11 chalakim PM.
 `,
