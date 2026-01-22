@@ -1,0 +1,13 @@
+{
+  "city": "Austin",
+  "language": "ashkenazi",
+  "molad": true,
+  "omer": true,
+  "sedrot": true,
+  "daily_sedra": true,
+  "no_modern": true,
+  "daily_zmanim": true,
+  "shabbat_mevarchim": true,
+  "events_file": "chabad-events.txt",
+  "havdalah_deg": 8.5
+}

@@ -170,6 +170,407 @@ Gregorian: 2025-12-15
 Hebrew: 25 Kislev 5786
 ```
 
+### Chabad zmanim
+
+This example replaces parts of the zmanim engine with custom templating,
+in other to calculate zmanim as described in
+[
+Chabad.org's article About Our Zmanim Calculations
+](https://www.chabad.org/library/article_cdo/aid/3209349/jewish/About-Our-Zmanim-Calculations.htm).
+It also displays certain special events,
+the omer, the molad, and the parsha of the week.
+
+<details>
+  <summary>examples/chabad.tmpl</summary>
+
+```tmpl
+{{- /* Shows: */ -}}
+{{- /*  - the given date in Jewish and Civil calendars */ -}}
+{{- /*  - special events today */ -}}
+{{- /*  - the omer count */ -}}
+{{- /*  - the parsha to be read this Shabbos */ -}}
+{{- /*  - generic zmanim */ -}}
+{{- /*  - zmanim specific to the day */ -}}
+{{- /*  - length of the halachic hour */ -}}
+{{- /*  - a warning about zmanim accuracy */ -}}
+{{- /*  - the past molad, until the 15th of the month */ -}}
+{{- /*  - the next molad, from the 16th of the month */ -}}
+
+{{- /* Configurations: */ -}}
+{{- /*  - CLI date */ -}}
+{{- /*  - bool cfg.daily_zmanim - enable all zmanim if true */ -}}
+{{- /*  - bool cfg.sunrise_sunset - enable netz and shkia if true */ -}}
+{{- /*  - bool cfg.candle_lighting - */ -}}
+{{- /*      enable zmanim for special mitzvos of the day, */ -}}
+{{- /*      like chametz, fasts, candles and havdalah */ -}}
+{{- /*  - bool cfg.daily_sedra - enable the parsha every day */ -}}
+{{- /*  - bool cfg.molad - enable the molad */ -}}
+{{- /*  - bool cfg.no_modern - disable modern holidays */ -}}
+{{- /*  - bool cfg.omer - enable the omer */ -}}
+{{- /*  - bool cfg.sedrot - enable the parsha on Shabbos */ -}}
+{{- /*  - bool cfg.shabbat_mevarchim - */ -}}
+{{- /*      enable Shabbat Mevarchim before Rosh Chodesh */ -}}
+{{- /*  - int cfg.candle_lighting_mins - */ -}}
+{{- /*      how many minutes before shkiah to light */ -}}
+{{- /*      for Shabbos and Yom Tov */ -}}
+{{- /*  - string cfg.city - location for zmanim */ -}}
+{{- /*  - float cfg.geo.lat, .lon - location for zmanim */ -}}
+{{- /*  - string cfg.timezone - location for zmanim */ -}}
+
+{{- $d := $.dateRange.StartOrToday false -}}
+{{- $shabbos := $d.OnOrAfter $.time.Saturday -}}
+
+{{- $z := forLocationDate $.location $d.Gregorian -}}
+{{- $zNext := forLocationDate $.location $d.Next.Gregorian -}}
+
+{{- if or
+      $.calOptions.DailyZmanim
+      $.calOptions.SunriseSunset
+      $.calOptions.CandleLighting
+-}}
+Zmanim for {{""}}
+{{- end}}
+  {{- ""}}{{$d.Gregorian.Format (printf "Monday, %s" $.time.DateOnly)}}
+  {{- ""}} / {{$d}}
+{{- if or
+      $.calOptions.DailyZmanim
+      $.calOptions.SunriseSunset
+      $.calOptions.CandleLighting
+}}
+  {{- ""}}, in {{$.location.Name}}
+{{- end}}
+
+{{- /* Is it a special day? */}}
+{{- range eventsByFlags (hebcal $d)
+      $.event.EREV
+      $.event.CHAG
+      $.event.CHOL_HAMOED
+      $.event.OMER_COUNT
+      $.event.CHANUKAH_CANDLES
+      $.event.MINOR_HOLIDAY
+      $.event.ROSH_CHODESH
+      $.event.MINOR_FAST
+      $.event.MAJOR_FAST
+      $.event.SPECIAL_SHABBAT
+      $.event.SHABBAT_MEVARCHIM
+      $.event.USER_EVENT
+}}
+{{-   if asOmerEvent . }}
+{{-     if $.calOptions.Omer}}
+Tonight, count the {{.Render $.language}}.
+{{-     end}}
+{{-   else if and
+        (not (asTimedEvent .))
+        (or (ne "Chag HaBanot" .Basename) (not $.calOptions.NoModern))
+}}
+{{      .Render $.language}}
+{{-   end}}
+{{- end}}
+
+{{- /* What is the parasha? */}}
+{{- if or
+      $.calOptions.DailySedra
+      (and
+        (eq $.time.Saturday $d.Weekday)
+        $.calOptions.Sedrot
+      )
+}}
+
+This {{translate $.language "Shabbat"}} we read
+  {{- ""}} {{parasha $shabbos (eq $.location.CountryCode "IL") $.language}}.
+{{- end}}
+
+{{- $fmt := $.time.TimeOnly}}
+
+{{- /* Zmanim calculations are based on */}}
+{{- /* https://www.chabad.org/library/article_cdo/aid/3209349/jewish/About-Our-Zmanim-Calculations.htm */}}
+
+{{- /* $h is halachic hour duration using Netz/Shkiah Amita @1.583 deg. */}}
+{{- $netzAmiti := $z.TimeAtAngle 1.583 true}}
+{{- $shkiahAmitis := $z.TimeAtAngle 1.583 false}}
+{{- $netzTomorrow := $zNext.TimeAtAngle 1.583 true}}
+{{- $h := durationDiv ($shkiahAmitis.Sub $netzAmiti) 12}}
+{{- $halfH := durationDiv $h 2}}
+
+{{- /* For Mincha Gedolah, choose the greater of 30m or 0.5h after chatzos. */}}
+{{- $d30m := timeParseDuration "30m"}}
+{{- if lt $halfH $d30m }}
+{{-   $halfH = $d30m}}
+{{- end}}
+{{- $chatzos := $netzAmiti.Add (durationMul $h 6) }}
+{{- $chatzosLailah := $shkiahAmitis.Add
+  (durationDiv ($netzTomorrow.Sub $shkiahAmitis) 2) }}
+
+{{- /* Display today's zmanim. */}}
+
+{{- if or
+      (and (dayHasFlags $d $.event.MINOR_FAST) $.calOptions.CandleLighting)
+      $.calOptions.DailyZmanim
+}}
+
+{{    ($z.TimeAtAngle 16.9 true).Format $fmt}}: Alot HaShachar
+        {{- if dayHasFlags $d $.event.MINOR_FAST -}}
+          , Fast starts
+        {{- end}} (16.9 deg)
+{{    ($z.TimeAtAngle 10.2 true).Format $fmt}}: Misheyakir (10.2 deg)
+{{- end}}
+
+{{- if or $.calOptions.DailyZmanim $.calOptions.SunriseSunset}}
+{{ ($z.TimeAtAngle 0.833 true).Format $fmt}}: Netz (0.833 deg)
+{{- end}}
+{{- if $.calOptions.DailyZmanim}}
+{{    ($netzAmiti.Add (durationMul $h 3)).Format $fmt}}: Sof Zman Krias Shema
+{{    ($netzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Tefillah
+{{- end}}
+
+{{- if or $.calOptions.DailyZmanim $.calOptions.CandleLighting}}
+{{- /* Chametz zmanim before Pesach */}}
+{{-   if eq $.time.Saturday (hdateNew $d.Year $.hdate.Nisan 14).Weekday}}
+{{-     if hdateNew $d.Year $.hdate.Nisan 13 | hdateEqual $d}}
+{{        ($netzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
+{{-     else if hdateNew $d.Year $.hdate.Nisan 14 | hdateEqual $d}}
+{{        ($netzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
+{{        ($netzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Bittul Chametz
+{{-     end}}
+{{-   else}}
+{{-     if hdateNew $d.Year $.hdate.Nisan 14 | hdateEqual $d}}
+{{        ($netzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
+{{        ($netzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
+{{-     end}}
+{{-   end}}
+{{- end}}
+
+{{- if $.calOptions.DailyZmanim}}
+{{    $chatzos.Format $fmt}}: Chatzos
+{{    ($chatzos.Add $halfH).Format $fmt}}: Mincha Gedolah
+        {{- if le $halfH $d30m }} (floored to 30m past chatzos){{end}}
+{{    ($shkiahAmitis.Add (durationMul $h -2.5)).Format $fmt}}: Mincha Ketanah
+{{    ($shkiahAmitis.Add (durationMul $h -1.25)).Format $fmt}}: Plag Hamincha
+{{- end}}
+
+{{- /* Candle lighting */}}
+{{- if or $.calOptions.CandleLighting $.calOptions.DailyZmanim}}
+{{-   if and
+        (or
+          (eq $.time.Friday $d.Weekday)
+          (not (dayIsShabbatOrYomTov $d))
+        )
+        (dayIsShabbatOrYomTov $d.Next) }}
+{{        (($z.TimeAtAngle 0.833 false).Add
+            (durationMul
+              (timeParseDuration "-1m")
+              (itof $.calOptions.CandleLightingMins)
+            )
+          ).Format $fmt}}: Licht bentshen
+              {{- if hdateNew $d.Year $.hdate.Tishrei 9 | hdateEqual $d -}}
+                , Fast starts
+              {{- end}}
+              {{- " "}}({{ $.calOptions.CandleLightingMins }}m)
+{{-   end}}
+{{- end}}
+
+{{- if or
+      $.calOptions.SunriseSunset
+      $.calOptions.DailyZmanim
+      (and
+        $.calOptions.CandleLighting
+        (eq $d.Month $.hdate.Av)
+        (dayHasFlags $d.Next $.event.MAJOR_FAST)
+      )
+}}
+{{   ($z.TimeAtAngle 0.833 false).Format $fmt}}: Shkiah
+  {{- if and
+        (eq $d.Month $.hdate.Av)
+        (dayHasFlags $d.Next $.event.MAJOR_FAST) -}}
+          , Fast starts
+  {{- end}} (0.833 deg)
+{{- end}}
+
+{{- if $.calOptions.DailyZmanim}}
+{{   ($z.TimeAtAngle 1.583 false).Format $fmt -}}
+       : Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+{{- end}}
+
+{{- /* What should we show for Tzeis? Havdalah? Licht? 3 medium star tzeis? */}}
+{{- if and (dayIsShabbatOrYomTov $d) (ne $.time.Friday $d.Weekday) }}
+{{-   if or $.calOptions.CandleLighting $.calOptions.DailyZmanim}}
+{{-     if dayIsShabbatOrYomTov $d.Next}}
+{{        (($z.TimeAtAngle $.calOptions.HavdalahDeg false).Add
+              (durationMul (timeParseDuration "1m") (itof $.calOptions.HavdalahMins))
+          ).Format $fmt -}}
+            : Licht bentshen
+            {{- ""}} ({{$.calOptions.HavdalahDeg}} deg
+            {{- with $.calOptions.HavdalahMins}} + {{.}}m{{end}}
+            {{- ""}}/3 small stars)
+{{-     else}}
+{{        (($z.TimeAtAngle $.calOptions.HavdalahDeg false).Add
+              (durationMul (timeParseDuration "1m") (itof $.calOptions.HavdalahMins))
+          ).Format $fmt -}}
+            : Havdalah
+            {{- if hdateNew $d.Year $.hdate.Tishrei 10 | hdateEqual $d -}}
+              , Fast ends
+            {{- end}}
+            {{- ""}} ({{$.calOptions.HavdalahDeg}} deg
+            {{- with $.calOptions.HavdalahMins}} + {{.}}m{{end}}
+            {{- ""}}/3 small stars)
+{{-     end}}
+{{-   end}}
+{{- else}}{{/* not after Shabbos or YK */}}
+{{-   if or
+        $.calOptions.DailyZmanim
+        (and
+          $.calOptions.CandleLighting
+          (dayHasFlags $d $.event.MINOR_FAST $.event.MAJOR_FAST)
+        )
+}}
+{{      ($z.TimeAtAngle 6 false).Format $fmt}}: Tzeis
+  {{-   if dayHasFlags $d $.event.MINOR_FAST $.event.MAJOR_FAST -}}
+          , Fast ends
+  {{-   end}} (6 deg/3 medium stars)
+{{-   end}}
+{{- end}}
+
+{{- /* Chatzos lailah - might be after midnight, so show the day of week. */}}
+{{- if $.calOptions.DailyZmanim}}
+{{    $chatzosLailah.Format (printf "%s (Mon)" $fmt) }}: Chatzos Halailah
+
+A halachic hour is {{ $h.Round $.time.Second}}.
+{{- end}}
+
+{{- if or
+      $.calOptions.DailyZmanim
+      $.calOptions.SunriseSunset
+      $.calOptions.CandleLighting
+}}
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions,
+  {{- ""}} local elevation, and local horizon elevations.
+Even sitting down or standing up
+  {{- ""}} can change observed sunrise and sunset times by about 10s.
+{{- end}}
+
+{{- if $.calOptions.Molad}}
+{{-   if le $d.Day 15}}
+{{-     $molad := molad $d.Year $d.Month}}
+{{-     $moladTime := $molad.Date.Gregorian}}
+{{-       $moladTime = $moladTime.Add (
+            printf "%dh%dm" $molad.Hours $molad.Minutes | timeParseDuration
+          ) }}
+
+The molad for this month, {{$d.MonthName $.language}},
+  {{- ""}} is {{$molad.Date.Weekday}}, {{$molad.Date}}
+  {{- ""}} at {{$moladTime.Format "3:04"}}
+  {{- ""}} and {{$molad.Chalakim}}
+  {{- ""}} {{if eq $molad.Chalakim 1}}cheilek{{else}}chalakim{{end}}
+  {{- ""}} {{$moladTime.Format "PM"}}.
+{{-   else}}
+{{-     $nextMonth := hdateNextMonth $d}}
+{{-     $molad := molad $nextMonth.Year $nextMonth.Month}}
+{{-     $moladTime := $molad.Date.Gregorian}}
+{{-       $moladTime = $moladTime.Add (
+            printf "%dh%dm" $molad.Hours $molad.Minutes | timeParseDuration
+          ) }}
+
+The molad for next month, {{$nextMonth.MonthName $.language}},
+  {{- ""}} is {{$molad.Date.Weekday}}, {{$molad.Date}}
+  {{- ""}} at {{$moladTime.Format "3:04"}}
+  {{- ""}} and {{$molad.Chalakim}}
+  {{- ""}} {{if eq $molad.Chalakim 1}}cheilek{{else}}chalakim{{end}}
+  {{- ""}} {{$moladTime.Format "PM"}}.
+{{-   end}}
+{{- end}}
+```
+
+</details>
+
+examples/chabad.json
+```json
+{
+  "city": "Austin",
+  "language": "ashkenazi",
+  "molad": true,
+  "omer": true,
+  "sedrot": true,
+  "daily_sedra": true,
+  "no_modern": true,
+  "daily_zmanim": true,
+  "shabbat_mevarchim": true,
+  "events_file": "chabad-events.txt",
+  "havdalah_deg": 8.5
+}
+```
+
+<details>
+  <summary>examples/chabad-events.txt</summary>
+
+```text
+Tishrei   6 Yahrtzeit of Rebbetzin Chana
+Tishrei  13 Yahrtzeit of the Rebbe Maharash
+Cheshvan 20 Birthday of the Rebbe Rashab
+Kislev    1 Recovery of the Rebbe from illness
+Kislev    9 Birthday and Yahrtzeit of the Mitteler Rebbe
+Kislev   10 Liberation of the Mitteler Rebbe
+Kislev   14 Anniversary of the Rebbe and Rebbetzin
+Kislev   19 Yahrtzeit of the Maggid of Mezeritch
+Kislev   19 Liberation of the Alter Rebbe
+Kislev   19 Rosh HaShanah of Chassidus
+Kislev   20 Liberation of the Alter Rebbe
+Kislev   20 Rosh HaShanah of Chassidus
+Tevet     5 Didan Notzach
+Tevet    24 Yahrtzeit of the Alter Rebbe
+Shevat   10 Yahrtzeit of the Frierdiker Rebbe
+Shevat   10 Anniversary of the Rebbe's Nesius
+Shevat   22 Yahrtzeit of Rebbetzin Chaya Mushka
+Adar     25 Birthday of Rebbetzin Chaya Mushka
+Nisan     2 Yahrtzeit of the Rebbe Rashab
+Nisan    11 Birthday of the Rebbe
+Nisan    13 Yahrtzeit of the Tzemach Tzedek
+Iyyar     2 Birthday of the Rebbe Maharash
+Sivan     6 Yahrtzeit of the Baal Shem Tov
+Tammuz    3 Yahrtzeit of the Rebbe
+Tammuz   12 Birthday and Liberation of the Frierdiker Rebbe
+Tammuz   13 Liberation of the Frierdiker Rebbe
+Av       20 Yahrtzeit of Rabbi Levi Yitzchak Schneerson
+Elul     18 Birthday of the Baal Shem Tov
+Elul     18 Birthday of the Alter Rebbe
+Elul     29 Birthday of the Tzemach Tzedek
+```
+
+</details>
+
+```bash
+$ hebcalfmt -c examples/chabad.json examples/chabad.tmpl 2026-01-21
+Zmanim for Wednesday, 2026-01-21 / 3 Sh'vat 5786, in Austin
+
+This Shabbos we read Parshas Bo.
+
+06:08:17: Alot HaShachar (16.9 deg)
+06:40:28: Misheyakir (10.2 deg)
+07:26:36: Netz (0.833 deg)
+10:02:29: Sof Zman Krias Shema
+10:55:42: Sof Zman Tefillah
+12:42:07: Chatzos
+13:12:07: Mincha Gedolah (floored to 30m past chatzos)
+15:48:22: Mincha Ketanah
+16:54:53: Plag Hamincha
+17:57:39: Shkiah (0.833 deg)
+18:01:24: Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+18:23:17: Tzeis (6 deg/3 medium stars)
+00:41:58 (Thu): Chatzos Halailah
+
+A halachic hour is 53m13s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+
+The molad for this month, Sh'vat, is Sunday, 29 Tevet 5786 at 3:06 and 11 chalakim PM.
+```
+
+
 ### Classic Hebcal
 
 This example emulates the classic hebcal program,

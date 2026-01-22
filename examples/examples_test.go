@@ -306,6 +306,107 @@ func TestExamples_Date(t *testing.T) {
 	}
 }
 
+func TestExamples_Chabad(t *testing.T) {
+	files, now := setupExample(t)
+	const fpath = "chabad.tmpl"
+
+	cases := []struct {
+		Name  string
+		Args  string
+		Want  string
+		Usage bool
+		Err   string
+	}{
+		{
+			Name: "empty args",
+			Want: `Zmanim for Monday, 2024-05-06 / 28 Nisan 5784, in Austin
+Tonight, count the 13th day of the Omer.
+
+This Shabbos we read Parshas Kedoshim.
+
+05:20:20: Alot HaShachar (16.9 deg)
+05:55:49: Misheyakir (10.2 deg)
+06:43:00: Netz (0.833 deg)
+10:03:24: Sof Zman Krias Shema
+11:11:27: Sof Zman Tefillah
+13:27:31: Chatzos
+14:01:32: Mincha Gedolah
+17:25:39: Mincha Ketanah
+18:50:42: Plag Hamincha
+20:12:03: Shkiah (0.833 deg)
+20:15:45: Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+20:37:48: Tzeis (6 deg/3 medium stars)
+01:27:08 (Tue): Chatzos Halailah
+
+A halachic hour is 1h8m2s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+
+The molad for next month, Iyyar, is Wednesday, 30 Nisan 5784 at 11:41 and 8 chalakim AM.
+`,
+		},
+		{
+			Name: "2026-01-21",
+			Args: "2026-01-21",
+			Want: `Zmanim for Wednesday, 2026-01-21 / 3 Sh'vat 5786, in Austin
+
+This Shabbos we read Parshas Bo.
+
+06:08:17: Alot HaShachar (16.9 deg)
+06:40:28: Misheyakir (10.2 deg)
+07:26:36: Netz (0.833 deg)
+10:02:29: Sof Zman Krias Shema
+10:55:42: Sof Zman Tefillah
+12:42:07: Chatzos
+13:12:07: Mincha Gedolah (floored to 30m past chatzos)
+15:48:22: Mincha Ketanah
+16:54:53: Plag Hamincha
+17:57:39: Shkiah (0.833 deg)
+18:01:24: Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+18:23:17: Tzeis (6 deg/3 medium stars)
+00:41:58 (Thu): Chatzos Halailah
+
+A halachic hour is 53m13s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+
+The molad for this month, Sh'vat, is Sunday, 29 Tevet 5786 at 3:06 and 11 chalakim PM.
+`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			logBuf := test.Logger(t)
+			args := []string{fpath, "--config=chabad.json"}
+			if c.Args != "" {
+				args = append(args, strings.Fields(c.Args)...)
+			}
+
+			var buf bytes.Buffer
+
+			err := cli.RunInEnvironment(
+				args, files, now, templating.BuildData, &buf)
+			test.CheckErr(t, err, c.Err)
+
+			if buf.String() != c.Want {
+				t.Errorf("want:\n%s\ngot:\n%s", c.Want, buf.String())
+			}
+
+			if c.Usage {
+				if !strings.HasPrefix(logBuf.String(), "usage:\n  hebcalfmt ") {
+					t.Errorf("expected usage message, got:\n%s", logBuf)
+				}
+			}
+		})
+	}
+}
+
 func TestExamples_HebcalClassic(t *testing.T) {
 	files, now := setupExample(t)
 	const fpath = "hebcalClassic.tmpl"
