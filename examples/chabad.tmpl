@@ -80,6 +80,12 @@ Tonight, count the {{.Render $.language}}.
 {{      .Render $.language}}
 {{-   end}}
 {{- end}}
+{{- /* Restore Chanukah untimed events, since Hebcal replaces them. */}}
+{{- range eventsByFlags (hebcal $d) $.event.CHANUKAH_CANDLES}}
+{{-   with asTimedEvent .}}
+{{      .LinkedEvent.Render $.language}}
+{{-   end}}
+{{- end}}
 
 {{- /* What is the parasha? */}}
 {{- if or
