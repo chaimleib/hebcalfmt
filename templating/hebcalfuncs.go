@@ -129,17 +129,22 @@ func TimedEvents(
 	}
 }
 
+// MergeFlags combines the flags into a single mask.
+func MergeFlags(flags ...event.HolidayFlags) event.HolidayFlags {
+	var mask event.HolidayFlags
+	for _, flag := range flags {
+		mask |= flag
+	}
+	return mask
+}
+
 // EventsByFlags filters the events to just the ones
 // which have any of the given flags set.
 func EventsByFlags(
 	events []event.CalEvent,
 	flags ...event.HolidayFlags,
 ) []event.CalEvent {
-	// Combine the flags into a mask.
-	var mask event.HolidayFlags
-	for _, flag := range flags {
-		mask |= flag
-	}
+	mask := MergeFlags(flags...)
 
 	// Gather the matching events.
 	var results []event.CalEvent
@@ -158,11 +163,7 @@ func DayHasFlags(
 	opts *hebcal.CalOptions,
 ) func(d hdate.HDate, flags ...event.HolidayFlags) (bool, error) {
 	return func(d hdate.HDate, flags ...event.HolidayFlags) (bool, error) {
-		// Combine the flags into a mask.
-		var mask event.HolidayFlags
-		for _, flag := range flags {
-			mask |= flag
-		}
+		mask := MergeFlags(flags...)
 
 		// Get the events occurring on d.
 		events, err := Hebcal(opts)(d)
