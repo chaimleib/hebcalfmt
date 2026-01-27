@@ -615,6 +615,114 @@ Note well that this software was released in the hopes that someone finds it use
 The molad for this month, Av, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalakim PM.
 `,
 		},
+		{
+			Name: "Nisan 14 5782, Erev Pesach",
+			Args: "Nisan 14 5782",
+			Want: `Zmanim for Friday, 2022-04-15 / 14 Nisan 5782, in Austin
+Erev Pesach
+Ta’anis Bechoros
+
+This Shabbos we read Parshas hachag.
+
+05:45:36: Alos HaShachar, Fast starts (16.9 deg)
+06:18:40: Misheyakir (10.2 deg)
+07:03:34: Neitz (0.833 deg)
+10:15:23: Sof Zman Krias Shema
+11:20:30: Sof Zman Tefillah
+11:20:30: Sof Zman Achilas Chametz
+12:25:38: Sof Zman Biur Chametz
+13:30:45: Chatzos
+14:03:19: Mincha Gedolah
+17:18:41: Mincha Ketanah
+18:40:05: Plag HaMincha
+19:39:57: Licht bentshen (18m)
+19:57:57: Shkiah (0.833 deg)
+20:01:30: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+20:22:33: Tzeis, Fast ends (6 deg/3 medium stars)
+01:30:12 (Sat): Chatzos HaLailah
+
+A halachic hour is 1h5m7s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for this month, Nisan, is Friday, 29 Adar II 5782 at 4:36 and 0 chalakim PM.
+`,
+		},
+		{
+			Name: "Nisan 13 5785, Early biur chametz, Erev Pesach is Shabbos",
+			Args: "Nisan 13 5785",
+			Want: `Zmanim for Friday, 2025-04-11 / 13 Nisan 5785, in Austin
+Yahrtzeit of the Tzemach Tzedek
+
+This Shabbos we read Parshas Tzav.
+
+05:50:30: Alos HaShachar (16.9 deg)
+06:23:14: Misheyakir (10.2 deg)
+07:07:49: Neitz (0.833 deg)
+10:17:59: Sof Zman Krias Shema
+11:22:33: Sof Zman Tefillah
+12:27:07: Sof Zman Biur Chametz
+13:31:41: Chatzos
+14:03:59: Mincha Gedolah
+17:17:41: Mincha Ketanah
+18:38:24: Plag HaMincha
+19:37:35: Licht bentshen (18m)
+19:55:35: Shkiah (0.833 deg)
+19:59:07: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+20:20:03: Tzeis (6 deg/3 medium stars)
+01:31:07 (Sat): Chatzos HaLailah
+
+A halachic hour is 1h4m34s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for this month, Nisan, is Saturday, 29 Adar 5785 at 7:46 and 1 cheilek AM.
+`,
+		},
+		{
+			Name: "Nisan 14 5785, Bittul chametz, Erev Pesach on Shabbos",
+			Args: "Nisan 14 5785",
+			Want: `Zmanim for Saturday, 2025-04-12 / 14 Nisan 5785, in Austin
+Erev Pesach
+Shabbos HaGadol
+
+This Shabbos we read Parshas Tzav.
+
+05:49:12: Alos HaShachar (16.9 deg)
+06:22:00: Misheyakir (10.2 deg)
+07:06:40: Neitz (0.833 deg)
+10:17:17: Sof Zman Krias Shema
+11:22:00: Sof Zman Tefillah
+11:22:00: Sof Zman Achilas Chametz
+12:26:43: Sof Zman Bittul Chametz
+13:31:26: Chatzos
+14:03:48: Mincha Gedolah
+17:17:57: Mincha Ketanah
+18:38:51: Plag HaMincha
+19:56:13: Shkiah (0.833 deg)
+19:59:45: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+20:32:41: Licht bentshen (8.5 deg/3 small stars)
+01:30:52 (Sun): Chatzos HaLailah
+
+A halachic hour is 1h4m43s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for this month, Nisan, is Saturday, 29 Adar 5785 at 7:46 and 1 cheilek AM.
+`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {

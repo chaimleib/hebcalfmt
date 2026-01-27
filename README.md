@@ -429,14 +429,14 @@ This {{translate $.language "Shabbat"}} we read
         ).Format $fmt -}}
   {{    if dayIsShabbatOrYomTov $d.Next -}}
             : Licht bentshen
-  {{    else -}}
+  {{-   else -}}
             : Havdalah
             {{- if hdateNew $d.Year $.hdate.Tishrei 10 | hdateEqual $d -}}
               , Fast ends
             {{- else if eq $chanukahTime "late" -}}
               , {{$chanukah}}
             {{- end -}}
-  {{    end -}}
+  {{-   end -}}
             {{- ""}} ( {{- $.calOptions.HavdalahDeg}} deg
             {{- with $.calOptions.HavdalahMins}} + {{.}}m{{end}}
             {{- ""}}/3 small stars)
