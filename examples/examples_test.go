@@ -515,6 +515,106 @@ Note well that this software was released in the hopes that someone finds it use
 The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
 `,
 		},
+		{
+			Name: "Av 9 5785, Tisha Bav",
+			Args: "Av 9 5785",
+			Want: `Zmanim for Sunday, 2025-08-03 / 9 Av 5785, in Austin
+Tish'a B'Av
+
+This Shabbos we read Parshas Vaeschanan.
+
+05:27:36: Alos HaShachar (16.9 deg)
+06:03:23: Misheyakir (10.2 deg)
+06:50:52: Neitz (0.833 deg)
+10:12:06: Sof Zman Krias Shema
+11:20:26: Sof Zman Tefillah
+13:37:05: Chatzos
+14:11:15: Mincha Gedolah
+17:36:14: Mincha Ketanah
+19:01:38: Plag HaMincha
+20:23:19: Shkiah (0.833 deg)
+20:27:03: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+20:49:13: Tzeis, Fast ends (6 deg/3 medium stars)
+01:37:24 (Mon): Chatzos HaLailah
+
+A halachic hour is 1h8m20s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for this month, Av, is Friday, 29 Tammuz 5785 at 10:42 and 5 chalakim AM.
+`,
+		},
+		{
+			Name: "Av 9 5782, Tisha Bav shenidcheh",
+			Args: "Av 9 5782",
+			Want: `Zmanim for Saturday, 2022-08-06 / 9 Av 5782, in Austin
+Erev Tish'a B'Av
+Shabbos Chazon
+
+This Shabbos we read Parshas Devarim.
+
+05:30:00: Alos HaShachar (16.9 deg)
+06:05:26: Misheyakir (10.2 deg)
+06:52:35: Neitz (0.833 deg)
+10:12:51: Sof Zman Krias Shema
+11:20:51: Sof Zman Tefillah
+13:36:50: Chatzos
+14:10:50: Mincha Gedolah
+17:34:49: Mincha Ketanah
+18:59:49: Plag HaMincha
+20:21:07: Shkiah, Fast starts (0.833 deg)
+20:24:49: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+20:59:32: Havdalah (8.5 deg/3 small stars)
+01:37:10 (Sun): Chatzos HaLailah
+
+A halachic hour is 1h8m0s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for this month, Av, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalakim PM.
+`,
+		},
+		{
+			Name: "Av 10 5782, Tisha Bav shenidcheh",
+			Args: "Av 10 5782",
+			Want: `Zmanim for Sunday, 2022-08-07 / 10 Av 5782, in Austin
+Tish'a B'Av (observed)
+
+This Shabbos we read Parshas Vaeschanan.
+
+05:30:51: Alos HaShachar (16.9 deg)
+06:06:10: Misheyakir (10.2 deg)
+06:53:12: Neitz (0.833 deg)
+10:13:07: Sof Zman Krias Shema
+11:21:00: Sof Zman Tefillah
+13:36:44: Chatzos
+14:10:41: Mincha Gedolah
+17:34:18: Mincha Ketanah
+18:59:08: Plag HaMincha
+20:20:18: Shkiah (0.833 deg)
+20:23:59: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+20:45:58: Tzeis, Fast ends (6 deg/3 medium stars)
+01:37:03 (Mon): Chatzos HaLailah
+
+A halachic hour is 1h7m52s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for this month, Av, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalakim PM.
+`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {

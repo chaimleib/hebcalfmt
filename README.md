@@ -394,19 +394,21 @@ This {{translate $.language "Shabbat"}} we read
 {{-   end}}
 {{- end}}
 
+{{- $fast9Av := and
+        (eq $d.Month $.hdate.Av)
+        (dayHasFlags $d.Next $.event.MAJOR_FAST)
+        (ne $.time.Friday $d.Weekday)
+}}
 {{- if or
       $.calOptions.SunriseSunset
       $.calOptions.DailyZmanim
-      (and
-        $.calOptions.CandleLighting
-        (eq $d.Month $.hdate.Av)
-        (dayHasFlags $d.Next $.event.MAJOR_FAST)
-      )
+      (and $.calOptions.CandleLighting (or
+        $fast9Av
+        (eq $chanukahTime "normal")
+      ))
 }}
 {{   ($z.TimeAtAngle 0.833 false).Format $fmt}}: Shkiah
-  {{- if and
-        (eq $d.Month $.hdate.Av)
-        (dayHasFlags $d.Next $.event.MAJOR_FAST) -}}
+  {{- if $fast9Av -}}
         , Fast starts
   {{- else if eq $chanukahTime "normal" -}}
         , {{$chanukah}}
