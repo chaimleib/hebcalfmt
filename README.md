@@ -355,6 +355,23 @@ This {{translate $.language "Shabbat"}} we read
 {{- end}}
 
 {{- /* Candle lighting */}}
+{{- $chanukah := ""}}
+{{- $chanukahTime := ""}}
+{{- range eventsByFlags (hebcal $d) $.event.CHANUKAH_CANDLES }}
+{{-   with asTimedEvent . -}}
+{{-     $chanukah = .LinkedEvent.Render $.language}}
+{{-   else}}
+{{-     $chanukah = .Render $.language}}
+{{-   end}}
+{{-   if eq $.time.Friday $d.Weekday}}
+{{-     $chanukahTime = "early"}}
+{{-   else if eq $.time.Saturday $d.Weekday}}
+{{-     $chanukahTime = "late"}}
+{{-   else}}
+{{-     $chanukahTime = "normal"}}
+{{-   end}}
+{{- end}}
+
 {{- if or $.calOptions.CandleLighting $.calOptions.DailyZmanim}}
 {{-   if and
         (or
@@ -367,7 +384,9 @@ This {{translate $.language "Shabbat"}} we read
               (timeParseDuration "-1m")
               (itof $.calOptions.CandleLightingMins)
             )
-          ).Format $fmt}}: Licht bentshen
+          ).Format $fmt -}}
+              : {{with $chanukah}}{{.}}, {{end -}}
+              Licht bentshen
               {{- if hdateNew $d.Year $.hdate.Tishrei 9 | hdateEqual $d -}}
                 , Fast starts
               {{- end}}
@@ -388,8 +407,11 @@ This {{translate $.language "Shabbat"}} we read
   {{- if and
         (eq $d.Month $.hdate.Av)
         (dayHasFlags $d.Next $.event.MAJOR_FAST) -}}
-          , Fast starts
+        , Fast starts
+  {{- else if eq $chanukahTime "normal" -}}
+        , {{$chanukah}}
   {{- end}} (0.833 deg)
+
 {{- end}}
 
 {{- if $.calOptions.DailyZmanim}}
@@ -400,26 +422,22 @@ This {{translate $.language "Shabbat"}} we read
 {{- /* What should we show for Tzeis? Havdalah? Licht? 3 medium star tzeis? */}}
 {{- if and (dayIsShabbatOrYomTov $d) (ne $.time.Friday $d.Weekday) }}
 {{-   if or $.calOptions.CandleLighting $.calOptions.DailyZmanim}}
-{{-     if dayIsShabbatOrYomTov $d.Next}}
-{{        (($z.TimeAtAngle $.calOptions.HavdalahDeg false).Add
-              (durationMul (timeParseDuration "1m") (itof $.calOptions.HavdalahMins))
-          ).Format $fmt -}}
+{{      (($z.TimeAtAngle $.calOptions.HavdalahDeg false).Add
+            (durationMul (timeParseDuration "1m") (itof $.calOptions.HavdalahMins))
+        ).Format $fmt -}}
+  {{    if dayIsShabbatOrYomTov $d.Next -}}
             : Licht bentshen
-            {{- ""}} ({{$.calOptions.HavdalahDeg}} deg
-            {{- with $.calOptions.HavdalahMins}} + {{.}}m{{end}}
-            {{- ""}}/3 small stars)
-{{-     else}}
-{{        (($z.TimeAtAngle $.calOptions.HavdalahDeg false).Add
-              (durationMul (timeParseDuration "1m") (itof $.calOptions.HavdalahMins))
-          ).Format $fmt -}}
+  {{    else -}}
             : Havdalah
             {{- if hdateNew $d.Year $.hdate.Tishrei 10 | hdateEqual $d -}}
               , Fast ends
-            {{- end}}
-            {{- ""}} ({{$.calOptions.HavdalahDeg}} deg
+            {{- else if eq $chanukahTime "late" -}}
+              , {{$chanukah}}
+            {{- end -}}
+  {{    end -}}
+            {{- ""}} ( {{- $.calOptions.HavdalahDeg}} deg
             {{- with $.calOptions.HavdalahMins}} + {{.}}m{{end}}
             {{- ""}}/3 small stars)
-{{-     end}}
 {{-   end}}
 {{- else}}{{/* not after Shabbos or YK */}}
 {{-   if or
