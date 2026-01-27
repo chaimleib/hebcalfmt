@@ -350,7 +350,7 @@ The molad for next month, Iyyar, is Wednesday, 30 Nisan 5784 at 11:41 and 8 chal
 `,
 		},
 		{
-			Name: "2026-01-21",
+			Name: "2026-01-21, floored Mincha Gedolah",
 			Args: "2026-01-21",
 			Want: `Zmanim for Wednesday, 2026-01-21 / 3 Sh'vat 5786, in Austin
 
@@ -379,6 +379,140 @@ Even sitting down or standing up can change observed sunrise and sunset times by
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
 The molad for this month, Sh'vat, is Sunday, 29 Tevet 5786 at 3:06 and 11 chalakim PM.
+`,
+		},
+		{
+			Name: "Kislev 24 5785, Chanukah 1 light at 0.833",
+			Args: "Kislev 24 5785",
+			Want: `Zmanim for Wednesday, 2024-12-25 / 24 Kislev 5785, in Austin
+Chanukah: 1 Candle
+
+This Shabbos we read Parshas Miketz.
+
+06:04:58: Alos HaShachar (16.9 deg)
+06:37:52: Misheyakir (10.2 deg)
+07:25:21: Neitz (0.833 deg)
+09:56:21: Sof Zman Krias Shema
+10:47:59: Sof Zman Tefillah
+12:31:14: Chatzos
+13:01:14: Mincha Gedolah (floored to 30m past chatzos)
+15:31:56: Mincha Ketanah
+16:36:28: Plag HaMincha
+17:37:08: Shkiah, Chanukah: 1 Candle (0.833 deg)
+17:41:01: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+18:03:35: Tzeis (6 deg/3 medium stars)
+00:31:26 (Thu): Chatzos HaLailah
+
+A halachic hour is 51m38s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
+`,
+		},
+		{
+			Name: "Kislev 25 5785, Chanukah 2 lights at 0.833",
+			Args: "Kislev 25 5785",
+			Want: `Zmanim for Thursday, 2024-12-26 / 25 Kislev 5785, in Austin
+Chanukah: 2 Candles
+
+This Shabbos we read Parshas Miketz.
+
+06:05:22: Alos HaShachar (16.9 deg)
+06:38:16: Misheyakir (10.2 deg)
+07:25:44: Neitz (0.833 deg)
+09:56:47: Sof Zman Krias Shema
+10:48:26: Sof Zman Tefillah
+12:31:43: Chatzos
+13:01:43: Mincha Gedolah (floored to 30m past chatzos)
+15:32:29: Mincha Ketanah
+16:37:02: Plag HaMincha
+17:37:43: Shkiah, Chanukah: 2 Candles (0.833 deg)
+17:41:36: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+18:04:09: Tzeis (6 deg/3 medium stars)
+00:31:54 (Fri): Chatzos HaLailah
+
+A halachic hour is 51m39s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
+`,
+		},
+		{
+			Name: "Kislev 26 5785, Chanukah 3 lights at 0.833 - 18m",
+			Args: "Kislev 26 5785",
+			Want: `Zmanim for Friday, 2024-12-27 / 26 Kislev 5785, in Austin
+Chanukah: 3 Candles
+
+This Shabbos we read Parshas Miketz.
+
+06:05:45: Alos HaShachar (16.9 deg)
+06:38:38: Misheyakir (10.2 deg)
+07:26:05: Neitz (0.833 deg)
+09:57:12: Sof Zman Krias Shema
+10:48:52: Sof Zman Tefillah
+12:32:12: Chatzos
+13:02:12: Mincha Gedolah (floored to 30m past chatzos)
+15:33:02: Mincha Ketanah
+16:37:37: Plag HaMincha
+17:20:19: Chanukah: 3 Candles, Licht bentshen (18m)
+17:38:19: Shkiah (0.833 deg)
+17:42:12: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+18:04:45: Tzeis (6 deg/3 medium stars)
+00:32:22 (Sat): Chatzos HaLailah
+
+A halachic hour is 51m40s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
+`,
+		},
+		{
+			Name: "Kislev 27 5785, Chanukah 4 lights at 8.5",
+			Args: "Kislev 27 5785",
+			Want: `Zmanim for Saturday, 2024-12-28 / 27 Kislev 5785, in Austin
+Shabbat Mevarchim Chodesh Tevet
+Chanukah: 4 Candles
+
+This Shabbos we read Parshas Miketz.
+
+06:06:07: Alos HaShachar (16.9 deg)
+06:38:59: Misheyakir (10.2 deg)
+07:26:25: Neitz (0.833 deg)
+09:57:36: Sof Zman Krias Shema
+10:49:17: Sof Zman Tefillah
+12:32:40: Chatzos
+13:02:40: Mincha Gedolah (floored to 30m past chatzos)
+15:33:35: Mincha Ketanah
+16:38:12: Plag HaMincha
+17:38:56: Shkiah (0.833 deg)
+17:42:49: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+18:17:54: Havdalah, Chanukah: 4 Candles (8.5 deg/3 small stars)
+00:32:50 (Sun): Chatzos HaLailah
+
+A halachic hour is 51m41s.
+
+WARNING: Allow +/-2m, as the above calculations are not exact.
+They approximate the location of a city.
+They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
+Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
+
+The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
 `,
 		},
 	}
