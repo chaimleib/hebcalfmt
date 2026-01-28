@@ -27,9 +27,14 @@ func (w Warnings) Join(err error) error {
 		return err
 	}
 	if err != nil {
-		return fmt.Errorf("%w\n%w", warning, err)
+		return fmt.Errorf("%w\n\nerror: %w", warning, err)
 	}
 	return warning
 }
 
-func (w *Warnings) Append(warn error) { *w = append(*w, warn) }
+func (w *Warnings) Append(warn error) {
+	if warn == nil {
+		return
+	}
+	*w = append(*w, warn)
+}
