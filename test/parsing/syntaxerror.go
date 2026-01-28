@@ -38,11 +38,12 @@ func (se SyntaxError) Error() string {
 	const tabLen = 8
 	var (
 		tab                      = strings.Repeat(" ", tabLen)
-		col                      int
+		col, visCol              int
 		markedLineBuf, markerBuf strings.Builder
 	)
 	for _, r := range se.Line {
 		col++
+		visCol++
 
 		markRune := ' '
 		if se.ColStart <= col && col <= se.ColEnd {
@@ -50,14 +51,15 @@ func (se SyntaxError) Error() string {
 		}
 
 		if r == '\t' {
-			markedLineBuf.WriteString(tab)
+			tabStopLen := tabLen - ((visCol - 1) % tabLen)
+			markedLineBuf.WriteString(tab[:tabStopLen])
 			if markRune == ' ' {
-				markerBuf.WriteString(tab)
+				markerBuf.WriteString(tab[:tabStopLen])
 			} else {
 				marker := strings.ReplaceAll(tab, " ", string(markRune))
-				markerBuf.WriteString(marker)
+				markerBuf.WriteString(marker[:tabStopLen])
 			}
-			col += tabLen - 1
+			visCol += tabStopLen - 1
 		} else {
 			markedLineBuf.WriteRune(r)
 			markerBuf.WriteRune(markRune)
