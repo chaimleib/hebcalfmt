@@ -16,6 +16,7 @@ import (
 	"github.com/chaimleib/hebcalfmt/warning"
 )
 
+// ReadmeCase describes a sample run documented in a Markdown file.
 type ReadmeCase struct {
 	Files  map[string]markdown.QuotedFile
 	Envs   map[string]string
@@ -47,10 +48,8 @@ func (c *ReadmeCase) ParseBashExample(
 			len(lines),
 			lines[0],
 		)
-		return warns, errs
+		return nil, nil
 	}
-
-	rc.ProgressCase.Output = strings.Join(lines[1:], "\n")
 
 	line := parsing.LineInfo{
 		FileName: rc.FileName,
@@ -110,61 +109,9 @@ func (c *ReadmeCase) ParseBashExample(
 		}
 	}
 
+	rc.ProgressCase.Output = strings.Join(lines[1:], "\n")
+
 	return warns, errs
-}
-
-func ParseEnvs(line parsing.LineInfo, envs string) (map[string]string, error) {
-	rest := strings.TrimSpace(envs)
-	if rest == "" {
-		return nil, nil
-	}
-
-	result := make(map[string]string)
-	for rest != "" {
-		var key string
-		var ok bool
-		key, rest, ok = strings.Cut(rest, "=")
-		if !ok {
-			col := strings.LastIndex(line.Line, key) + 1
-			return nil, parsing.NewSyntaxError(
-				line, col, 0, errors.New(
-					"failed to parse envs, expected = after this point",
-				))
-		}
-
-		if rest == "" {
-			result[key] = ""
-			return result, nil
-		}
-
-		var value string
-		// not exactly right, missing escapes. But close enough for now.
-		if rest, ok = strings.CutPrefix(rest, `"`); ok {
-			value, rest, ok = strings.Cut(rest, `"`)
-			if !ok {
-				col := strings.LastIndex(line.Line, value) + 1
-				return nil, parsing.NewSyntaxError(
-					line, col, 0, errors.New(
-						"failed to parse envs, expected \" after this point",
-					))
-			}
-		} else if rest, ok = strings.CutPrefix(rest, "'"); ok {
-			value, rest, ok = strings.Cut(rest, "'")
-			if !ok {
-				col := strings.LastIndex(line.Line, value) + 1
-				return nil, parsing.NewSyntaxError(
-					line, col, 0, errors.New(
-						"failed to parse envs, expected ' after this point",
-					))
-			}
-		} else {
-			value, rest, _ = strings.Cut(rest, " ")
-		}
-		result[key] = value
-		rest = strings.TrimLeft(rest, " \t")
-	}
-
-	return result, nil
 }
 
 func (c ReadmeCase) Check(t *testing.T, rc ReadmeContext) {
