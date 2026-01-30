@@ -172,6 +172,21 @@ func TestSyntaxError_Error(t *testing.T) {
 	hello   world
 	        ^    `,
 		},
+		{
+			Name: "single char pointer after end",
+			Input: parsing.SyntaxError{
+				Line:     "hello world",
+				FileName: "hello.txt",
+				LineNo:   1,
+				ColStart: 12,
+				ColEnd:   12,
+				Err:      errors.New("missing char"),
+			},
+			Err: `syntax at hello.txt:1:12: missing char
+
+	hello world
+	           ^`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {

@@ -65,6 +65,9 @@ func (se SyntaxError) Error() string {
 			markerBuf.WriteRune(markRune)
 		}
 	}
+	if se.ColStart == len(se.Line)+1 {
+		markerBuf.WriteRune('^')
+	}
 
 	return fmt.Sprintf("syntax at %s:%d:%d%s: %v\n\n\t%s\n\t%s",
 		se.FileName,
