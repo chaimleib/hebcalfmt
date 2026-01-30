@@ -1,5 +1,5 @@
 test:
-	go test -race -timeout 15s \
+	go test -race -timeout 5s \
 		-coverprofile coverage.out \
 		./...
 
