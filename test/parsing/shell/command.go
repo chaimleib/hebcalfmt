@@ -76,7 +76,7 @@ func (c Command) String() string {
 		parts = append(parts, varString)
 	}
 
-	parts = append(parts, c.Name)
+	parts = append(parts, FormatString(c.Name))
 
 	for _, arg := range c.Args {
 		parts = append(parts, FormatString(arg))
@@ -137,7 +137,7 @@ func ParseCommand(
 	if err != nil {
 		var se parsing.SyntaxError
 		if errors.As(err, &se) {
-			se.Err = fmt.Errorf("error parsing command name: %w", err)
+			se.Err = fmt.Errorf("error parsing command name: %w", se.Err)
 			return nil, orig, se
 		}
 		return errOut(0, "expected command name: %w", err)
