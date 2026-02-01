@@ -2,6 +2,7 @@ package shell
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"maps"
 	"slices"
@@ -26,17 +27,7 @@ func ParseIdentifier(
 	rest []byte,
 ) (identifier string, newRest []byte, err error) {
 	orig := rest
-	errOut := func(span int, msg string, args ...any) (string, []byte, error) {
-		col := 1 + len(line.Line) - len(rest)
-		var colEnd int
-		if span > 0 {
-			colEnd = col + span - 1
-		}
-		return "", orig, parsing.NewSyntaxError(
-			line, col, colEnd,
-			fmt.Errorf(msg, args...),
-		)
-	}
+	errOut := ErrOut[string](line, &rest)
 
 	if len(rest) == 0 {
 		return "", orig, ErrNoMatch
@@ -88,6 +79,9 @@ func ParseAssignment(
 	}
 
 	value, rest, err = ParseShellString(line, rest)
+	if errors.Is(err, ErrNoMatch) {
+		return key, "", rest, nil
+	}
 	if err != nil {
 		return "", "", orig, err
 	}

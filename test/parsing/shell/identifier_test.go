@@ -160,7 +160,7 @@ func TestParseIdentifier(t *testing.T) {
 	}
 }
 
-func TestAssignment(t *testing.T) {
+func TestParseAssignment(t *testing.T) {
 	cases := []struct {
 		Name           string
 		Rest           string
@@ -209,6 +209,17 @@ func TestAssignment(t *testing.T) {
 			},
 			WantRest: "80invalid=value",
 			Err:      "no match",
+		},
+		{
+			Name: "close paren in value",
+			Rest: "key=)value",
+			Line: parsing.LineInfo{
+				Line:     "key=)value",
+				Number:   1,
+				FileName: "value-close-paren.sh",
+			},
+			WantIdentifier: "key",
+			WantRest:       ")value",
 		},
 		{
 			Name: "missing equal",
