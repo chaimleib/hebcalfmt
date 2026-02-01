@@ -155,7 +155,7 @@ func TestBuildData(t *testing.T) {
 			var buf bytes.Buffer
 			err = tmpl.Execute(&buf, data)
 			test.CheckErr(t, err, c.OutErr)
-			test.CheckString(t, "output", c.WantOut, buf.String(), test.WantEqual)
+			test.CheckString(t, "output", c.WantOut, buf.String())
 		})
 	}
 }

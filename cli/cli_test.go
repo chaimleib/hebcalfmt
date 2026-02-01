@@ -172,8 +172,8 @@ To show the available languages, run
 			err := cli.RunInEnvironment(args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
-			test.CheckString(t, "output", c.Want, buf.String(), c.WantMode)
-			test.CheckString(t, "logs", c.WantLog, logBuf.String(), c.WantLogMode)
+			test.CheckStringMode(t, "output", c.Want, buf.String(), c.WantMode)
+			test.CheckStringMode(t, "logs", c.WantLog, logBuf.String(), c.WantLogMode)
 		})
 	}
 }

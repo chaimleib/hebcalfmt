@@ -17,16 +17,77 @@ func TestCheckString(t *testing.T) {
 		{Name: "empties equal"},
 		{Name: "strings equal", WantInput: "hi", GotInput: "hi"},
 		{
+			Name:      "multiline strings equal",
+			WantInput: "hi\nbye",
+			GotInput:  "hi\nbye",
+		},
+		{
 			Name:      "strings not equal",
 			WantInput: "hi",
 			GotInput:  "hello",
 			Failed:    true,
-			Logs: `Field did not match - want:
-hi
-got:
-hello
+			Logs: `Field did not match at index 1 (line 1, col 2) -
+want: hi
+got:  hello
+       ^
 `,
 		},
+		{
+			Name:      "strings not equal with longer want",
+			WantInput: "hello there",
+			GotInput:  "hello",
+			Failed:    true,
+			Logs: `Field did not match at index 5 (line 1, col 6) -
+want: hello there
+got:  hello
+           ^
+`,
+		},
+		{
+			Name:      "strings not equal with got trailing newline",
+			WantInput: "hi",
+			GotInput:  "hi\n",
+			Failed:    true,
+			Logs: `Field did not match at index 2 (line 1, col 3) -
+want: hi
+got:  hi⏎
+        ^
+`,
+		},
+		{
+			Name:      "strings not equal with want trailing newline",
+			WantInput: "hi\n",
+			GotInput:  "hi",
+			Failed:    true,
+			Logs: `Field did not match at index 2 (line 1, col 3) -
+want: hi⏎
+got:  hi
+        ^
+`,
+		},
+		{
+			Name:      "multiline strings not equal",
+			WantInput: "hello\nbye",
+			GotInput:  "hello\nbye-bye",
+			Failed:    true,
+			Logs: `Field did not match at index 9 (line 2, col 4) -
+want: bye
+got:  bye-bye
+         ^
+`,
+		},
+		{
+			Name:      "tabbed strings not equal",
+			WantInput: "hello\tbye",
+			GotInput:  "hello\tbye-bye",
+			Failed:    true,
+			Logs: `Field did not match at index 9 (line 1, col 10) -
+want: hello   bye
+got:  hello   bye-bye
+                 ^
+`,
+		},
+
 		{
 			Name:      "strings prefix ok",
 			WantInput: "hi",
@@ -39,12 +100,14 @@ hello
 			GotInput:  "hello",
 			Mode:      test.WantPrefix,
 			Failed:    true,
-			Logs: `Field did not match prefix - want:
-hi
-got:
-hello
+			Logs: `Field did not match prefix
+Field did not match at index 1 (line 1, col 2) -
+want: hi
+got:  hello
+       ^
 `,
 		},
+
 		{
 			Name:      "strings contains ok",
 			WantInput: "ig",
@@ -63,6 +126,7 @@ got:
 hello
 `,
 		},
+
 		{
 			Name:      "strings regex ok",
 			WantInput: `([a-z])igh(?:light)?`,
@@ -81,15 +145,175 @@ got:
 hello
 `,
 		},
+
+		{
+			Name:      "strings ellipsis ok with len 1 splits",
+			WantInput: `high`,
+			GotInput:  "high",
+			Mode:      test.WantEllipsis,
+		},
+		{
+			Name:      "strings ellipsis fail with len 1 splits",
+			WantInput: "bye",
+			GotInput:  "hello",
+			Mode:      test.WantEllipsis,
+			Failed:    true,
+			Logs: `Field did not match ellipsis portion 0 - want:
+bye
+got:
+hello
+`,
+		},
+		{
+			Name:      "strings ellipsis fail trailing got with len 1 splits",
+			WantInput: "hello",
+			GotInput:  "hello there",
+			Mode:      test.WantEllipsis,
+			Failed:    true,
+			Logs: `Field did not match, has trailing content after wanted string - got[5:]:
+ there
+`,
+		},
+		{
+			Name:      "strings ellipsis ok with len 2 splits",
+			WantInput: `high...five`,
+			GotInput:  "high friggin five",
+			Mode:      test.WantEllipsis,
+		},
+		{
+			Name:      "strings ellipsis fail with len 2 splits on split 0",
+			WantInput: "bye... later",
+			GotInput:  "hello",
+			Mode:      test.WantEllipsis,
+			Failed:    true,
+			Logs: `Field did not match ellipsis portion 0 - want:
+bye...
+got:
+hello
+`,
+		},
+		{
+			Name:      "strings ellipsis fail with len 2 splits on split 1",
+			WantInput: "bye... later",
+			GotInput:  "bye, see you some other time",
+			Mode:      test.WantEllipsis,
+			Failed:    true,
+			Logs: `Field did not match ellipsis portion 1 - want:
+... later
+got[3:]:
+, see you some other time
+`,
+		},
+		{
+			Name:      "strings ellipsis fail trailing got with len 2 splits",
+			WantInput: "hello... there",
+			GotInput:  "hello over there, little one",
+			Mode:      test.WantEllipsis,
+			Failed:    true,
+			Logs: `Field did not match, has trailing content after last ellipsis portion - got[16:]:
+, little one
+`,
+		},
+		{
+			Name: "strings ellipsis fail with len 3 splits on split 1",
+			WantInput: `1
+...
+3
+...
+`,
+			GotInput: `1
+2
+4`,
+			Mode:   test.WantEllipsis,
+			Failed: true,
+			Logs: `Field did not match ellipsis portion 1 - want:
+...
+3
+...
+got[2:]:
+2
+4
+`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
 			mockT := NewMockT(t)
-			test.CheckString(mockT, "Field", c.WantInput, c.GotInput, c.Mode)
+			test.CheckStringMode(mockT, "Field", c.WantInput, c.GotInput, c.Mode)
 
 			if c.Failed != mockT.Failed() {
 				t.Errorf("c.Failed is %v, but t.Failed() is %v",
 					c.Failed, mockT.Failed())
+			}
+			if gotLogs := mockT.buf.String(); c.Logs != gotLogs {
+				t.Errorf("logs do not match - want:\n%s\ngot:\n%s", c.Logs, gotLogs)
+			}
+		})
+	}
+}
+
+func TestShowFirstDiff(t *testing.T) {
+	type Case struct {
+		Name   string
+		Want   string
+		Got    string
+		Offset int
+		Logs   string
+	}
+	cases := []Case{
+		{Name: "empty"},
+		{
+			Name:   "negative offset",
+			Offset: -1,
+			Logs: `ShowFirstDiff offset out of bounds: -1
+`,
+		},
+		{
+			Name:   "offset exceeds string len",
+			Offset: 1000,
+			Got:    "hello",
+			Logs: `ShowFirstDiff offset out of bounds: 1000
+`,
+		},
+		{
+			Name:   "ok offset equals string len",
+			Offset: 5,
+			Got:    "hello",
+		},
+		{
+			Name:   "fail offset equals string len",
+			Offset: 5,
+			Got:    "hello",
+			Want:   "not at offset 5",
+			Logs: `Field did not match at index 5 (line 1, col 6) -
+     want: not at offset 5
+got:  hello
+           ^
+`,
+		},
+		// }
+		// cases = []Case{
+		{
+			Name:   "fail offset equals string len after newline",
+			Offset: 6,
+			Got:    "hello\n",
+			Want:   "not at offset 6",
+			Logs: `Field did not match at index 6 (line 1, col 7) -
+      want: not at offset 6
+got:  hello⏎
+            ^
+`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			mockT := NewMockT(t)
+			test.ShowFirstDiff(mockT, "Field", c.Want, c.Got, c.Offset)
+
+			wantFailed := c.Logs != ""
+			if wantFailed != mockT.Failed() {
+				t.Errorf("wantFailed is %v, but t.Failed() is %v",
+					wantFailed, mockT.Failed())
 			}
 			if gotLogs := mockT.buf.String(); c.Logs != gotLogs {
 				t.Errorf("logs do not match - want:\n%s\ngot:\n%s", c.Logs, gotLogs)

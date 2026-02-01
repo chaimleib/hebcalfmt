@@ -21,7 +21,7 @@ func TestTranslate(t *testing.T) {
 	for _, c := range cases {
 		t.Run(fmt.Sprintf("To %s: %s", c.Lang, c.Input), func(t *testing.T) {
 			got := templating.Translate(c.Lang, c.Input)
-			test.CheckString(t, "translation", c.Want, got, test.WantEqual)
+			test.CheckString(t, "translation", c.Want, got)
 		})
 	}
 }

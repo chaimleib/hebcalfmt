@@ -73,7 +73,7 @@ func TestLocalizedParasha(t *testing.T) {
 	for _, c := range cases {
 		t.Run(fmt.Sprintf("%s (%s)", c.Want, c.Lang), func(t *testing.T) {
 			got := templating.LocalizedParasha(c.HDate, c.IL, c.Lang)
-			test.CheckString(t, "parasha", c.Want, got, test.WantEqual)
+			test.CheckString(t, "parasha", c.Want, got)
 		})
 	}
 }

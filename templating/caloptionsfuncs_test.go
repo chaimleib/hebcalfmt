@@ -63,8 +63,7 @@ func TestSetDates(t *testing.T) {
 			gotOpts := c.Opts
 			got, err := templating.SetDates(&gotOpts)(c.Dates...)
 			test.CheckErr(t, err, c.Err)
-			test.CheckString(
-				t, "dummy return", "", got.(string), test.WantEqual)
+			test.CheckString(t, "dummy return", "", got.(string))
 		})
 	}
 }

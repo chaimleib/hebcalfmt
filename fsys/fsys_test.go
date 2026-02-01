@@ -126,7 +126,7 @@ func TestFSFunc_Format(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
 			for format, want := range c.Want {
-				test.CheckString(
+				test.CheckStringMode(
 					t,
 					format,
 					want.Value,
@@ -302,7 +302,7 @@ func TestWrapFS_Format(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
 			for format, want := range c.Want {
-				test.CheckString(
+				test.CheckStringMode(
 					t,
 					format,
 					want.Value,

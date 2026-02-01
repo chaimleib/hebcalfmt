@@ -261,12 +261,9 @@ func TestJoin(t *testing.T) {
 					)
 				}
 
-				test.CheckString(
-					t,
-					fmt.Sprintf("subwarn[%d]", i),
+				test.CheckString(t, fmt.Sprintf("subwarn[%d]", i),
 					c.SubWarns[i],
 					warn.Error(),
-					test.WantEqual,
 				)
 			}
 
