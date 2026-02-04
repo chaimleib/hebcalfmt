@@ -254,6 +254,7 @@ func (b *FencedBlock) Line(
 
 type QuotedFile struct {
 	Name   string
+	Block  *FencedBlock
 	Data   string
 	Syntax string
 }

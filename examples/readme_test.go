@@ -114,47 +114,59 @@ func (c *ReadmeCase) ParseBashExample(
 	return warns, errs
 }
 
-func (c ReadmeCase) Check(t *testing.T, rc ReadmeContext) {
-	t.Run("files equal", func(t *testing.T) {
-		for fname, quoted := range c.Files {
-			t.Run(fname, func(t *testing.T) {
-				t.Parallel()
-				f, err := rc.Open(fname)
-				if err != nil {
-					t.Error(err)
+func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
+	for fname, quoted := range c.Files {
+		t.Run(fname, func(t *testing.T) {
+			t.Parallel()
+			f, err := rc.Open(fname)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			defer f.Close()
+
+			scanner := bufio.NewScanner(f)
+			var scannerDone bool
+			var lineNumber int
+			for quotedLine := range strings.SplitSeq(quoted.Data, "\n") {
+				if scannerDone {
+					t.Errorf(
+						"fence block at %s:%d ran out of lines before file at %s:%d",
+						rc.FileName,
+						quoted.Block.StartLineNumber+lineNumber,
+						fname,
+						lineNumber,
+					)
 					return
 				}
-				defer f.Close()
 
-				scanner := bufio.NewScanner(f)
-				var scannerDone bool
-				var lineNumber int
-				for quotedLine := range strings.SplitSeq(quoted.Data, "\n") {
-					if scannerDone {
-						t.Errorf("read file ran out of lines before quoted file at %s:%d",
-							fname, lineNumber)
-						return
-					}
-
-					lineNumber++
-					scannerDone = !scanner.Scan()
-					readLine := scanner.Text()
-					if readLine != quotedLine {
-						t.Errorf("found difference at %s:%d - read:\n%s\nquoted:\n%s",
-							fname, lineNumber, readLine, quotedLine)
-						return
-					}
+				lineNumber++
+				scannerDone = !scanner.Scan()
+				readLine := scanner.Text()
+				if readLine != quotedLine {
+					t.Errorf(
+						"found difference at -\nread %s:%d:\n%s\nfence block line at %s:%d:\n%s",
+						fname,
+						lineNumber,
+						readLine,
+						rc.FileName,
+						quoted.Block.StartLineNumber+lineNumber,
+						quotedLine,
+					)
+					return
 				}
-				if !scannerDone {
-					t.Errorf("quoted file ran out of lines before read file at %s:%d",
-						fname, lineNumber)
-				}
-				if err := scanner.Err(); err != nil {
-					t.Error(err)
-				}
-			})
-		}
-	})
+			}
+			if !scannerDone {
+				t.Errorf("fence block at %s:%d ran out of lines before file at %s:%d",
+					rc.FileName,
+					quoted.Block.StartLineNumber+lineNumber,
+					fname, lineNumber)
+			}
+			if err := scanner.Err(); err != nil {
+				t.Error(err)
+			}
+		})
+	}
 }
 
 func (rc ReadmeCase) String() string {
@@ -204,7 +216,7 @@ func NewReadmeContext(fpath string) *ReadmeContext {
 	return &ReadmeContext{
 		FileName:       fpath,
 		MaxMemoryLines: 2,
-		DebugWriter:    os.Stderr,
+		DebugWriter:    io.Discard,
 		ProgressCase:   NewReadmeCase(),
 		Stat:           stat,
 		Open:           open,
@@ -305,6 +317,7 @@ func (rc *ReadmeContext) FencedBlock(
 
 		rc.ProgressCase.Files[fname] = markdown.QuotedFile{
 			Name:   fname,
+			Block:  rc.ProgressBlock,
 			Data:   strings.Join(b.Lines, "\n"),
 			Syntax: syntax,
 		}
@@ -355,7 +368,7 @@ func (rc *ReadmeContext) Line(
 	return warns, errs
 }
 
-func TestReadme_QuotedFilesMatch(t *testing.T) {
+func TestReadme(t *testing.T) {
 	const fpath = "../README.md"
 	readme, err := os.Open(fpath)
 	if err != nil {
@@ -376,15 +389,16 @@ func TestReadme_QuotedFilesMatch(t *testing.T) {
 	if err := scanner.Err(); err != nil {
 		errs = append(errs, fmt.Errorf("error reading %s: %w", fpath, err))
 	}
-
-	for _, c := range rc.Cases {
-		c.Check(t, *rc)
-	}
-
 	if len(warns) > 0 {
 		t.Error(warns.Build())
 	}
 	if len(errs) > 0 {
-		t.Errorf("errors:\n%v", errors.Join(errs...))
+		t.Fatalf("errors:\n%v", errors.Join(errs...))
 	}
+
+	t.Run("quoted files match filesystem", func(t *testing.T) {
+		for _, c := range rc.Cases {
+			c.CheckQuotedFilesMatch(t, *rc)
+		}
+	})
 }
