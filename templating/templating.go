@@ -105,6 +105,7 @@ func BuildData(
 		"now":           cfg.Now,
 		"nowInLocation": cfg.Now.In(z.TimeZone),
 		"calOptions":    opts,
+		"configSource":  cfg.ConfigSource,
 		"language":      cfg.Language,
 		"dateRange":     cfg.DateRange,
 		"tz":            z.TimeZone,
