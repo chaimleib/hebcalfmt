@@ -2,8 +2,12 @@ package cli_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/fs"
+	"log"
+	"log/slog"
+	"os"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -11,9 +15,87 @@ import (
 
 	"github.com/chaimleib/hebcalfmt/cli"
 	"github.com/chaimleib/hebcalfmt/config"
+	"github.com/chaimleib/hebcalfmt/fsys"
 	"github.com/chaimleib/hebcalfmt/templating"
 	"github.com/chaimleib/hebcalfmt/test"
 )
+
+func TestInitLogging(t *testing.T) {
+	// exercise the function, make sure it doesn't panic.
+	cli.InitLogging()
+}
+
+func setLogger(t *testing.T) fmt.Stringer {
+	orig := cli.InitLogging
+	t.Cleanup(func() {
+		cli.InitLogging = orig
+	})
+
+	var buf bytes.Buffer
+	cli.InitLogging = func() {
+		slogger := slog.New(slog.NewTextHandler(&buf, nil))
+		slog.SetDefault(slogger)
+
+		log.Default().SetFlags(0)
+		log.Default().SetOutput(&buf)
+		log.Default().SetPrefix("")
+	}
+
+	return &buf
+}
+
+func setArgs(t *testing.T, args string) {
+	oldArgs := os.Args
+	t.Cleanup(func() {
+		os.Args = oldArgs
+	})
+
+	argFields := strings.Fields(args)
+	os.Args = append(os.Args[:1], argFields...)
+}
+
+func failFS() (fs.FS, error) { return nil, errors.New("test: failFS") }
+
+func TestRun(t *testing.T) {
+	cases := []struct {
+		Name      string
+		Args      string // split with strings.Fields()
+		DefaultFS func() (fs.FS, error)
+		Want      int
+		Logs      string
+	}{
+		{Name: "empty input template", Args: "/dev/null"},
+		{
+			Name: "nonexistent template path",
+			Args: "does-not-exist.tmpl",
+			Want: 1,
+			Logs: "open does-not-exist.tmpl: no such file or directory\n",
+		},
+		{
+			Name:      "failFS",
+			Want:      1,
+			DefaultFS: failFS,
+			Logs:      "time=... level=ERROR msg=\"failed to initialize DefaultFS\" error=\"test: failFS\"\n",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			logBuf := setLogger(t)
+			setArgs(t, c.Args)
+			if c.DefaultFS != nil {
+				orig := fsys.DefaultFS
+				fsys.DefaultFS = c.DefaultFS
+				t.Cleanup(func() { fsys.DefaultFS = orig })
+			}
+
+			got := cli.Run()
+			if c.Want != got {
+				t.Errorf("Run exited with code %d, want %d", got, c.Want)
+			}
+			test.CheckEllipsis(t, "logs", c.Logs, logBuf.String())
+		})
+	}
+}
 
 func TestRunInEnvironment(t *testing.T) {
 	fdata := func(s string) *fstest.MapFile {
