@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -60,7 +61,7 @@ func ShowFirstDiff(t Test, name, want, got string, offset int) {
 	var buf bytes.Buffer
 	buf.Grow(512)
 	// If the want is only desired at an offset, indent the want that far.
-	for range blankToCol(offsetCol, got) {
+	for range visualCol(offsetCol, got) {
 		buf.WriteRune(' ')
 	}
 	const wantLabel = "want: "
@@ -113,24 +114,21 @@ func CheckEllipsis(t Test, name, want, got string) {
 	splits := strings.Split(want, "...")
 	var ok bool
 	if got, ok = strings.CutPrefix(got, splits[0]); !ok {
-		var trailEllipse string
-		if len(splits) != 1 { // not the last split
-			trailEllipse = "..."
-		}
 		t.Errorf(
-			"%s did not match ellipsis portion 0 - want:\n%s%s\ngot:\n%s",
-			name, splits[0], trailEllipse, got)
+			"%s did not match ellipsis portion 1 of %d -",
+			name, len(splits),
+		)
+		ShowFirstDiff(t, name, splits[0], got, 0)
 		return
 	}
 	if len(splits) == 1 {
 		// No "..." was in the want string. Basically, WantEqual.
 		if len(got) > 0 {
 			t.Errorf(
-				"%s did not match, has trailing content after wanted string - got[%d:]:\n%s",
+				"%s did not match, has trailing content after wanted string -",
 				name,
-				len(orig)-len(got),
-				got,
 			)
+			ShowFirstDiff(t, name, splits[0], orig, 0)
 		}
 		return
 	}
@@ -139,13 +137,14 @@ func CheckEllipsis(t Test, name, want, got string) {
 	for splitIdx, split := range splits[1:] {
 		i := strings.Index(got, split)
 		if i < 0 {
-			var trailEllipse string
-			if splitIdx != len(splits[1:])-1 { // not the last split
-				trailEllipse = "..."
-			}
 			t.Errorf(
-				"%s did not match ellipsis portion %d - want:\n...%s%s\ngot[%d:]:\n%s",
-				name, splitIdx+1, split, trailEllipse, len(orig)-len(got), got)
+				"%s did not match, ellipsis portion %d of %d not found -\nwant:\n%s\nsomewhere at or after %s",
+				name,
+				splitIdx+2,
+				len(splits),
+				split,
+				linePointer(len(orig)-len(got), orig),
+			)
 			return
 		}
 		got = got[i+len(split):]
@@ -153,10 +152,9 @@ func CheckEllipsis(t Test, name, want, got string) {
 
 	if len(got) > 0 {
 		t.Errorf(
-			"%s did not match, has trailing content after last ellipsis portion - got[%d:]:\n%s",
+			"%s did not match, unexpected trailing content after last ellipsis portion -\n%s",
 			name,
-			len(orig)-len(got),
-			got,
+			linePointer(len(orig)-len(got), orig),
 		)
 	}
 }
@@ -195,6 +193,32 @@ func lineCol(idx int, s string) (line, col, lineStart int) {
 	return line, col, lineStart
 }
 
+func lineEndIdx(idx int, s string) (lineEnd int, found bool) {
+	lineEnd = strings.IndexRune(s[idx:], '\n')
+	if lineEnd < 0 {
+		return len(s), false
+	}
+	return idx + lineEnd, true
+}
+
+func linePointer(idx int, s string) string {
+	line, col, lineStart := lineCol(idx, s)
+	lineEnd, nlFound := lineEndIdx(lineStart, s)
+	var trailingPlaceholder string
+	if nlFound && lineEnd < len(s)-1 {
+		trailingPlaceholder = "⏎..."
+	}
+	return fmt.Sprintf(
+		"got[%d:] (line %d, col %d):\n%s%s\n%s^",
+		idx,
+		line,
+		col,
+		s[lineStart:lineEnd],
+		trailingPlaceholder,
+		strings.Repeat(" ", visualCol(col, s)),
+	)
+}
+
 const tabStop = 4
 
 // displayLine takes a buffer, an index to the start of a line,
@@ -207,14 +231,8 @@ func displayLine(
 	cursor int,
 	s string,
 ) {
-	// if i < 0 || i >= len(s) {
-	// 	return // impossible to reach from exported funcs
-	// }
-	end := strings.IndexRune(s[lineStart:], '\n')
-	if end == -1 {
-		end = len(s)
-	}
-	line := s[lineStart:end] // logical line
+	lineEnd, nlFound := lineEndIdx(lineStart, s)
+	line := s[lineStart:lineEnd] // logical line
 
 	// Build display line, replacing tabs with spaces.
 	for i, r := range line {
@@ -229,19 +247,19 @@ func displayLine(
 
 	// For diffs at or just after the newline,
 	// show the newline as a glyph.
-	if cursor >= end && end < len(s) && s[end] == '\n' {
+	if cursor >= lineEnd && nlFound {
 		buf.WriteRune('⏎')
 	}
 }
 
 func markCol(buf *bytes.Buffer, col int, s string) {
-	for range blankToCol(col, s) {
+	for range visualCol(col, s) {
 		buf.WriteRune(' ')
 	}
 	buf.WriteRune('^')
 }
 
-func blankToCol(col int, s string) int {
+func visualCol(col int, s string) int {
 	var n int
 	col--
 	for i, r := range s {

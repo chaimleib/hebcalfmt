@@ -7,13 +7,14 @@ import (
 )
 
 func TestCheckString(t *testing.T) {
-	cases := []struct {
+	type Case struct {
 		Name                string
 		WantInput, GotInput string
 		Mode                test.WantMode
 		Failed              bool
 		Logs                string
-	}{
+	}
+	cases := []Case{
 		{Name: "empties equal"},
 		{Name: "strings equal", WantInput: "hi", GotInput: "hi"},
 		{
@@ -40,6 +41,17 @@ got:  hello
 			Logs: `Field did not match at index 5 (line 1, col 6) -
 want: hello there
 got:  hello
+           ^
+`,
+		},
+		{
+			Name:      "strings not equal with longer got",
+			WantInput: "hello",
+			GotInput:  "hello there",
+			Failed:    true,
+			Logs: `Field did not match at index 5 (line 1, col 6) -
+want: hello
+got:  hello there
            ^
 `,
 		},
@@ -158,10 +170,11 @@ hello
 			GotInput:  "hello",
 			Mode:      test.WantEllipsis,
 			Failed:    true,
-			Logs: `Field did not match ellipsis portion 0 - want:
-bye
-got:
-hello
+			Logs: `Field did not match ellipsis portion 1 of 1 -
+Field did not match at index 0 (line 1, col 1) -
+want: bye
+got:  hello
+      ^
 `,
 		},
 		{
@@ -170,8 +183,11 @@ hello
 			GotInput:  "hello there",
 			Mode:      test.WantEllipsis,
 			Failed:    true,
-			Logs: `Field did not match, has trailing content after wanted string - got[5:]:
- there
+			Logs: `Field did not match, has trailing content after wanted string -
+Field did not match at index 5 (line 1, col 6) -
+want: hello
+got:  hello there
+           ^
 `,
 		},
 		{
@@ -186,10 +202,11 @@ hello
 			GotInput:  "hello",
 			Mode:      test.WantEllipsis,
 			Failed:    true,
-			Logs: `Field did not match ellipsis portion 0 - want:
-bye...
-got:
-hello
+			Logs: `Field did not match ellipsis portion 1 of 2 -
+Field did not match at index 0 (line 1, col 1) -
+want: bye
+got:  hello
+      ^
 `,
 		},
 		{
@@ -198,10 +215,12 @@ hello
 			GotInput:  "bye, see you some other time",
 			Mode:      test.WantEllipsis,
 			Failed:    true,
-			Logs: `Field did not match ellipsis portion 1 - want:
-... later
-got[3:]:
-, see you some other time
+			Logs: `Field did not match, ellipsis portion 2 of 2 not found -
+want:
+ later
+somewhere at or after got[3:] (line 1, col 4):
+bye, see you some other time
+   ^
 `,
 		},
 		{
@@ -210,29 +229,46 @@ got[3:]:
 			GotInput:  "hello over there, little one",
 			Mode:      test.WantEllipsis,
 			Failed:    true,
-			Logs: `Field did not match, has trailing content after last ellipsis portion - got[16:]:
-, little one
+			Logs: `Field did not match, unexpected trailing content after last ellipsis portion -
+got[16:] (line 1, col 17):
+hello over there, little one
+                ^
+`,
+		},
+		{
+			Name:      "strings ellipsis fail trailing multiline got with len 2 splits",
+			WantInput: "hello... there",
+			GotInput:  "hello over there, little one\nthe world is large",
+			Mode:      test.WantEllipsis,
+			Failed:    true,
+			Logs: `Field did not match, unexpected trailing content after last ellipsis portion -
+got[16:] (line 1, col 17):
+hello over there, little one⏎...
+                ^
 `,
 		},
 		{
 			Name: "strings ellipsis fail with len 3 splits on split 1",
-			WantInput: `1
+			WantInput: `alpha
 ...
-3
+charlie
 ...
-`,
-			GotInput: `1
-2
-4`,
+echo`,
+			GotInput: `alpha
+bravo
+c
+delta
+echo`,
 			Mode:   test.WantEllipsis,
 			Failed: true,
-			Logs: `Field did not match ellipsis portion 1 - want:
-...
-3
-...
-got[2:]:
-2
-4
+			Logs: `Field did not match, ellipsis portion 2 of 3 not found -
+want:
+
+charlie
+
+somewhere at or after got[6:] (line 2, col 1):
+bravo⏎...
+^
 `,
 		},
 	}
@@ -245,7 +281,8 @@ got[2:]:
 				t.Errorf("c.Failed is %v, but t.Failed() is %v",
 					c.Failed, mockT.Failed())
 			}
-			if gotLogs := mockT.buf.String(); c.Logs != gotLogs {
+			gotLogs := mockT.buf.String()
+			if c.Logs != gotLogs {
 				t.Errorf("logs do not match - want:\n%s\ngot:\n%s", c.Logs, gotLogs)
 			}
 		})
@@ -291,8 +328,6 @@ got:  hello
            ^
 `,
 		},
-		// }
-		// cases = []Case{
 		{
 			Name:   "fail offset equals string len after newline",
 			Offset: 6,
@@ -301,6 +336,28 @@ got:  hello
 			Logs: `Field did not match at index 6 (line 1, col 7) -
       want: not at offset 6
 got:  hello⏎
+            ^
+`,
+		},
+		{
+			Name:   "offset strings not equal with got trailing newline",
+			Offset: 4,
+			Want:   "hi",
+			Got:    "oh, hi\n",
+			Logs: `Field did not match at index 6 (line 1, col 7) -
+    want: hi
+got:  oh, hi⏎
+            ^
+`,
+		},
+		{
+			Name:   "offset strings not equal with want trailing newline",
+			Offset: 4,
+			Want:   "hi\n",
+			Got:    "oh, hi",
+			Logs: `Field did not match at index 6 (line 1, col 7) -
+    want: hi⏎
+got:  oh, hi
             ^
 `,
 		},
