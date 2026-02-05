@@ -143,7 +143,7 @@ func (b *FencedBlock) appendInnerLine(l string) {
 		if b.Indent[indent] != l[indent] {
 			break
 		}
-		indent++ // overwritten if next indent char exists
+		indent++ // overwritten if loop continues
 	}
 	b.Lines = append(b.Lines, l[indent:])
 }
