@@ -172,8 +172,9 @@ func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
 func (c ReadmeCase) String() string {
 	outputClip := c.Output
 	var outputEllipsis string
-	if len(c.Output) > 10 {
-		outputClip = outputClip[:10]
+	const clipLen = 20
+	if len(c.Output) > clipLen {
+		outputClip = outputClip[:clipLen]
 		outputEllipsis = "..."
 	}
 
