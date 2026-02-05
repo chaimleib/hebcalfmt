@@ -171,17 +171,19 @@ func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
 
 func (rc ReadmeCase) String() string {
 	outputClip := rc.Output
+func (c ReadmeCase) String() string {
+	outputClip := c.Output
 	var outputEllipsis string
-	if len(rc.Output) > 10 {
+	if len(c.Output) > 10 {
 		outputClip = outputClip[:10]
 		outputEllipsis = "..."
 	}
 
 	return fmt.Sprintf(
 		"ReadmeCase<Files: %s; Args: %q; Output<%d>: %q%s>",
-		rc.Files,
-		rc.Args,
-		len(rc.Output),
+		c.Files,
+		c.Args,
+		len(c.Output),
 		outputClip,
 		outputEllipsis,
 	)
@@ -330,9 +332,7 @@ func (rc *ReadmeContext) FencedBlock(
 	return warns, errs
 }
 
-func (rc *ReadmeContext) Line(
-	lineStr string,
-) (warning.Warnings, []error) {
+func (rc *ReadmeContext) Line(lineStr string) (warning.Warnings, []error) {
 	col := 1
 	var warns, subwarns warning.Warnings
 	var err error
