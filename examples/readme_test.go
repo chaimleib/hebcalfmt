@@ -169,8 +169,6 @@ func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
 	}
 }
 
-func (rc ReadmeCase) String() string {
-	outputClip := rc.Output
 func (c ReadmeCase) String() string {
 	outputClip := c.Output
 	var outputEllipsis string
