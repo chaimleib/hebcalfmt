@@ -54,7 +54,7 @@ func ParseInlineFile(
 			return errOut(0, "expected a command")
 		}
 		subProg = append(subProg, Closure{
-			Command: *cmd,
+			Command: cmd,
 			Env:     env,
 		})
 		env = env.Child(len(rest) - len(newRest))

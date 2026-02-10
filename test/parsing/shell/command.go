@@ -98,12 +98,19 @@ type Env struct {
 	Col      int // points to cmd name, not assignments
 	Vars     Vars
 	Files    fs.FS
+	Library  map[string]CommandFunc
 	Stdout   io.Writer
 	Stderr   io.Writer
 }
 
-func (e Env) LookupCommand(cmd string) (CommandFunc, error) {
-	result, ok := DefaultCommands[cmd]
+func (e Env) LookupCommand(
+	cmd string,
+) (CommandFunc, error) {
+	library := e.Library
+	if library == nil {
+		library = DefaultCommands
+	}
+	result, ok := library[cmd]
 	if !ok {
 		return nil, UnknownCommandError(cmd)
 	}
@@ -118,15 +125,18 @@ func (e Env) Child(colOffset int) Env {
 }
 
 type Command struct {
-	Name        string
-	Envs        Vars
+	Name string
+
+	// Col points to the first char of the command name, not the assignments.
+	Col         int
+	Vars        Vars
 	Args        []string
 	InlineFiles []InlineFile
 }
 
 func (c Command) String() string {
 	parts := make([]string, 0, 2+len(c.Args))
-	if varString := c.Envs.String(); varString != "" {
+	if varString := c.Vars.String(); varString != "" {
 		parts = append(parts, varString)
 	}
 
@@ -155,7 +165,10 @@ func (c Command) Run(env Env) (Code, error) {
 
 	// Merge the vars.
 	vars := maps.Clone(env.Vars)
-	maps.Insert(vars, maps.All(c.Envs))
+	if vars == nil {
+		vars = make(Vars)
+	}
+	maps.Insert(vars, maps.All(c.Vars))
 
 	// Populate the inline files, if any.
 	tmpFiles := make(fstest.MapFS, len(c.InlineFiles))
@@ -175,29 +188,28 @@ func (c Command) Run(env Env) (Code, error) {
 }
 
 func ParseCommand(
-	line parsing.LineInfo,
+	li parsing.LineInfo,
 	rest []byte,
-) (cmd *Command, newRest []byte, err error) {
+) (cmd Command, newRest []byte, err error) {
+	var zero Command
 	orig := rest
-	errOut := ErrOut[*Command](line, &rest)
-
-	cmd = new(Command)
+	errOut := ErrOut[Command](li, &rest)
 
 	// Build envs.
 	for len(rest) > 0 {
 		var key, value string
-		key, value, rest, err = ParseAssignment(line, rest)
+		key, value, rest, err = ParseAssignment(li, rest)
 		if errors.Is(err, ErrNoMatch) {
 			break
 		}
 		if err != nil {
-			return nil, orig, err
+			return zero, orig, err
 		}
 
-		if cmd.Envs == nil {
-			cmd.Envs = make(map[string]string)
+		if cmd.Vars == nil {
+			cmd.Vars = make(map[string]string)
 		}
-		cmd.Envs[key] = value
+		cmd.Vars[key] = value
 
 		newRest = bytes.TrimLeft(rest, "\t ")
 		if len(newRest) == len(rest) {
@@ -207,21 +219,23 @@ func ParseCommand(
 	}
 
 	// Parse command name.
-	cmd.Name, rest, err = ParseShellString(line, rest)
+	cmd.Name, newRest, err = ParseShellString(li, rest)
 	if err != nil {
 		var se parsing.SyntaxError
 		if errors.As(err, &se) {
 			se.Err = fmt.Errorf("error parsing command name: %w", se.Err)
-			return nil, orig, se
+			return zero, orig, se
 		}
 		return errOut(0, "expected command name: %w", err)
 	}
+	cmd.Col = len(li.Line) - len(rest) + 1
+	rest = newRest
 
 	// Parse whitespace, then arguments.
 	var argsAndFiles ArgsAndFiles
-	argsAndFiles, rest, err = ParseWhitespaceThenArgs(line, rest)
+	argsAndFiles, rest, err = ParseWhitespaceThenArgs(li, rest)
 	if err != nil && !errors.Is(err, ErrNoMatch) {
-		return nil, orig, err
+		return zero, orig, err
 	}
 	cmd.Args = argsAndFiles.Args
 	cmd.InlineFiles = argsAndFiles.Files

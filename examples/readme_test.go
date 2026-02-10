@@ -7,10 +7,16 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"testing"
+	"testing/fstest"
+	"time"
 
+	"github.com/chaimleib/hebcalfmt/cli"
+	"github.com/chaimleib/hebcalfmt/templating"
+	"github.com/chaimleib/hebcalfmt/test"
 	"github.com/chaimleib/hebcalfmt/test/parsing"
 	"github.com/chaimleib/hebcalfmt/test/parsing/markdown"
 	"github.com/chaimleib/hebcalfmt/test/parsing/shell"
@@ -24,7 +30,9 @@ type ReadmeCase struct {
 
 	// Command is the bash command, which may have inline variables
 	// which override the global environment variables.
-	Command *shell.Command
+	Command shell.Command
+
+	CommandLineInfo parsing.LineInfo
 
 	// Output holds the expected output from the running the bash Command
 	// with the given context.
@@ -50,6 +58,7 @@ func (c *ReadmeCase) ParseBashExample(
 		Number:   b.StartLineNumber + 1,
 		Line:     lines[0], // missing possible indent, but close enough
 	}
+	c.CommandLineInfo = li
 
 	// bash examples should have a leading $
 	// and be more than one line long to show output.
@@ -166,6 +175,53 @@ func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
 			}
 		})
 	}
+}
+
+func (r *ReadmeCase) CheckCommandOutput(t *testing.T, casesSoFar []ReadmeCase) {
+	t.Run(r.Command.String(), func(t *testing.T) {
+		files := make(fstest.MapFS)
+		// Collect the files defined so far at that point in the readme.
+		for _, c := range casesSoFar {
+			for fname, quoted := range c.Files {
+				files[fname] = &fstest.MapFile{Data: []byte(quoted.Data)}
+			}
+		}
+
+		now := time.Date(2025, time.December, 14, 0, 0, 0, 0, time.UTC)
+
+		var hebcalfmt shell.CommandFunc = func(env shell.Env, args ...string) (code shell.Code) {
+			err := cli.RunInEnvironment(
+				args, env.Files, now, templating.BuildData, env.Stdout)
+			if err != nil {
+				fmt.Fprintln(env.Stderr, err)
+				code = shell.CodeError
+			}
+			return code
+		}
+
+		library := maps.Clone(shell.DefaultCommands)
+		library["hebcalfmt"] = hebcalfmt
+
+		var env shell.Env
+		env.LineInfo = r.CommandLineInfo
+		env.Col = r.Command.Col
+		env.Files = files
+		env.Library = library
+		var buf bytes.Buffer
+		env.Stdout = &buf
+		env.Stderr = &buf
+
+		// Set env vars.
+		for k, v := range r.Command.Vars {
+			t.Setenv(k, v)
+		}
+
+		code, err := r.Command.Run(env)
+
+		test.CheckComparable(t, "code", shell.CodeOK, code)
+		test.CheckErr(t, err, "")
+		test.CheckEllipsis(t, "output", string(r.Output), buf.String())
+	})
 }
 
 func (c ReadmeCase) String() string {
@@ -351,6 +407,7 @@ func (rc *ReadmeContext) Line(
 		}
 	} else if errors.Is(err, markdown.ErrNoMatch) { // no code block
 		if trimmed := markdown.TrimSpace(line); len(trimmed) > 0 {
+			li.Line = markdown.CopyOf(li.Line, false)
 			rc.LastNonemptyLine = li
 		} else if rc.LastNonemptyLine != nil &&
 			li.Number-rc.LastNonemptyLine.Number >= rc.MaxMemoryLines {
@@ -395,6 +452,12 @@ func TestReadme(t *testing.T) {
 	t.Run("quoted files match filesystem", func(t *testing.T) {
 		for _, c := range rc.Cases {
 			c.CheckQuotedFilesMatch(t, *rc)
+		}
+	})
+
+	t.Run("command output matches", func(t *testing.T) {
+		for i, c := range rc.Cases {
+			c.CheckCommandOutput(t, rc.Cases[:i+1])
 		}
 	})
 }

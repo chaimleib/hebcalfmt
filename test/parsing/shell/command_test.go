@@ -153,13 +153,13 @@ func TestCommand_String(t *testing.T) {
 		},
 		{
 			Name:    "command with 1 var",
-			Command: shell.Command{Envs: shell.Vars{"TZ": "UTC"}, Name: "date"},
+			Command: shell.Command{Vars: shell.Vars{"TZ": "UTC"}, Name: "date"},
 			Want:    `TZ=UTC date`,
 		},
 		{
 			Name: "command with 2 vars",
 			Command: shell.Command{
-				Envs: shell.Vars{"LC_TIME": "en_US.UTF-8", "TZ": "UTC"},
+				Vars: shell.Vars{"LC_TIME": "en_US.UTF-8", "TZ": "UTC"},
 				Name: "date",
 			},
 			Want: `LC_TIME=en_US.UTF-8 TZ=UTC date`,
@@ -167,7 +167,7 @@ func TestCommand_String(t *testing.T) {
 		{
 			Name: "command with 1 var and 1 arg",
 			Command: shell.Command{
-				Envs: shell.Vars{"TZ": "UTC"},
+				Vars: shell.Vars{"TZ": "UTC"},
 				Name: "date",
 				Args: []string{"+%H:%M:%S"},
 			},
@@ -426,7 +426,6 @@ func TestCommand_Run(t *testing.T) {
 			var stdout, stderr bytes.Buffer
 			c.Env.Stdout = &stdout
 			c.Env.Stderr = &stderr
-			c.Env.Vars = make(shell.Vars)
 
 			code, err := c.Cmd.Run(c.Env)
 			test.CheckErr(t, err, c.Err)
@@ -526,7 +525,7 @@ func CheckCommand(
 ) {
 	t.Helper()
 	test.CheckString(t, fmt.Sprintf("%s.Name", name), want.Name, got.Name)
-	test.CheckMap(t, fmt.Sprintf("%s.Envs", name), want.Envs, got.Envs)
+	test.CheckMap(t, fmt.Sprintf("%s.Envs", name), want.Vars, got.Vars)
 	test.CheckSlice(t, fmt.Sprintf("%s.Args", name), want.Args, got.Args)
 	test.CheckComparable(
 		t,
@@ -557,7 +556,7 @@ func TestParseCommand(t *testing.T) {
 		Name     string // defaults to Rest
 		Line     string // defaults to Rest
 		Rest     string
-		Want     *shell.Command
+		Want     shell.Command
 		WantRest string
 		Err      string
 	}{
@@ -570,11 +569,11 @@ func TestParseCommand(t *testing.T) {
 		},
 		{
 			Rest: "date",
-			Want: &shell.Command{Name: "date"},
+			Want: shell.Command{Name: "date"},
 		},
 		{
 			Rest: "cat <(echo yes)",
-			Want: &shell.Command{
+			Want: shell.Command{
 				Name: "cat",
 				Args: []string{"tmp/inlineFile01"},
 				InlineFiles: []shell.InlineFile{{
@@ -609,37 +608,37 @@ func TestParseCommand(t *testing.T) {
 		},
 		{
 			Rest: "TZ=UTC date",
-			Want: &shell.Command{
-				Envs: shell.Vars{"TZ": "UTC"},
+			Want: shell.Command{
+				Vars: shell.Vars{"TZ": "UTC"},
 				Name: "date",
 			},
 		},
 		{
 			Rest: "date '+%Y-%m-%d %H:%M:%S %Z'",
-			Want: &shell.Command{
+			Want: shell.Command{
 				Name: "date",
 				Args: []string{"+%Y-%m-%d %H:%M:%S %Z"},
 			},
 		},
 		{
 			Rest: "date '+%Y-%m-%d %H:%M:%S %Z' 1965-12-07T14:20:06Z",
-			Want: &shell.Command{
+			Want: shell.Command{
 				Name: "date",
 				Args: []string{"+%Y-%m-%d %H:%M:%S %Z", "1965-12-07T14:20:06Z"},
 			},
 		},
 		{
 			Rest: "TZ=UTC date '+%Y-%m-%d %H:%M:%S %Z' 1965-12-07T14:20:06Z",
-			Want: &shell.Command{
-				Envs: shell.Vars{"TZ": "UTC"},
+			Want: shell.Command{
+				Vars: shell.Vars{"TZ": "UTC"},
 				Name: "date",
 				Args: []string{"+%Y-%m-%d %H:%M:%S %Z", "1965-12-07T14:20:06Z"},
 			},
 		},
 		{
 			Rest: "TZ= date",
-			Want: &shell.Command{
-				Envs: shell.Vars{"TZ": ""},
+			Want: shell.Command{
+				Vars: shell.Vars{"TZ": ""},
 				Name: "date",
 			},
 		},
@@ -653,7 +652,7 @@ func TestParseCommand(t *testing.T) {
 		},
 		{
 			Rest: "0INVALID_ASSIGN= date",
-			Want: &shell.Command{
+			Want: shell.Command{
 				Name: "0INVALID_ASSIGN=",
 				Args: []string{"date"},
 			},
@@ -701,7 +700,7 @@ func TestParseCommand(t *testing.T) {
 			if c.Line == "" {
 				li.Line = []byte(c.Rest)
 			}
-			if c.Want != nil {
+			if c.Want.Name != "" {
 				for _, inlineFile := range c.Want.InlineFiles {
 					for i := range inlineFile.SubProg {
 						closure := &inlineFile.SubProg[i]
@@ -711,7 +710,7 @@ func TestParseCommand(t *testing.T) {
 			}
 			got, rest, err := shell.ParseCommand(li, []byte(c.Rest))
 			test.CheckErr(t, err, c.Err)
-			test.CheckNilPtrThen(t, CheckCommand, "command", c.Want, got)
+			CheckCommand(t, "command", c.Want, got)
 			test.CheckString(t, "rest", c.WantRest, string(rest))
 		})
 	}

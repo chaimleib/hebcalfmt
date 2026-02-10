@@ -18,8 +18,7 @@ go install github.com/chaimleib/hebcalfmt
 ## Examples
 
 Some things you can do with `hebcalfmt`.
-These examples are tested automatically every time we push a change to GitHub,
-so that this README and the examples/ folder stay updated and in-sync.
+These examples are tested automatically every time we push a change to GitHub.
 
 ### Show today's date
 
@@ -31,7 +30,7 @@ Hebrew: {{hdateFromTime $.now}}
 
 ```bash
 $ hebcalfmt examples/today.tmpl
-Today: 2025-12-14
+Gregorian: 2025-12-14
 Hebrew: 24 Kislev 5786
 ```
 
@@ -154,8 +153,8 @@ Hebrew: {{$d.Day}} {{$d.MonthName $.language}} {{$d.Year}}
 
 ```bash
 $ hebcalfmt examples/date.tmpl
-Gregorian: 2025-12-18
-Hebrew: 28 Kislev 5786
+Gregorian: 2025-12-14
+Hebrew: 24 Kislev 5786
 ```
 
 ```bash
@@ -579,7 +578,7 @@ Zmanim for Wednesday, 2026-01-21 / 3 Sh'vat 5786, in Austin
 
 This Shabbos we read Parshas Bo.
 
-06:08:17: Alot HaShachar (16.9 deg)
+06:08:17: Alos HaShachar (16.9 deg)
 06:40:28: Misheyakir (10.2 deg)
 07:26:36: Neitz (0.833 deg)
 10:02:29: Sof Zman Krias Shema
@@ -587,11 +586,11 @@ This Shabbos we read Parshas Bo.
 12:42:07: Chatzos
 13:12:07: Mincha Gedolah (floored to 30m past chatzos)
 15:48:22: Mincha Ketanah
-16:54:53: Plag Hamincha
+16:54:53: Plag HaMincha
 17:57:39: Shkiah (0.833 deg)
-18:01:24: Shkiah Amitis/Bein Hashmashos starts (1.583 deg)
+18:01:24: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
 18:23:17: Tzeis (6 deg/3 medium stars)
-00:41:58 (Thu): Chatzos Halailah
+00:41:58 (Thu): Chatzos HaLailah
 
 A halachic hour is 53m13s.
 
@@ -651,8 +650,8 @@ $ hebcalfmt examples/hebcalClassic.tmpl
 
 ```bash
 $ hebcalfmt -c <(echo '{"today": true}') examples/hebcalClassic.tmpl
-12/18/2025 28th of Kislev, 5786
-12/18/2025 Chanukah: 5 Candles
+12/14/2025 24th of Kislev, 5786
+12/14/2025 Chanukah: 1 Candle
 ```
 
 ```bash
@@ -731,20 +730,20 @@ examples/mincha.tmpl
 
 ```bash
 $ hebcalfmt examples/mincha.tmpl 2025-09-01
-Mon Sep 01, 2025: 6:35 PM
-Tue Sep 02, 2025: 6:35 PM
-Wed Sep 03, 2025: 6:35 PM
-Thu Sep 04, 2025: 6:35 PM
-Fri Sep 05, 2025: 6:30 PM
-Sat Sep 06, 2025: 6:30 PM
-Sun Sep 07, 2025: 6:30 PM
-Mon Sep 08, 2025: 6:25 PM
-Tue Sep 09, 2025: 6:25 PM
-Wed Sep 10, 2025: 6:25 PM
-Thu Sep 11, 2025: 6:25 PM
-Fri Sep 12, 2025: 6:20 PM
-Sat Sep 13, 2025: 6:20 PM
-Sun Sep 14, 2025: 6:20 PM
+Mon Sep 01, 2025: 7:10 PM
+Tue Sep 02, 2025: 7:10 PM
+Wed Sep 03, 2025: 7:10 PM
+Thu Sep 04, 2025: 7:05 PM
+Fri Sep 05, 2025: 7:05 PM
+Sat Sep 06, 2025: 7:05 PM
+Sun Sep 07, 2025: 7:00 PM
+Mon Sep 08, 2025: 7:00 PM
+Tue Sep 09, 2025: 7:00 PM
+Wed Sep 10, 2025: 6:55 PM
+Thu Sep 11, 2025: 6:55 PM
+Fri Sep 12, 2025: 6:55 PM
+Sat Sep 13, 2025: 6:50 PM
+Sun Sep 14, 2025: 6:50 PM
 ```
 
 ### Custom zmanim for a configurable day and city
