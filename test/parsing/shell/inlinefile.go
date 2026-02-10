@@ -3,7 +3,7 @@ package shell
 import (
 	"bytes"
 	"fmt"
-	"testing/fstest"
+	"io"
 
 	"github.com/chaimleib/hebcalfmt/test/parsing"
 )
@@ -11,18 +11,14 @@ import (
 func ParseInlineFile(
 	li parsing.LineInfo,
 	rest []byte,
-	tmpFileID int,
-	files fstest.MapFS,
-) (fname string, newRest []byte, err error) {
-	// After the buf is filled, add it to files.
-	fname = fmt.Sprintf("tmp/inlineFile%02d", tmpFileID)
-	buf, errOut, noMatchOut, _ := BufferReturn(li, &rest)
-	okOut := func() (string, []byte, error) {
-		files[fname] = &fstest.MapFile{Data: buf.Bytes()}
-		return fname, rest, nil
+) (subProg []Closure, newRest []byte, err error) {
+	orig := rest
+
+	noMatchOut := func() ([]Closure, []byte, error) {
+		return nil, orig, ErrNoMatch
 	}
 
-	orig := rest
+	errOut := ErrOut[[]Closure](li, &rest)
 
 	// Cut <( prefix.
 	var ok bool
@@ -44,13 +40,11 @@ func ParseInlineFile(
 		return errOut(span, "inline file with no commands")
 	}
 
-	var subProg []Closure
 	env := Env{
 		LineInfo: li,
 		Col:      1 + len(li.Line) - len(rest),
 		Vars:     make(Vars), // TODO: get global vars
-		Stdout:   buf,
-		Stderr:   buf,
+		// Stdout and Stderr will be set just before execution.
 	}
 
 	// Build the subprogram.
@@ -60,7 +54,7 @@ func ParseInlineFile(
 			return errOut(0, "expected a command")
 		}
 		subProg = append(subProg, Closure{
-			Command: cmd,
+			Command: *cmd,
 			Env:     env,
 		})
 		env = env.Child(len(rest) - len(newRest))
@@ -103,17 +97,54 @@ func ParseInlineFile(
 		}
 	} // get the next cmd
 
-	// Run the subprogram.
+	return subProg, rest, nil
+}
+
+type Closure struct {
+	Env     Env
+	Command Command
+}
+
+type InlineFile struct {
+	Name    string
+	SubProg []Closure
+}
+
+func (f InlineFile) String() string {
+	var buf bytes.Buffer
+	for i, closure := range f.SubProg {
+		if i != 0 {
+			buf.WriteString("; ")
+		}
+		buf.WriteString(closure.Command.String())
+	}
+	return fmt.Sprintf("<(%s)", &buf)
+}
+
+// Run the subprogram.
+func (inlineFile InlineFile) Run(
+	stdout, stderr io.Writer,
+) (Code, error) {
 	var code Code
-	for _, closure := range subProg {
+	for _, closure := range inlineFile.SubProg {
+		if closure.Env.Vars == nil {
+			closure.Env.Vars = make(Vars)
+		}
 		closure.Env.Vars["?"] = fmt.Sprint(code)
+		closure.Env.Stdout = stdout
+		closure.Env.Stderr = stderr
+		var err error
 		code, err = closure.Command.Run(closure.Env)
 		if code != CodeOK {
-			rest = []byte(closure.Env.LineInfo.Line[closure.Env.Col-1:])
-
-			return errOut(0, "%w - exited with code %d", err, code)
+			if err == nil {
+				err = fmt.Errorf("exited with code %d", code)
+			} else {
+				err = fmt.Errorf("%w - exited with code %d", err, code)
+			}
+			return code, parsing.NewSyntaxError(
+				closure.Env.LineInfo, closure.Env.Col, 0, err)
 		}
 	}
 
-	return okOut()
+	return CodeOK, nil
 }

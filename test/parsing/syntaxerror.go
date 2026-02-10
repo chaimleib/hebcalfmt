@@ -18,7 +18,7 @@ func NewSyntaxError(line LineInfo, col, colEnd int, err error) error {
 		colEnd = col
 	}
 	return SyntaxError{
-		Line:     line.Line,
+		Line:     string(line.Line),
 		FileName: line.FileName,
 		LineNo:   line.Number,
 		ColStart: col,

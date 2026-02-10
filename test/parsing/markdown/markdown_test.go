@@ -1,6 +1,7 @@
 package markdown_test
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"testing"
@@ -9,6 +10,98 @@ import (
 	"github.com/chaimleib/hebcalfmt/test/parsing"
 	"github.com/chaimleib/hebcalfmt/test/parsing/markdown"
 )
+
+func TestFencedBlock_Format(t *testing.T) {
+	type Case struct {
+		Name  string
+		Block markdown.FencedBlock
+		Want  string
+	}
+	cases := []Case{
+		{
+			Name: "backticks",
+			Block: markdown.FencedBlock{
+				StartLineNumber: 1,
+				Terminator:      []byte("```"),
+			},
+			Want: `markdown.FencedBlock<[1 0] Info:"" Indent:"" Terminator:"` + "```" + `" Lines[0]>`,
+		},
+		{
+			Name: "tildes",
+			Block: markdown.FencedBlock{
+				StartLineNumber: 1,
+				Terminator:      []byte("~~~"),
+			},
+			Want: `markdown.FencedBlock<[1 0] Info:"" Indent:"" Terminator:"~~~" Lines[0]>`,
+		},
+		{
+			Name: "indent 3",
+			Block: markdown.FencedBlock{
+				StartLineNumber: 1,
+				Indent:          []byte("   "),
+				Terminator:      []byte("```"),
+			},
+			Want: `markdown.FencedBlock<[1 0] Info:"" Indent:"   " Terminator:"` + "```" + `" Lines[0]>`,
+		},
+		{
+			Name: "backtick info string",
+			Block: markdown.FencedBlock{
+				StartLineNumber: 1,
+				Terminator:      []byte("```"),
+				Info:            []byte("lang"),
+			},
+			Want: `markdown.FencedBlock<[1 0] Info:"lang" Indent:"" Terminator:"` + "```" + `" Lines[0]>`,
+		},
+		{
+			Name: "tilde info string contains tildes",
+			Block: markdown.FencedBlock{
+				StartLineNumber: 1,
+				Terminator:      []byte("~~~"),
+				Info:            []byte(" lang ~~~ ``` other"),
+			},
+			Want: `markdown.FencedBlock<[1 0] Info:" lang ~~~` + " ```" + ` other" Indent:"" Terminator:"~~~" Lines[0]>`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			got := fmt.Sprintf("%v", c.Block)
+			test.CheckString(t, "format string", c.Want, got)
+		})
+	}
+}
+
+func TestCopyOf(t *testing.T) {
+	const orig = "hello"
+	t.Run("does nothing if sharing memory", func(t *testing.T) {
+		src := []byte(orig)
+		dst := markdown.CopyOf(src, true)
+		// By changing src, we expect dst to change as well,
+		// since it shares memory.
+		copy(src, "HELLO")
+		if !bytes.Equal(dst, []byte("HELLO")) {
+			t.Errorf("memory was not shared as expected")
+		}
+	})
+
+	t.Run("gets separate storage if not sharing memory", func(t *testing.T) {
+		src := []byte(orig)
+		dst := markdown.CopyOf(src, false)
+		// By changing src, we expect dst to not change,
+		// since it has its own backing storage.
+		copy(src, "HELLO")
+		if !bytes.Equal(dst, []byte("hello")) {
+			t.Errorf("memory was unexpectedly changed")
+		}
+	})
+}
+
+func stringLines(lines ...string) [][]byte {
+	var result [][]byte
+	for _, l := range lines {
+		result = append(result, []byte(l))
+	}
+	return result
+}
 
 func CheckFencedBlock(
 	t test.Test,
@@ -29,29 +122,29 @@ func CheckFencedBlock(
 		want.EndLineNumber,
 		got.EndLineNumber,
 	)
-	test.CheckComparable(
+	test.CheckString(
 		t,
 		fmt.Sprintf("%s.Info", name),
-		want.Info,
-		got.Info,
+		string(want.Info),
+		string(got.Info),
 	)
-	test.CheckComparable(
+	test.CheckString(
 		t,
 		fmt.Sprintf("%s.Indent", name),
-		want.Indent,
-		got.Indent,
+		string(want.Indent),
+		string(got.Indent),
 	)
-	test.CheckComparable(
+	test.CheckString(
 		t,
 		fmt.Sprintf("%s.Terminator", name),
-		want.Terminator,
-		got.Terminator,
+		string(want.Terminator),
+		string(got.Terminator),
 	)
-	test.CheckSlice(
+	test.CheckString(
 		t,
 		fmt.Sprintf("%s.Lines", name),
-		want.Lines,
-		got.Lines,
+		string(bytes.Join(want.Lines, []byte("\n"))),
+		string(bytes.Join(got.Lines, []byte("\n"))),
 	)
 }
 
@@ -74,9 +167,20 @@ func TestNewFencedBlock(t *testing.T) {
 			ErrID: markdown.ErrNoMatch,
 		},
 		{
+			Name: "nomatch: not a fence block",
+			Line: parsing.LineInfo{
+				Line:     []byte("hello"),
+				FileName: "hello.txt",
+				Number:   1,
+			},
+			Col:   1,
+			Err:   "no match",
+			ErrID: markdown.ErrNoMatch,
+		},
+		{
 			Name: "nomatch: indent 4",
 			Line: parsing.LineInfo{
-				Line:     "    ```",
+				Line:     []byte("    ```"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -87,7 +191,7 @@ func TestNewFencedBlock(t *testing.T) {
 		{
 			Name: "nomatch: tab",
 			Line: parsing.LineInfo{
-				Line:     "\t```",
+				Line:     []byte("\t```"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -96,23 +200,49 @@ func TestNewFencedBlock(t *testing.T) {
 			ErrID: markdown.ErrNoMatch,
 		},
 		{
-			Name: "indent 3",
+			Name: "backticks",
 			Line: parsing.LineInfo{
-				Line:     "   ```",
+				Line:     []byte("```"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
 			Col: 1,
 			Want: &markdown.FencedBlock{
 				StartLineNumber: 1,
-				Indent:          "   ",
-				Terminator:      "```",
+				Terminator:      []byte("```"),
+			},
+		},
+		{
+			Name: "tildes",
+			Line: parsing.LineInfo{
+				Line:     []byte("~~~"),
+				FileName: "hello.txt",
+				Number:   1,
+			},
+			Col: 1,
+			Want: &markdown.FencedBlock{
+				StartLineNumber: 1,
+				Terminator:      []byte("~~~"),
+			},
+		},
+		{
+			Name: "indent 3",
+			Line: parsing.LineInfo{
+				Line:     []byte("   ```"),
+				FileName: "hello.txt",
+				Number:   1,
+			},
+			Col: 1,
+			Want: &markdown.FencedBlock{
+				StartLineNumber: 1,
+				Indent:          []byte("   "),
+				Terminator:      []byte("```"),
 			},
 		},
 		{
 			Name: "nomatch: 2 tildes",
 			Line: parsing.LineInfo{
-				Line:     "~~",
+				Line:     []byte("~~"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -129,7 +259,7 @@ func TestNewFencedBlock(t *testing.T) {
 		{
 			Name: "nomatch: 1 tilde",
 			Line: parsing.LineInfo{
-				Line:     "~",
+				Line:     []byte("~"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -140,7 +270,7 @@ func TestNewFencedBlock(t *testing.T) {
 		{
 			Name: "nomatch: 1 backtick",
 			Line: parsing.LineInfo{
-				Line:     "`",
+				Line:     []byte("`"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -151,7 +281,7 @@ func TestNewFencedBlock(t *testing.T) {
 		{
 			Name: "nomatch: mid-line backticks",
 			Line: parsing.LineInfo{
-				Line:     "content ```",
+				Line:     []byte("content ```"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -168,35 +298,35 @@ func TestNewFencedBlock(t *testing.T) {
 		{
 			Name: "backtick info string",
 			Line: parsing.LineInfo{
-				Line:     "```lang",
+				Line:     []byte("```lang"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
 			Col: 1,
 			Want: &markdown.FencedBlock{
 				StartLineNumber: 1,
-				Terminator:      "```",
-				Info:            "lang",
+				Terminator:      []byte("```"),
+				Info:            []byte("lang"),
 			},
 		},
 		{
 			Name: "tilde info string contains tildes",
 			Line: parsing.LineInfo{
-				Line:     "~~~ lang ~~~ ``` other",
+				Line:     []byte("~~~ lang ~~~ ``` other"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
 			Col: 1,
 			Want: &markdown.FencedBlock{
 				StartLineNumber: 1,
-				Terminator:      "~~~",
-				Info:            " lang ~~~ ``` other",
+				Terminator:      []byte("~~~"),
+				Info:            []byte(" lang ~~~ ``` other"),
 			},
 		},
 		{
 			Name: "nomatch: same-line termination",
 			Line: parsing.LineInfo{
-				Line:     "```content```",
+				Line:     []byte("```content```"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -213,7 +343,7 @@ func TestNewFencedBlock(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			got, _, warns, err := markdown.NewFencedBlock(c.Line, c.Col)
+			got, _, warns, err := markdown.NewFencedBlock(c.Line, c.Col, false)
 			test.CheckErr(t, err, c.Err)
 			if c.ErrID != nil {
 				if !errors.Is(err, c.ErrID) {
@@ -249,26 +379,26 @@ func TestFencedBlock_Line(t *testing.T) {
 		{
 			Name: "max emptiness",
 			FencedBlock: &markdown.FencedBlock{
-				Terminator: "```",
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Terminator: "```",
+				Terminator: []byte("```"),
 			},
 			WantCol: 1,
 		},
 		{
 			Name: "terminator",
 			Line: parsing.LineInfo{
-				Line:   "```",
+				Line:   []byte("```"),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
-				Terminator: "```",
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Terminator:    "```",
+				Terminator:    []byte("```"),
 				EndLineNumber: 2,
-				Lines:         []string{""},
+				Lines:         stringLines(""),
 			},
 			WantCol: 4,
 			Err:     "done",
@@ -277,16 +407,16 @@ func TestFencedBlock_Line(t *testing.T) {
 		{
 			Name: "content + terminator",
 			Line: parsing.LineInfo{
-				Line:   "content```",
+				Line:   []byte("content```"),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
-				Terminator: "```",
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Terminator:    "```",
+				Terminator:    []byte("```"),
 				EndLineNumber: 2,
-				Lines:         []string{"content"},
+				Lines:         stringLines("content"),
 			},
 			WantCol: 11,
 			Err:     "done",
@@ -295,104 +425,104 @@ func TestFencedBlock_Line(t *testing.T) {
 		{
 			Name: "indented content",
 			Line: parsing.LineInfo{
-				Line:   "  content",
+				Line:   []byte("  content"),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
-				Lines:      []string{"content"},
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
+				Lines:      stringLines("content"),
 			},
 			WantCol: 10,
 		},
 		{
 			Name: "partially indented content",
 			Line: parsing.LineInfo{
-				Line:   " content",
+				Line:   []byte(" content"),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
-				Lines:      []string{"content"},
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
+				Lines:      stringLines("content"),
 			},
 			WantCol: 9,
 		},
 		{
 			Name: "overly indented content",
 			Line: parsing.LineInfo{
-				Line:   "   content",
+				Line:   []byte("   content"),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
-				Lines:      []string{" content"},
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
+				Lines:      stringLines(" content"),
 			},
 			WantCol: 11,
 		},
 		{
 			Name: "overly indented empty line",
 			Line: parsing.LineInfo{
-				Line:   "   ",
+				Line:   []byte("   "),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
-				Lines:      []string{" "},
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
+				Lines:      stringLines(" "),
 			},
 			WantCol: 4,
 		},
 		{
 			Name: "under-indented empty line",
 			Line: parsing.LineInfo{
-				Line:   " ",
+				Line:   []byte(" "),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
-				Indent:     "  ",
-				Terminator: "```",
-				Lines:      []string{""},
+				Indent:     []byte("  "),
+				Terminator: []byte("```"),
+				Lines:      stringLines(""),
 			},
 			WantCol: 2,
 		},
 		{
 			Name: "extra-long terminator",
 			Line: parsing.LineInfo{
-				Line:     "`````",
+				Line:     []byte("`````"),
 				FileName: "extra.md",
 				Number:   2,
 			},
 			FencedBlock: &markdown.FencedBlock{
 				StartLineNumber: 1,
-				Terminator:      "```",
+				Terminator:      []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
 				StartLineNumber: 1,
 				EndLineNumber:   2,
-				Terminator:      "```",
-				Lines:           []string{""},
+				Terminator:      []byte("```"),
+				Lines:           stringLines(""),
 			},
 			WantCol: 6,
 			Warns: []string{
@@ -407,18 +537,18 @@ func TestFencedBlock_Line(t *testing.T) {
 		{
 			Name: "spaces after terminator",
 			Line: parsing.LineInfo{
-				Line:   "```   ",
+				Line:   []byte("```   "),
 				Number: 2,
 			},
 			FencedBlock: &markdown.FencedBlock{
 				StartLineNumber: 1,
-				Terminator:      "```",
+				Terminator:      []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
 				StartLineNumber: 1,
 				EndLineNumber:   2,
-				Terminator:      "```",
-				Lines:           []string{""},
+				Terminator:      []byte("```"),
+				Lines:           stringLines(""),
 			},
 			WantCol: 7,
 			Err:     "done",
@@ -427,19 +557,19 @@ func TestFencedBlock_Line(t *testing.T) {
 		{
 			Name: "text after terminator",
 			Line: parsing.LineInfo{
-				Line:     "``` hi  ",
+				Line:     []byte("``` hi  "),
 				FileName: "extra.md",
 				Number:   2,
 			},
 			FencedBlock: &markdown.FencedBlock{
 				StartLineNumber: 1,
-				Terminator:      "```",
+				Terminator:      []byte("```"),
 			},
 			Want: &markdown.FencedBlock{
 				StartLineNumber: 1,
 				EndLineNumber:   2,
-				Terminator:      "```",
-				Lines:           []string{"``` hi  "},
+				Terminator:      []byte("```"),
+				Lines:           stringLines("``` hi  "),
 			},
 			WantCol: 9,
 			Warns: []string{
@@ -478,7 +608,7 @@ func TestFencedBlock_Line(t *testing.T) {
 func TestQuotedFile_String(t *testing.T) {
 	q := markdown.QuotedFile{
 		Name:   "file.txt",
-		Data:   "test file\n",
+		Data:   []byte("test file\n"),
 		Syntax: "text",
 	}
 	got := q.String()

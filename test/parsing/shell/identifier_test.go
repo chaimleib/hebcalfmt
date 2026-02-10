@@ -73,7 +73,7 @@ func TestParseIdentifier(t *testing.T) {
 			Name: "invalid initial unicode",
 			Rest: "\x80 invalid unicode",
 			Line: parsing.LineInfo{
-				Line:     "\x80 invalid unicode",
+				Line:     []byte("\x80 invalid unicode"),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -87,7 +87,7 @@ func TestParseIdentifier(t *testing.T) {
 			Name: "invalid internal unicode",
 			Rest: "hi\x80 invalid unicode",
 			Line: parsing.LineInfo{
-				Line:     "hi\x80 invalid unicode",
+				Line:     []byte("hi\x80 invalid unicode"),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -101,7 +101,7 @@ func TestParseIdentifier(t *testing.T) {
 			Name: "bad initial digit",
 			Rest: "80invalid",
 			Line: parsing.LineInfo{
-				Line:     "80invalid",
+				Line:     []byte("80invalid"),
 				Number:   1,
 				FileName: "invalid-initial-digit.sh",
 			},
@@ -112,7 +112,7 @@ func TestParseIdentifier(t *testing.T) {
 			Name: "ok",
 			Rest: "ok",
 			Line: parsing.LineInfo{
-				Line:     "ok",
+				Line:     []byte("ok"),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -122,7 +122,7 @@ func TestParseIdentifier(t *testing.T) {
 			Name: "ok mixed",
 			Rest: "_ok_2",
 			Line: parsing.LineInfo{
-				Line:     "_ok_2",
+				Line:     []byte("_ok_2"),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -132,7 +132,7 @@ func TestParseIdentifier(t *testing.T) {
 			Name: "ok after $",
 			Rest: "ok",
 			Line: parsing.LineInfo{
-				Line:     "echo $ok",
+				Line:     []byte("echo $ok"),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -142,7 +142,7 @@ func TestParseIdentifier(t *testing.T) {
 			Name: "ok in assignment",
 			Rest: "ok=true",
 			Line: parsing.LineInfo{
-				Line:     "ok=true",
+				Line:     []byte("ok=true"),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -175,7 +175,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "invalid initial unicode",
 			Rest: "\x80invalid=unicode",
 			Line: parsing.LineInfo{
-				Line:     "\x80invalid=unicode",
+				Line:     []byte("\x80invalid=unicode"),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -189,7 +189,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "invalid internal unicode",
 			Rest: "hi\x80invalid=unicode",
 			Line: parsing.LineInfo{
-				Line:     "hi\x80invalid=unicode",
+				Line:     []byte("hi\x80invalid=unicode"),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -203,7 +203,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "bad initial digit",
 			Rest: "80invalid=value",
 			Line: parsing.LineInfo{
-				Line:     "80invalid=value",
+				Line:     []byte("80invalid=value"),
 				Number:   1,
 				FileName: "invalid-initial-digit.sh",
 			},
@@ -214,7 +214,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "close paren in value",
 			Rest: "key=)value",
 			Line: parsing.LineInfo{
-				Line:     "key=)value",
+				Line:     []byte("key=)value"),
 				Number:   1,
 				FileName: "value-close-paren.sh",
 			},
@@ -225,7 +225,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "missing equal",
 			Rest: "missing equal",
 			Line: parsing.LineInfo{
-				Line:     "missing equal",
+				Line:     []byte("missing equal"),
 				Number:   1,
 				FileName: "missing-equal.sh",
 			},
@@ -236,7 +236,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "invalid string",
 			Rest: "invalid='string",
 			Line: parsing.LineInfo{
-				Line:     "invalid='string",
+				Line:     []byte("invalid='string"),
 				Number:   1,
 				FileName: "invalid-string.sh",
 			},
@@ -250,7 +250,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "ok raw",
 			Rest: "ok=value",
 			Line: parsing.LineInfo{
-				Line:     "ok=value",
+				Line:     []byte("ok=value"),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -261,7 +261,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "ok squote",
 			Rest: "ok='value'",
 			Line: parsing.LineInfo{
-				Line:     "ok='value'",
+				Line:     []byte("ok='value'"),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -272,7 +272,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "ok dquote",
 			Rest: `ok="value"`,
 			Line: parsing.LineInfo{
-				Line:     `ok="value"`,
+				Line:     []byte(`ok="value"`),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -283,7 +283,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "ok mixed",
 			Rest: `_ok_2=v'al'"ue"`,
 			Line: parsing.LineInfo{
-				Line:     `_ok_2=v'al'"ue"`,
+				Line:     []byte(`_ok_2=v'al'"ue"`),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -294,7 +294,7 @@ func TestParseAssignment(t *testing.T) {
 			Name: "ok in series",
 			Rest: "ok=value other=item",
 			Line: parsing.LineInfo{
-				Line:     "name=Joe ok=value other=item",
+				Line:     []byte("name=Joe ok=value other=item"),
 				Number:   1,
 				FileName: "ok.sh",
 			},

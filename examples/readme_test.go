@@ -2,26 +2,33 @@ package examples_test
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/chaimleib/hebcalfmt/test/parsing"
 	"github.com/chaimleib/hebcalfmt/test/parsing/markdown"
+	"github.com/chaimleib/hebcalfmt/test/parsing/shell"
 	"github.com/chaimleib/hebcalfmt/warning"
 )
 
 // ReadmeCase describes a sample run documented in a Markdown file.
 type ReadmeCase struct {
-	Files  map[string]markdown.QuotedFile
-	Envs   map[string]string
-	Args   string
-	Output string
+	// Files are files quoted previous to the bash Command in the markdown.
+	Files map[string]markdown.QuotedFile
+
+	// Command is the bash command, which may have inline variables
+	// which override the global environment variables.
+	Command *shell.Command
+
+	// Output holds the expected output from the running the bash Command
+	// with the given context.
+	Output []byte
 }
 
 func NewReadmeCase() ReadmeCase {
@@ -30,88 +37,80 @@ func NewReadmeCase() ReadmeCase {
 	}
 }
 
+var ErrSkip = errors.New("skipping code block, not an example")
+
 func (c *ReadmeCase) ParseBashExample(
 	rc *ReadmeContext,
 	b markdown.FencedBlock,
-) (warns warning.Warnings, errs []error) {
+) (warns warning.Warnings, err error) {
 	lines := b.Lines
 
-	// bash examples should have a leading $
-	// and be more than one line long to show output.
-	if len(lines) < 2 ||
-		!strings.HasPrefix(lines[0], "$ ") ||
-		!strings.Contains(lines[0], " hebcalfmt ") {
-
-		fmt.Fprintf(
-			rc.DebugWriter,
-			`debug: skipping non-example "bash"-language block, must >=2 lines AND "$ " prefix AND contain " hebcalfmt": line 1 of %d: %s`+"\n",
-			len(lines),
-			lines[0],
-		)
-		return nil, nil
-	}
-
-	line := parsing.LineInfo{
+	li := parsing.LineInfo{
 		FileName: rc.FileName,
 		Number:   b.StartLineNumber + 1,
 		Line:     lines[0], // missing possible indent, but close enough
 	}
-	cmd := strings.TrimPrefix(lines[0], "$ ")
-	envs, args, _ := strings.Cut(cmd, "hebcalfmt ")
-	rc.ProgressCase.Args = strings.TrimSpace(args)
-	rest := strings.TrimSpace(envs)
-	if rest != "" {
-		rc.ProgressCase.Envs = make(map[string]string)
-		for rest != "" {
-			var key string
-			var ok bool
-			key, rest, ok = strings.Cut(rest, "=")
-			if !ok {
-				col := strings.LastIndex(line.Line, key) + 1
-				errs = append(errs, parsing.NewSyntaxError(
-					line, col, 0, errors.New(
-						"failed to parse envs, expected = after this point",
-					)))
-			}
 
-			if rest == "" {
-				rc.ProgressCase.Envs[key] = ""
-				break
-			}
-
-			var value string
-			if rest, ok = strings.CutPrefix(rest, `"`); ok {
-				// not exactly right, missing escapes. But close enough for now.
-				value, rest, ok = strings.Cut(rest, `"`)
-				if !ok {
-					col := strings.LastIndex(line.Line, value) + 1
-					errs = append(errs, parsing.NewSyntaxError(
-						line, col, 0, errors.New(
-							"failed to parse envs, expected \" after this point",
-						)))
-					return warns, errs
-				}
-			} else if rest, ok = strings.CutPrefix(rest, "'"); ok {
-				value, rest, ok = strings.Cut(rest, "'")
-				if !ok {
-					col := strings.LastIndex(line.Line, value) + 1
-					errs = append(errs, parsing.NewSyntaxError(
-						line, col, 0, errors.New(
-							"failed to parse envs, expected ' after this point",
-						)))
-					return warns, errs
-				}
-			} else {
-				value, rest, _ = strings.Cut(rest, " ")
-			}
-			rc.ProgressCase.Envs[key] = value
-			rest = strings.TrimLeft(rest, " \t")
-		}
+	// bash examples should have a leading $
+	// and be more than one line long to show output.
+	if len(lines) < 2 {
+		fmt.Fprintf(
+			rc.DebugWriter,
+			`debug: %s:%d: skipping non-example "bash"-language block, must have at least 2 lines, had %d`+"\n%s\n",
+			li.FileName,
+			li.Number,
+			len(lines),
+			lines[0],
+		)
+		return nil, ErrSkip
 	}
 
-	rc.ProgressCase.Output = strings.Join(lines[1:], "\n")
+	afterDollar, ok := bytes.CutPrefix(lines[0], []byte("$ "))
+	if !ok {
+		fmt.Fprintf(
+			rc.DebugWriter,
+			`debug: %s:%d: skipping non-example "bash"-language block, must have "$ " prefix`+"\n%s\n",
+			li.FileName,
+			li.Number,
+			lines[0],
+		)
+		return nil, ErrSkip
+	}
+	cmd, rest, err := shell.ParseCommand(li, afterDollar)
+	if err != nil {
+		fmt.Fprintf(
+			rc.DebugWriter,
+			`debug: %s:%d: skipping non-example "bash"-language block, must contain command on first line`+"\n%s\n%v\n",
+			li.FileName,
+			li.Number,
+			lines[0],
+			err,
+		)
+		return nil, ErrSkip
+	}
 
-	return warns, errs
+	if cmd.Name != "hebcalfmt" {
+		fmt.Fprintf(
+			rc.DebugWriter,
+			`debug: %s:%d: skipping non-example "bash"-language block, must be a hebcalfmt invocation`+"\n%s\n%v\n",
+			li.FileName,
+			li.Number,
+			lines[0],
+			err,
+		)
+		return nil, ErrSkip
+	}
+
+	rc.ProgressCase.Command = cmd
+	if rest = shell.TrimSpace(rest); len(rest) != 0 {
+		err = parsing.NewSyntaxError(
+			li, len(li.Line)-len(rest)+1, 0,
+			errors.New("unexpected chars after command"))
+	}
+
+	rc.ProgressCase.Output = bytes.Join(lines[1:], []byte("\n"))
+
+	return warns, err
 }
 
 func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
@@ -128,7 +127,7 @@ func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
 			scanner := bufio.NewScanner(f)
 			var scannerDone bool
 			var lineNumber int
-			for quotedLine := range strings.SplitSeq(quoted.Data, "\n") {
+			for quotedLine := range bytes.SplitSeq(quoted.Data, []byte("\n")) {
 				if scannerDone {
 					t.Errorf(
 						"fence block at %s:%d ran out of lines before file at %s:%d",
@@ -142,8 +141,8 @@ func (c ReadmeCase) CheckQuotedFilesMatch(t *testing.T, rc ReadmeContext) {
 
 				lineNumber++
 				scannerDone = !scanner.Scan()
-				readLine := scanner.Text()
-				if readLine != quotedLine {
+				readLine := scanner.Bytes()
+				if !bytes.Equal(readLine, quotedLine) {
 					t.Errorf(
 						"found difference at -\nread %s:%d:\n%s\nfence block line at %s:%d:\n%s",
 						fname,
@@ -179,9 +178,9 @@ func (c ReadmeCase) String() string {
 	}
 
 	return fmt.Sprintf(
-		"ReadmeCase<Files: %s; Args: %q; Output<%d>: %q%s>",
+		"ReadmeCase<Files: %s; Command: %q; Output<%d>: %q%s>",
 		c.Files,
-		c.Args,
+		c.Command,
 		len(c.Output),
 		outputClip,
 		outputEllipsis,
@@ -232,24 +231,24 @@ var syntaxExts = map[string]string{
 
 func (rc *ReadmeContext) FencedBlock(
 	b *markdown.FencedBlock,
-) (warning.Warnings, []error) {
-	info := strings.TrimSpace(rc.ProgressBlock.Info)
-	syntax, _, _ := strings.Cut(info, " ")
+) (warning.Warnings, error) {
+	info := markdown.TrimSpace(rc.ProgressBlock.Info)
+	syntax, _, _ := bytes.Cut(info, []byte(" "))
 	defer func() {
 		rc.ProgressBlock = nil
 		rc.LastNonemptyLine = nil
 	}()
 
 	var warns warning.Warnings
-	var errs []error
 
-	switch syntax {
+	switch syntax := string(syntax); syntax {
 	case "bash":
-		subwarns, suberrs := rc.ProgressCase.ParseBashExample(rc, *b)
+		subwarns, err := rc.ProgressCase.ParseBashExample(rc, *b)
 		warns = append(warns, subwarns...)
-		errs = append(errs, suberrs...)
-		if len(suberrs) != 0 {
-			return warns, errs
+		if errors.Is(err, ErrSkip) {
+			return warns, nil
+		} else if err != nil {
+			return warns, err
 		}
 
 		rc.Cases = append(rc.Cases, rc.ProgressCase)
@@ -263,64 +262,54 @@ func (rc *ReadmeContext) FencedBlock(
 				syntax,
 				rc.ProgressBlock,
 			)
-			return warns, errs
+			return warns, nil
 		}
 
 		wantExt, ok := syntaxExts[syntax]
 		if !ok { // should be unreachable
-			errs = append(errs, fmt.Errorf(
+			return warns, fmt.Errorf(
 				"unreachable: unknown ext for syntax %q (from %s:%d)",
-				syntax, rc.FileName, b.StartLineNumber))
-			return warns, errs
+				syntax, rc.FileName, b.StartLineNumber)
 		}
 
-		fname := strings.TrimSpace(rc.LastNonemptyLine.Line)
-		if fname, ok = strings.CutPrefix(fname, "<summary>"); ok {
-			if fname, ok = strings.CutSuffix(fname, "</summary>"); !ok {
-				col := 1 + strings.Index(rc.LastNonemptyLine.Line, fname[:1])
-				errs = append(errs, parsing.NewSyntaxError(
-					*rc.LastNonemptyLine, col, col+len(fname),
-					fmt.Errorf("missing </summary> tag: %s (from %s:%d)",
+		lineLen := len(rc.LastNonemptyLine.Line)
+		fname := markdown.TrimSpace(rc.LastNonemptyLine.Line)
+		fnameCol := 1 + lineLen - len(fname)
+		if fname, ok = bytes.CutPrefix(fname, []byte("<summary>")); ok {
+			fnameCol += 1 + lineLen - len(fname)
+			if fname, ok = bytes.CutSuffix(fname, []byte("</summary>")); !ok {
+				return warns, parsing.NewSyntaxError(
+					*rc.LastNonemptyLine, fnameCol, fnameCol+len(fname),
+					fmt.Errorf(
+						"missing </summary> tag: %s (from %s:%d)",
 						fname,
 						rc.FileName, // usually README.md
 						rc.LastNonemptyLine.Number,
-					)))
+					),
+				)
 			}
 		}
 
 		// Check for wantExt; if not there, LastNonemptyLine is probably not a file
 		// and we should skip it.
-		if !strings.HasSuffix(fname, wantExt) {
+		if !bytes.HasSuffix(fname, []byte(wantExt)) {
 			fmt.Fprintf(
 				rc.DebugWriter,
-				"debug: skipping likely non-file, as LastNonemptyLine is missing the wantExt %q: %q\n",
+				"debug: %s:%d: skipping likely non-file, as LastNonemptyLine is missing the wantExt %q: %q\n",
+				rc.FileName,
+				b.StartLineNumber,
 				wantExt,
 				fname,
 			)
-			return warns, errs
+			return warns, nil
 		}
 
-		col := 1 + strings.Index(rc.LastNonemptyLine.Line, fname[:1])
-		_, err := rc.Stat(fname)
-		if err != nil {
-			errs = append(errs, parsing.NewSyntaxError(
-				*rc.LastNonemptyLine,
-				col,
-				col+len(fname),
-				fmt.Errorf("failed to stat: %s (from %s:%d): %w",
-					fname,
-					rc.FileName, // usually README.md
-					rc.LastNonemptyLine.Number,
-					err,
-				)))
-			break
-		}
-
-		rc.ProgressCase.Files[fname] = markdown.QuotedFile{
-			Name:   fname,
-			Block:  rc.ProgressBlock,
-			Data:   strings.Join(b.Lines, "\n"),
-			Syntax: syntax,
+		rc.ProgressCase.Files[string(fname)] = markdown.QuotedFile{
+			Name:         string(fname),
+			NamePosition: rc.LastNonemptyLine.Position(fnameCol),
+			Block:        rc.ProgressBlock,
+			Data:         bytes.Join(b.Lines, []byte("\n")),
+			Syntax:       syntax,
 		}
 
 	default:
@@ -328,40 +317,48 @@ func (rc *ReadmeContext) FencedBlock(
 			syntax, b)
 	}
 
-	return warns, errs
+	return warns, nil
 }
 
-func (rc *ReadmeContext) Line(lineStr string) (warning.Warnings, []error) {
+func (rc *ReadmeContext) Line(
+	line []byte,
+) (warns warning.Warnings, errs []error) {
 	col := 1
-	var warns, subwarns warning.Warnings
+	var subwarns warning.Warnings
 	var err error
-	var errs, suberrs []error
 
 	rc.LineNum++
-	line := parsing.LineInfo{
+	li := &parsing.LineInfo{
 		FileName: rc.FileName,
-		Line:     lineStr,
+		Line:     line,
 		Number:   rc.LineNum,
 	}
 	if rc.ProgressBlock == nil {
 		rc.ProgressBlock, col, subwarns, err = markdown.NewFencedBlock(
-			line, col)
+			*li,
+			col,
+			false,
+		)
 	} else {
-		col, subwarns, err = rc.ProgressBlock.Line(line, col)
+		col, subwarns, err = rc.ProgressBlock.Line(*li, col)
 	}
 	warns = append(warns, subwarns...)
 	if errors.Is(err, markdown.ErrDone) {
-		subwarns, suberrs = rc.FencedBlock(rc.ProgressBlock)
+		subwarns, err = rc.FencedBlock(rc.ProgressBlock) // save the block
 		warns = append(warns, subwarns...)
-		errs = append(errs, suberrs...)
+		if err != nil {
+			errs = append(errs, err)
+		}
 	} else if errors.Is(err, markdown.ErrNoMatch) { // no code block
-		if trimmed := strings.TrimSpace(lineStr); trimmed != "" {
-			rc.LastNonemptyLine = &line
+		if trimmed := markdown.TrimSpace(line); len(trimmed) > 0 {
+			rc.LastNonemptyLine = li
 		} else if rc.LastNonemptyLine != nil &&
-			line.Number-rc.LastNonemptyLine.Number >= rc.MaxMemoryLines {
+			li.Number-rc.LastNonemptyLine.Number >= rc.MaxMemoryLines {
 
 			rc.LastNonemptyLine = nil
 		}
+	} else if err != nil {
+		errs = append(errs, err)
 	}
 
 	return warns, errs
@@ -380,7 +377,7 @@ func TestReadme(t *testing.T) {
 	rc := NewReadmeContext(fpath)
 	scanner := bufio.NewScanner(readme)
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := scanner.Bytes()
 		subwarns, suberrs := rc.Line(line)
 		warns = append(warns, subwarns...)
 		errs = append(errs, suberrs...)

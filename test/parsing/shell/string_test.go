@@ -22,7 +22,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "missing quotes",
 			Line: parsing.LineInfo{
-				Line:     "noquotes",
+				Line:     []byte("noquotes"),
 				Number:   1,
 				FileName: "missing.sh",
 			},
@@ -33,7 +33,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "ok",
 			Line: parsing.LineInfo{
-				Line:     `"ok"`,
+				Line:     []byte(`"ok"`),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -43,7 +43,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "missing end quote",
 			Line: parsing.LineInfo{
-				Line:     `"missing end`,
+				Line:     []byte(`"missing end`),
 				Number:   1,
 				FileName: "missing-end.sh",
 			},
@@ -57,7 +57,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "ok escaped quote",
 			Line: parsing.LineInfo{
-				Line:     `"ok \""`,
+				Line:     []byte(`"ok \""`),
 				Number:   1,
 				FileName: "ok-quote.sh",
 			},
@@ -67,7 +67,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "ok surrounded escaped quote",
 			Line: parsing.LineInfo{
-				Line:     `"ok \" quotes"`,
+				Line:     []byte(`"ok \" quotes"`),
 				Number:   1,
 				FileName: "ok-quotes.sh",
 			},
@@ -77,7 +77,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "missing escaped char",
 			Line: parsing.LineInfo{
-				Line:     `"missing escape \`,
+				Line:     []byte(`"missing escape \`),
 				Number:   1,
 				FileName: "missing-escape.sh",
 			},
@@ -91,7 +91,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "multibyte unicode",
 			Line: parsing.LineInfo{
-				Line:     `"🤩"`,
+				Line:     []byte(`"🤩"`),
 				Number:   1,
 				FileName: "multibyte-unicode.sh",
 			},
@@ -101,7 +101,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "invalid 1-byte unicode",
 			Line: parsing.LineInfo{
-				Line:     "\"\x80 is invalid unicode\"",
+				Line:     []byte("\"\x80 is invalid unicode\""),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -115,7 +115,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "invalid 2-byte unicode",
 			Line: parsing.LineInfo{
-				Line:     "\"\xc0\x80 is invalid unicode\"",
+				Line:     []byte("\"\xc0\x80 is invalid unicode\""),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -129,7 +129,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "invalid escaped 1-byte unicode",
 			Line: parsing.LineInfo{
-				Line:     "\"\\\x80 is invalid unicode\"",
+				Line:     []byte("\"\\\x80 is invalid unicode\""),
 				Number:   1,
 				FileName: "invalid-unicode-escape.sh",
 			},
@@ -143,7 +143,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "escape nl",
 			Line: parsing.LineInfo{
-				Line:     `"escape \n"`,
+				Line:     []byte(`"escape \n"`),
 				Number:   1,
 				FileName: "escape-nl.sh",
 			},
@@ -153,7 +153,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "escape cr",
 			Line: parsing.LineInfo{
-				Line:     `"escape \r"`,
+				Line:     []byte(`"escape \r"`),
 				Number:   1,
 				FileName: "escape-cr.sh",
 			},
@@ -163,7 +163,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "escape tab",
 			Line: parsing.LineInfo{
-				Line:     `"escape \t"`,
+				Line:     []byte(`"escape \t"`),
 				Number:   1,
 				FileName: "escape-tab.sh",
 			},
@@ -173,7 +173,7 @@ func TestParseShellStringDquote(t *testing.T) {
 		{
 			Name: "missing quote after escaped quote",
 			Line: parsing.LineInfo{
-				Line:     `"missing close\"`,
+				Line:     []byte(`"missing close\"`),
 				Number:   1,
 				FileName: "missing-close.sh",
 			},
@@ -212,7 +212,7 @@ func TestParseShellStringSquote(t *testing.T) {
 		{
 			Name: "missing quotes",
 			Line: parsing.LineInfo{
-				Line:     "noquotes",
+				Line:     []byte("noquotes"),
 				Number:   1,
 				FileName: "missing.sh",
 			},
@@ -223,7 +223,7 @@ func TestParseShellStringSquote(t *testing.T) {
 		{
 			Name: "ok",
 			Line: parsing.LineInfo{
-				Line:     `'ok'`,
+				Line:     []byte(`'ok'`),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -233,7 +233,7 @@ func TestParseShellStringSquote(t *testing.T) {
 		{
 			Name: "missing end quote",
 			Line: parsing.LineInfo{
-				Line:     `'missing end`,
+				Line:     []byte(`'missing end`),
 				Number:   1,
 				FileName: "missing-end.sh",
 			},
@@ -247,7 +247,7 @@ func TestParseShellStringSquote(t *testing.T) {
 		{
 			Name: "ok literal backslash",
 			Line: parsing.LineInfo{
-				Line:     `'ok \'`,
+				Line:     []byte(`'ok \'`),
 				Number:   1,
 				FileName: "ok-literal.sh",
 			},
@@ -257,7 +257,7 @@ func TestParseShellStringSquote(t *testing.T) {
 		{
 			Name: "ok surrounded literal backslash",
 			Line: parsing.LineInfo{
-				Line:     `'ok \ literal'`,
+				Line:     []byte(`'ok \ literal'`),
 				Number:   1,
 				FileName: "ok-surrounded-literal.sh",
 			},
@@ -292,7 +292,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "unexpected quotes",
 			Line: parsing.LineInfo{
-				Line:     "'unexpected quote",
+				Line:     []byte("'unexpected quote"),
 				Number:   1,
 				FileName: "unexpected-quote.sh",
 			},
@@ -303,7 +303,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "ok",
 			Line: parsing.LineInfo{
-				Line:     `ok`,
+				Line:     []byte(`ok`),
 				Number:   1,
 				FileName: "ok.sh",
 			},
@@ -313,7 +313,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "ok before space",
 			Line: parsing.LineInfo{
-				Line:     `ok ignored`,
+				Line:     []byte(`ok ignored`),
 				Number:   1,
 				FileName: "ok-space.sh",
 			},
@@ -324,7 +324,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "ok escaped space",
 			Line: parsing.LineInfo{
-				Line:     `ok\ good`,
+				Line:     []byte(`ok\ good`),
 				Number:   1,
 				FileName: "ok-esc-space.sh",
 			},
@@ -334,7 +334,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "ok trailing escape",
 			Line: parsing.LineInfo{
-				Line:     `ok\<`,
+				Line:     []byte(`ok\<`),
 				Number:   1,
 				FileName: "ok-esc-literal.sh",
 			},
@@ -344,7 +344,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "ok surrounded literal backslash",
 			Line: parsing.LineInfo{
-				Line:     `ok\\literal`,
+				Line:     []byte(`ok\\literal`),
 				Number:   1,
 				FileName: "ok-surrounded-literal.sh",
 			},
@@ -354,7 +354,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "ok flag",
 			Line: parsing.LineInfo{
-				Line:     `-v`,
+				Line:     []byte(`-v`),
 				Number:   1,
 				FileName: "ok-flag.sh",
 			},
@@ -364,7 +364,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "ok option",
 			Line: parsing.LineInfo{
-				Line:     `--color=auto`,
+				Line:     []byte(`--color=auto`),
 				Number:   1,
 				FileName: "ok-option.sh",
 			},
@@ -374,7 +374,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "missing escape",
 			Line: parsing.LineInfo{
-				Line:     `missingEscape\`,
+				Line:     []byte(`missingEscape\`),
 				Number:   1,
 				FileName: "missing-esc.sh",
 			},
@@ -388,7 +388,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "multibyte unicode",
 			Line: parsing.LineInfo{
-				Line:     `🤩`,
+				Line:     []byte(`🤩`),
 				Number:   1,
 				FileName: "multibyte-unicode.sh",
 			},
@@ -398,7 +398,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "invalid 1-byte unicode",
 			Line: parsing.LineInfo{
-				Line:     "\x80 is invalid unicode",
+				Line:     []byte("\x80 is invalid unicode"),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -412,7 +412,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "invalid 2-byte unicode",
 			Line: parsing.LineInfo{
-				Line:     "\xc0\x80 is invalid unicode",
+				Line:     []byte("\xc0\x80 is invalid unicode"),
 				Number:   1,
 				FileName: "invalid-unicode.sh",
 			},
@@ -426,7 +426,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "invalid escaped 1-byte unicode",
 			Line: parsing.LineInfo{
-				Line:     "\\\x80 is invalid unicode",
+				Line:     []byte("\\\x80 is invalid unicode"),
 				Number:   1,
 				FileName: "invalid-unicode-escape.sh",
 			},
@@ -440,7 +440,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "todo backtick",
 			Line: parsing.LineInfo{
-				Line:     "`",
+				Line:     []byte("`"),
 				Number:   1,
 				FileName: "todo-backtick.sh",
 			},
@@ -451,7 +451,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "todo history",
 			Line: parsing.LineInfo{
-				Line:     "!-1",
+				Line:     []byte("!-1"),
 				Number:   1,
 				FileName: "todo-history.sh",
 			},
@@ -462,7 +462,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "todo subshell",
 			Line: parsing.LineInfo{
-				Line:     "$(echo a)",
+				Line:     []byte("$(echo a)"),
 				Number:   1,
 				FileName: "todo-subshell.sh",
 			},
@@ -473,7 +473,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "todo glob",
 			Line: parsing.LineInfo{
-				Line:     "*glob",
+				Line:     []byte("*glob"),
 				Number:   1,
 				FileName: "todo-glob.sh",
 			},
@@ -484,7 +484,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "var",
 			Line: parsing.LineInfo{
-				Line:     "var$name",
+				Line:     []byte("var$name"),
 				Number:   1,
 				FileName: "todo-var.sh",
 			},
@@ -495,7 +495,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "unexpected close bracket",
 			Line: parsing.LineInfo{
-				Line:     "unpaired]",
+				Line:     []byte("unpaired]"),
 				Number:   1,
 				FileName: "unexpected-close.sh",
 			},
@@ -506,7 +506,7 @@ func TestParseShellStringRaw(t *testing.T) {
 		{
 			Name: "redirection",
 			Line: parsing.LineInfo{
-				Line:     "input>output",
+				Line:     []byte("input>output"),
 				Number:   1,
 				FileName: "redirection.sh",
 			},
@@ -542,7 +542,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "raw",
 			Line: parsing.LineInfo{
-				Line:     "raw",
+				Line:     []byte("raw"),
 				Number:   1,
 				FileName: "raw.sh",
 			},
@@ -552,7 +552,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "raw trailing paren",
 			Line: parsing.LineInfo{
-				Line:     "raw)",
+				Line:     []byte("raw)"),
 				Number:   1,
 				FileName: "raw-trail-paren.sh",
 			},
@@ -563,7 +563,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "squote",
 			Line: parsing.LineInfo{
-				Line:     "'squote'",
+				Line:     []byte("'squote'"),
 				Number:   1,
 				FileName: "squote.sh",
 			},
@@ -573,7 +573,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "dquote",
 			Line: parsing.LineInfo{
-				Line:     `"'dquote'"`,
+				Line:     []byte(`"'dquote'"`),
 				Number:   1,
 				FileName: "dquote.sh",
 			},
@@ -583,7 +583,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "combo",
 			Line: parsing.LineInfo{
-				Line:     `"'dquote'"'squote'raw`,
+				Line:     []byte(`"'dquote'"'squote'raw`),
 				Number:   1,
 				FileName: "combo.sh",
 			},
@@ -593,7 +593,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "ok flag",
 			Line: parsing.LineInfo{
-				Line:     `-v`,
+				Line:     []byte(`-v`),
 				Number:   1,
 				FileName: "ok-flag.sh",
 			},
@@ -603,7 +603,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "ok option",
 			Line: parsing.LineInfo{
-				Line:     `--color="auto"`,
+				Line:     []byte(`--color="auto"`),
 				Number:   1,
 				FileName: "ok-option.sh",
 			},
@@ -613,7 +613,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "raw with close curly",
 			Line: parsing.LineInfo{
-				Line:     `raw}curly`,
+				Line:     []byte(`raw}curly`),
 				Number:   1,
 				FileName: "raw-curly.sh",
 			},
@@ -624,7 +624,7 @@ func TestParseShellString(t *testing.T) {
 		{
 			Name: "raw then space",
 			Line: parsing.LineInfo{
-				Line:     "raw space",
+				Line:     []byte("raw space"),
 				Number:   1,
 				FileName: "raw-space.sh",
 			},

@@ -1,15 +1,13 @@
 package markdown
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/chaimleib/hebcalfmt/test/parsing"
 	"github.com/chaimleib/hebcalfmt/warning"
 )
-
-const FenceChars = "`~"
 
 var (
 	ErrNoMatch = errors.New("no match")
@@ -29,13 +27,13 @@ type FencedBlock struct {
 	// Info is the word immediately after the starting quotes of the block.
 	// There may be spaces after the fence start before the [Info],
 	// but no line breaks.
-	Info string
+	Info []byte
 
 	// Indent contains the indent string that was present
 	// before the starting fence.
 	// Partial or full matches of this will be removed from inner lines
 	// before appending to [Lines].
-	Indent string
+	Indent []byte
 
 	// Terminator is the value of the trimmed line which will end the block.
 	// This is not always "```"; it may be "~~~",
@@ -49,10 +47,45 @@ type FencedBlock struct {
 	// although it is bad form to do so.
 	//
 	// A [Terminator] may occur after the starting fence on the same line.
-	Terminator string
+	Terminator []byte
 
 	// Lines holds the inner lines between the fences.
-	Lines []string
+	Lines [][]byte
+
+	// ShareMem controls whether byte slices should rely on the provided buffer
+	// for backing storage, or should copy the slice to new storage
+	// owned by this struct.
+	// When reading a file piecemeal through a reused buffer,
+	// e.g. io/bufio.Scanner, this should be false.
+	// Otherwise, the backing storage can be overwritten,
+	// corrupting this struct's byte slices.
+	ShareMem bool
+}
+
+func (fb FencedBlock) Format(f fmt.State, verb rune) {
+	fmt.Fprintf(
+		f,
+		"markdown.FencedBlock<[%d %d] Info:%q Indent:%q Terminator:%q Lines[%d]>",
+		fb.StartLineNumber,
+		fb.EndLineNumber,
+		string(fb.Info),
+		string(fb.Indent),
+		string(fb.Terminator),
+		len(fb.Lines),
+	)
+}
+
+func IsFenceChar(b byte) bool {
+	return b == '`' || b == '~'
+}
+
+func CopyOf(s []byte, shareMem bool) []byte {
+	if shareMem {
+		return s
+	}
+	buf := make([]byte, len(s))
+	copy(buf, s)
+	return buf
 }
 
 // NewFencedBlock returns a new [FencedBlock] if line contains a starting fence.
@@ -60,11 +93,13 @@ type FencedBlock struct {
 // In case the [Terminator][FencedBlock.Terminator] is on the same line,
 // the caller should check for [ErrDone].
 func NewFencedBlock(
-	line parsing.LineInfo,
+	li parsing.LineInfo,
 	col int,
+	shareMem bool,
 ) (*FencedBlock, int, warning.Warnings, error) {
 	b := &FencedBlock{
-		StartLineNumber: line.Number,
+		StartLineNumber: li.Number,
+		ShareMem:        shareMem,
 	}
 	var warns warning.Warnings
 
@@ -73,36 +108,34 @@ func NewFencedBlock(
 	}
 	startCol := col
 
-	// Detect indent, only if at line start.
-	rest := line.Line[startCol-1:]
+	rest := li.Line[startCol-1:]
 	var indentLen int
-	if col == 1 {
-		rest = strings.TrimLeft(line.Line, " ")
-		indentLen = len(line.Line) - len(rest)
+	// Detect indent, only if at line start.
+	if startCol == 1 {
+		rest = bytes.TrimLeft(rest, " ")
+		indentLen = len(li.Line) - len(rest)
 		// Up to 3 chars indent allowed. Tabs are counted as 4 spaces.
 		// https://spec.commonmark.org/0.31.2/#tabs
-		if indentLen > 3 || strings.ContainsRune(rest, '\t') {
+		if indentLen > 3 {
 			return nil, startCol, warns, ErrNoMatch
 		}
 		if indentLen > 0 {
-			b.Indent = line.Line[:indentLen]
+			b.Indent = CopyOf(li.Line[:indentLen], b.ShareMem)
 			col += indentLen
 		}
 	}
 
 	// Detect starting fence.
-	var fenceLen int
-	if rest == "" || !strings.Contains(FenceChars, rest[:1]) {
+	if len(rest) == 0 || !IsFenceChar(rest[0]) {
 		return nil, startCol, warns, ErrNoMatch
 	}
 
 	// Count the fence chars
-	defenced := strings.TrimLeft(rest, rest[:1])
-	fenceLen = len(rest) - len(defenced)
+	defenced, fenceLen := TrimRepeating(rest)
 	if fenceLen <= 2 {
 		if fenceLen == 2 { // not a code fence, but warn about it
 			warns.Append(parsing.NewSyntaxError(
-				line, col, col+fenceLen-1, errors.New(
+				li, col, col+fenceLen-1, errors.New(
 					"code fences should be at least 3 chars long",
 				),
 			))
@@ -111,14 +144,14 @@ func NewFencedBlock(
 	} // found a code fence
 
 	// Is it the first thing after the indent?
-	if line.Line[:col-1] != b.Indent {
-		warns.Append(parsing.NewSyntaxError(line, col, 0, errors.New(
+	if !bytes.Equal(li.Line[:col-1], b.Indent[:indentLen]) {
+		warns.Append(parsing.NewSyntaxError(li, col, 0, errors.New(
 			"code fence interrupts a line, try breaking the line here",
 		)))
 		return nil, startCol, warns, ErrNoMatch
 	}
 
-	b.Terminator = rest[:fenceLen]
+	b.Terminator = CopyOf(rest[:fenceLen], b.ShareMem)
 	col += fenceLen
 	rest = defenced
 	// We have entered just past the starting code block fence.
@@ -126,7 +159,7 @@ func NewFencedBlock(
 	// Detect Info or inner line until the EOL or Terminator.
 	var subwarns warning.Warnings
 	var err error
-	col, subwarns, err = b.Line(line, col)
+	col, subwarns, err = b.Line(li, col)
 	warns = append(warns, subwarns...)
 	if err != nil {
 		return nil, startCol, warns, err
@@ -134,7 +167,7 @@ func NewFencedBlock(
 	return b, col, warns, nil
 }
 
-func (b *FencedBlock) appendInnerLine(l string) {
+func (b *FencedBlock) appendInnerLine(l []byte) {
 	var indent int
 	for indent = range b.Indent {
 		if indent >= len(l) {
@@ -145,7 +178,7 @@ func (b *FencedBlock) appendInnerLine(l string) {
 		}
 		indent++ // overwritten if loop continues
 	}
-	b.Lines = append(b.Lines, l[indent:])
+	b.Lines = append(b.Lines, CopyOf(l[indent:], b.ShareMem))
 }
 
 // line interprets a new line of markdown, starting from col,
@@ -160,6 +193,7 @@ func (b *FencedBlock) Line(
 	}
 	startCol := col
 	rest := line.Line[col-1:]
+	orig := rest
 	var warns warning.Warnings
 	isStartLine := b.StartLineNumber == line.Number
 
@@ -167,19 +201,19 @@ func (b *FencedBlock) Line(
 	// any "terminator" here is not a terminator, just text.
 	// So, put the rest into info.
 	if isStartLine && b.Terminator[0] != '`' {
-		b.Info = rest
+		b.Info = CopyOf(rest, b.ShareMem)
 		col += len(rest)
 		return col, warns, nil
 	}
 
 	// Find the Terminator.
-	terminatorIdx := strings.Index(rest, b.Terminator)
+	terminatorIdx := bytes.Index(rest, b.Terminator)
 	// If NOT found, finish processing the line here.
 	if terminatorIdx < 0 {
 		// If on the start line,
 		if isStartLine {
 			// save the rest to info.
-			b.Info = rest
+			b.Info = CopyOf(rest, b.ShareMem)
 			// Otherwise,
 		} else {
 			// trim indent and append.
@@ -193,7 +227,7 @@ func (b *FencedBlock) Line(
 
 	// Should we save to the info string?
 	if isStartLine {
-		b.Info = rest[:terminatorIdx]
+		b.Info = CopyOf(rest[:terminatorIdx], b.ShareMem)
 		warns.Append(parsing.NewSyntaxError(line, col, 0, errors.New(
 			"possible fenced code block begins and ends on the same line, try splitting the line here",
 		)))
@@ -211,8 +245,7 @@ func (b *FencedBlock) Line(
 	rest = rest[terminatorIdx:]
 
 	// More terminator chars than required are allowed; count them.
-	defenced := strings.TrimLeft(rest, b.Terminator[:1])
-	terminatorLen := len(rest) - len(defenced)
+	defenced, terminatorLen := TrimRepeating(rest)
 	if terminatorLen != len(b.Terminator) {
 		// Build some info about the starting fence.
 		startLine := fmt.Sprintf("on line %d", b.StartLineNumber)
@@ -227,12 +260,11 @@ func (b *FencedBlock) Line(
 	}
 	// Either there is nothing but spaces after the fence,
 	// or there is content which means this line is not the end.
-	terminator := rest[:terminatorLen]
 	col += terminatorLen
 	rest = defenced
 
-	trimmed := strings.TrimLeft(rest, " \t")
-	if trimmed != "" {
+	trimmed := TrimSpace(rest)
+	if len(trimmed) > 0 {
 		warns.Append(
 			parsing.NewSyntaxError(
 				line,
@@ -243,20 +275,21 @@ func (b *FencedBlock) Line(
 				),
 			),
 		)
-		innerLine += terminator + rest
-		col += len(defenced)
+		innerLine = orig
+		col = startCol + len(orig)
 		return col, warns, nil
 	}
 
-	col += len(defenced)
+	col += len(rest) // EOL, potentially after spaces
 	return col, warns, ErrDone
 }
 
 type QuotedFile struct {
-	Name   string
-	Block  *FencedBlock
-	Data   string
-	Syntax string
+	Name         string
+	NamePosition parsing.Position
+	Block        *FencedBlock
+	Data         []byte
+	Syntax       string
 }
 
 func (qf QuotedFile) String() string {

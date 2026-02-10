@@ -22,7 +22,7 @@ func TestNewSyntaxError(t *testing.T) {
 		{
 			Name: "zero col",
 			Line: parsing.LineInfo{
-				Line:     "hello world",
+				Line:     []byte("hello world"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
@@ -40,7 +40,7 @@ func TestNewSyntaxError(t *testing.T) {
 		{
 			Name: "col span",
 			Line: parsing.LineInfo{
-				Line:     "hello world",
+				Line:     []byte("hello world"),
 				FileName: "hello.txt",
 				Number:   1,
 			},
