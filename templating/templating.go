@@ -7,9 +7,10 @@ import (
 	"maps"
 	"text/template"
 
-	"github.com/chaimleib/hebcalfmt/config"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/zmanim"
+
+	"github.com/chaimleib/hebcalfmt/config"
 )
 
 // ParseFile opens fpath from the files given and parses it into the tmpl.
@@ -50,6 +51,7 @@ func SetFuncMap(
 	maps.Insert(funcs, maps.All(TimeFuncs))
 	maps.Insert(funcs, maps.All(CastFuncs))
 	maps.Insert(funcs, maps.All(EnvFuncs))
+	maps.Insert(funcs, maps.All(CollectionFuncs))
 	return tmpl.Funcs(funcs)
 }
 
