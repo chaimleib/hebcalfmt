@@ -19,6 +19,7 @@ var TimeFuncs = map[string]any{
 	"timeLoadLocation": time.LoadLocation,
 
 	// time.Time
+	"timeNow":             time.Now,
 	"timeParse":           time.Parse,
 	"timeParseInLocation": time.ParseInLocation,
 	"timeUnix":            time.Unix,
