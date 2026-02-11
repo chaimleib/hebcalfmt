@@ -65,6 +65,7 @@ func SetFuncMap(
 //     - `$.now`
 //     - `$.nowInLocation`
 //     - `$.calOptions`
+//     - `$.configSource`
 //     - `$.language`
 //     - `$.dateRange`
 //     - `$.tz`
