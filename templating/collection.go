@@ -11,6 +11,8 @@ var CollectionFuncs = map[string]any{
 	"reversed": Reversed,
 }
 
+// Map takes a slice of keys and values and builds a map out of it.
+// The keys must be strings.
 func Map(kvs ...any) (map[string]any, error) {
 	if len(kvs)%2 != 0 {
 		return nil, errors.New(
@@ -34,8 +36,11 @@ func Map(kvs ...any) (map[string]any, error) {
 	return result, nil
 }
 
+// List takes any number of arguments and returns a slice containing them.
 func List(args ...any) []any { return args }
 
+// Reversed takes a slice and returns a copy of it
+// with the items in reverse order.
 func Reversed(s []any) []any {
 	result := make([]any, len(s))
 	i := len(s)
