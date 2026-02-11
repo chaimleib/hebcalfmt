@@ -58,7 +58,7 @@ func TestMap(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			got, err := templating.Map(c.Args...)
+			got, err := templating.MakeMap(c.Args...)
 			test.CheckErr(t, err, c.Err)
 			test.CheckMap(t, "map", c.Want, got)
 		})
@@ -77,7 +77,7 @@ func TestList(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
-			got := templating.List(c.Args...)
+			got := templating.MakeList(c.Args...)
 			test.CheckSlice(t, "list", c.Args, got)
 		})
 	}
@@ -106,6 +106,56 @@ func TestReversed(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			got := templating.Reversed(c.Args)
 			test.CheckSlice(t, "list", c.Want, got)
+		})
+	}
+}
+
+func TestAppendList(t *testing.T) {
+	cases := []struct {
+		Name string
+		List []any
+		Args []any
+		Want []any
+	}{
+		{Name: "empty"},
+		{
+			Name: "nil + 1 string",
+			Args: []any{"hello"},
+			Want: []any{"hello"},
+		},
+		{
+			Name: "nil + 2 strings",
+			Args: []any{"Hello", "world!"},
+			Want: []any{"Hello", "world!"},
+		},
+		{
+			Name: "nil + 1 string 1 int",
+			Args: []any{"hello", 42},
+			Want: []any{"hello", 42},
+		},
+		{
+			Name: "string + 1 string",
+			List: []any{"oh"},
+			Args: []any{"hello"},
+			Want: []any{"oh", "hello"},
+		},
+		{
+			Name: "string + 2 strings",
+			List: []any{"oh"},
+			Args: []any{"Hello", "world!"},
+			Want: []any{"oh", "Hello", "world!"},
+		},
+		{
+			Name: "string + 1 string 1 int",
+			List: []any{"oh"},
+			Args: []any{"hello", 42},
+			Want: []any{"oh", "hello", 42},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			got := templating.AppendList(c.List, c.Args...)
+			test.CheckSlice(t, "append", c.Want, got)
 		})
 	}
 }

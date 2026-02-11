@@ -6,14 +6,15 @@ import (
 )
 
 var CollectionFuncs = map[string]any{
-	"map":      Map,
-	"list":     List,
+	"map":      MakeMap,
+	"list":     MakeList,
 	"reversed": Reversed,
+	"append":   AppendList,
 }
 
-// Map takes a slice of keys and values and builds a map out of it.
+// MakeMap takes a slice of keys and values and builds a map out of it.
 // The keys must be strings.
-func Map(kvs ...any) (map[string]any, error) {
+func MakeMap(kvs ...any) (map[string]any, error) {
 	if len(kvs)%2 != 0 {
 		return nil, errors.New(
 			"must provide an even number of arguments to make key-value pairs",
@@ -36,8 +37,8 @@ func Map(kvs ...any) (map[string]any, error) {
 	return result, nil
 }
 
-// List takes any number of arguments and returns a slice containing them.
-func List(args ...any) []any { return args }
+// MakeList takes any number of arguments and returns a slice containing them.
+func MakeList(args ...any) []any { return args }
 
 // Reversed takes a slice and returns a copy of it
 // with the items in reverse order.
@@ -50,3 +51,6 @@ func Reversed(s []any) []any {
 	}
 	return result
 }
+
+// AppendList returns the result of appending args to s.
+func AppendList(s []any, args ...any) []any { return append(s, args...) }
