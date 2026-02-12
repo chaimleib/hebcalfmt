@@ -61,26 +61,40 @@ func SetFuncMap(
 // In detail:
 //
 //  1. Builds variables and adds them to a data map,
-//     which the template will run on:
-//     - `$.now`
-//     - `$.nowInLocation`
-//     - `$.calOptions`
-//     - `$.configSource`
-//     - `$.language`
-//     - `$.dateRange`
-//     - `$.tz`
-//     - `$.location`
-//     - `$.z`
-//     - `$.hdate.*`
-//     - `$.event.*`
-//     - `$.sedra.*`
-//     - `$.time.*`
+//     which the template will run on.
 //
 //  2. Builds the FuncMap and adds it to the template.
 //
 //  3. Parses the template.
 //
 //  4. Sets the template ParseName (for runtime debugging messages).
+//
+// These are the variables provided to the template:
+//
+//   - `$.now` - the current time
+//   - `$.nowInLocation` - the current time, localized
+//     to the config file's timezone.
+//   - `$.calOptions` - the options that will be passed through
+//     to hebcal library functions.
+//     This is controlled via the JSON config file, CLI arguments,
+//     and certain config-altering functions which can be called
+//     from the template itself.
+//   - `$.configSource` - the name of the JSON config file,
+//     or else the empty string if the compiled default config was used.
+//   - `$.language` - the name of the language to be used.
+//   - `$.dateRange` - the [daterange.DateRange] implied or specified
+//     by the command line arguments.
+//   - `$.tz` - the [time.Location] of the configured city.
+//   - `$.location` - a [zmanim.Location] configuring which place
+//     to calculate zmanim and holidays for.
+//     This can be customized in the JSON config via `city`,
+//     `geo.lat`, `geo.lon`, `timezone`,
+//     and `il` (whether the place is in Israel).
+//   - `$.z` - a [zmanim.Zmanim] object for calculating zmanim for a location.
+//   - `$.hdate.*` - [HDateConsts], a map of constants for Hebrew dates.
+//   - `$.event.*` - [EventConsts], a map of constants for categorizing events.
+//   - `$.sedra.*` - [SedraConsts], a map of constants for parshas.
+//   - `$.time.*` - [TimeConsts], a map of constants for the [time] package.
 func BuildData(
 	cfg *config.Config,
 	files fs.FS,

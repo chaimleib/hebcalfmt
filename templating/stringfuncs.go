@@ -42,6 +42,9 @@ var StringFuncs = map[string]any{
 	"translate": Translate,
 }
 
+// Translate attempts to translate s into lang
+// using hebcal's translation dictionaries.
+// If it fails, it returns s.
 func Translate(lang, s string) string {
 	if got, ok := locales.LookupTranslation(s, lang); ok {
 		return got
@@ -49,6 +52,7 @@ func Translate(lang, s string) string {
 	return s
 }
 
+// Apply calls fn on each of the members of s and returns the results.
 func Apply(s []string, fn func(string) string) []string {
 	result := make([]string, 0, len(s))
 	for _, item := range s {

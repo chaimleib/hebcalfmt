@@ -14,6 +14,7 @@ import (
 	"github.com/chaimleib/hebcalfmt/config"
 )
 
+// InfoKeys lists types of data which can be queried with the --info CLI option.
 var InfoKeys = []string{
 	"cities",
 	"default-city",

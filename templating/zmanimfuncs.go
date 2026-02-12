@@ -10,6 +10,8 @@ import (
 	"github.com/hebcal/hebcal-go/zmanim"
 )
 
+// ZmanimFuncs builds a map of templating functions for zmanim
+// using the given [hebcal.CalOptions].
 func ZmanimFuncs(opts *hebcal.CalOptions) map[string]any {
 	return map[string]any{
 		// zmanim.Location

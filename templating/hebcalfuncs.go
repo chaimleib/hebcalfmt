@@ -10,6 +10,7 @@ import (
 	"github.com/hebcal/hebcal-go/omer"
 )
 
+// HebcalFuncs builds a map of templating functions from a [hebcal.CalOptions].
 func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 	return map[string]any{
 		// as<Type>Event converts [event.CalEvent]s to struct types.

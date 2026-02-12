@@ -1,5 +1,6 @@
 package templating
 
+// CastFuncs is a map of templating functions for typecasting values.
 var CastFuncs = map[string]any{
 	// type conversions
 	"itof": Itof,
