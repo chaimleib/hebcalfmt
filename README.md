@@ -222,15 +222,30 @@ the omer, the molad, and the parsha of the week.
 {{- $z := forLocationDate $.location $d.Gregorian -}}
 {{- $zNext := forLocationDate $.location $d.Next.Gregorian -}}
 
+{{- define "hdate" -}}
+  {{.hdate.Day}}
+  {{- ""}} {{.hdate.MonthName "" | translate .base.language}}
+  {{- ""}} {{.hdate.Year}}
+{{- end}}
+
+{{- define "weekday" -}}
+  {{- if eq .hdate.Weekday .base.time.Saturday -}}
+    {{translate .base.language "Shabbat"}}
+  {{- else -}}
+    {{.hdate.Weekday}}
+  {{- end}}
+{{- end}}
+
 {{- if or
       $.calOptions.DailyZmanim
       $.calOptions.SunriseSunset
       $.calOptions.CandleLighting
 -}}
-Zmanim for {{""}}
+Z'monim for {{""}}
 {{- end}}
-  {{- ""}}{{$d.Gregorian.Format (printf "Monday, %s" $.time.DateOnly)}}
-  {{- ""}} / {{$d}}
+  {{- ""}}{{ template "weekday" (map "hdate" $d "base" $) }}
+  {{- ""}}, {{$d.Gregorian.Format $.time.DateOnly}}
+  {{- ""}} / {{ template "hdate" (map "hdate" $d "base" $) }}
 {{- if or
       $.calOptions.DailyZmanim
       $.calOptions.SunriseSunset
@@ -262,7 +277,7 @@ Tonight, count the {{.Render $.language}}.
         (not (asTimedEvent .))
         (or (ne "Chag HaBanot" .Basename) (not $.calOptions.NoModern))
 }}
-{{      .Render $.language}}
+{{      replaceAll (.Render $.language) "Shabbat Mevarchim Chodesh" "Shabbos M'vorchim Chodesh" }}
 {{-   end}}
 {{- end}}
 {{- /* Restore Chanukah untimed events, since Hebcal replaces them. */}}
@@ -324,33 +339,33 @@ This {{translate $.language "Shabbat"}} we read
 {{ ($z.TimeAtAngle 0.833 true).Format $fmt}}: Neitz (0.833 deg)
 {{- end}}
 {{- if $.calOptions.DailyZmanim}}
-{{    ($neitzAmiti.Add (durationMul $h 3)).Format $fmt}}: Sof Zman Krias Shema
-{{    ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Tefillah
+{{    ($neitzAmiti.Add (durationMul $h 3)).Format $fmt}}: Sof Z'man Kri'as Sh'ma
+{{    ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Z'man T'fillo
 {{- end}}
 
 {{- if or $.calOptions.DailyZmanim $.calOptions.CandleLighting}}
 {{- /* Chametz zmanim before Pesach */}}
 {{-   if eq $.time.Saturday (hdateNew $d.Year $.hdate.Nisan 14).Weekday}}
 {{-     if hdateNew $d.Year $.hdate.Nisan 13 | hdateEqual $d}}
-{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
+{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Z'man Bi'ur Chomeitz
 {{-     else if hdateNew $d.Year $.hdate.Nisan 14 | hdateEqual $d}}
-{{        ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
-{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Bittul Chametz
+{{        ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Z'man Achilas Chomeitz
+{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Z'man Bittul Chomeitz
 {{-     end}}
 {{-   else}}
 {{-     if hdateNew $d.Year $.hdate.Nisan 14 | hdateEqual $d}}
-{{        ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Zman Achilas Chametz
-{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Zman Biur Chametz
+{{        ($neitzAmiti.Add (durationMul $h 4)).Format $fmt}}: Sof Z'man Achilas Chomeitz
+{{        ($neitzAmiti.Add (durationMul $h 5)).Format $fmt}}: Sof Z'man Bi'ur Chomeitz
 {{-     end}}
 {{-   end}}
 {{- end}}
 
 {{- if $.calOptions.DailyZmanim}}
 {{    $chatzos.Format $fmt}}: Chatzos
-{{    ($chatzos.Add $halfH).Format $fmt}}: Mincha Gedolah
+{{    ($chatzos.Add $halfH).Format $fmt}}: Mincho G'dolo
         {{- if le $halfH $d30m }} (floored to 30m past chatzos){{end}}
-{{    ($shkiahAmitis.Add (durationMul $h -2.5)).Format $fmt}}: Mincha Ketanah
-{{    ($shkiahAmitis.Add (durationMul $h -1.25)).Format $fmt}}: Plag HaMincha
+{{    ($shkiahAmitis.Add (durationMul $h -2.5)).Format $fmt}}: Mincho K'tano
+{{    ($shkiahAmitis.Add (durationMul $h -1.25)).Format $fmt}}: Plag HaMincho
 {{- end}}
 
 {{- /* Candle lighting */}}
@@ -385,7 +400,7 @@ This {{translate $.language "Shabbat"}} we read
             )
           ).Format $fmt -}}
               : {{with $chanukah}}{{.}}, {{end -}}
-              Licht bentshen
+              Licht Bentsh'n
               {{- if hdateNew $d.Year $.hdate.Tishrei 9 | hdateEqual $d -}}
                 , Fast starts
               {{- end}}
@@ -406,7 +421,7 @@ This {{translate $.language "Shabbat"}} we read
         (eq $chanukahTime "normal")
       ))
 }}
-{{   ($z.TimeAtAngle 0.833 false).Format $fmt}}: Shkiah
+{{   ($z.TimeAtAngle 0.833 false).Format $fmt}}: Shki'o
   {{- if $fast9Av -}}
         , Fast starts
   {{- else if eq $chanukahTime "normal" -}}
@@ -417,7 +432,7 @@ This {{translate $.language "Shabbat"}} we read
 
 {{- if $.calOptions.DailyZmanim}}
 {{   ($z.TimeAtAngle 1.583 false).Format $fmt -}}
-       : Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+       : Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 {{- end}}
 
 {{- /* What should we show for Tzeis? Havdalah? Licht? 3 medium star tzeis? */}}
@@ -427,9 +442,9 @@ This {{translate $.language "Shabbat"}} we read
             (durationMul (timeParseDuration "1m") (itof $.calOptions.HavdalahMins))
         ).Format $fmt -}}
   {{    if dayIsShabbatOrYomTov $d.Next -}}
-            : Licht bentshen
+            : Licht Bentsh'n
   {{-   else -}}
-            : Havdalah
+            : Havdolo
             {{- if hdateNew $d.Year $.hdate.Tishrei 10 | hdateEqual $d -}}
               , Fast ends
             {{- else if eq $chanukahTime "late" -}}
@@ -457,7 +472,7 @@ This {{translate $.language "Shabbat"}} we read
 
 {{- /* Chatzos lailah - might be after midnight, so show the day of week. */}}
 {{- if $.calOptions.DailyZmanim}}
-{{    $chatzosLailah.Format (printf "%s (Mon)" $fmt) }}: Chatzos HaLailah
+{{    $chatzosLailah.Format (printf "%s (Mon)" $fmt) }}: Chatzos HaLailo
 
 A halachic hour is {{ $h.Round $.time.Second}}.
 {{- end}}
@@ -487,11 +502,12 @@ Note well that this software was released
             printf "%dh%dm" $molad.Hours $molad.Minutes | timeParseDuration
           ) }}
 
-The molad for this month, {{$d.MonthName $.language}},
-  {{- ""}} is {{$molad.Date.Weekday}}, {{$molad.Date}}
+The molad for this month, {{$d.MonthName "" | translate $.language}},
+  {{- ""}} is {{ template "weekday" (map "hdate" $molad.Date "base" $) }},
+  {{- ""}} {{ template "hdate" (map "hdate" $molad.Date "base" $) }}
   {{- ""}} at {{$moladTime.Format "3:04"}}
   {{- ""}} and {{$molad.Chalakim}}
-  {{- ""}} {{if eq $molad.Chalakim 1}}cheilek{{else}}chalakim{{end}}
+  {{- ""}} {{if eq $molad.Chalakim 1}}cheilek{{else}}chalokim{{end}}
   {{- ""}} {{$moladTime.Format "PM"}}.
 {{-   else}}
 {{-     $nextMonth := hdateNextMonth $d}}
@@ -501,11 +517,12 @@ The molad for this month, {{$d.MonthName $.language}},
             printf "%dh%dm" $molad.Hours $molad.Minutes | timeParseDuration
           ) }}
 
-The molad for next month, {{$nextMonth.MonthName $.language}},
-  {{- ""}} is {{$molad.Date.Weekday}}, {{$molad.Date}}
+The molad for next month, {{$nextMonth.MonthName "" | translate $.language}},
+  {{- ""}} is {{ template "weekday" (map "hdate" $molad.Date "base" $) }},
+  {{- ""}} {{ template "hdate" (map "hdate" $molad.Date "base" $) }}
   {{- ""}} at {{$moladTime.Format "3:04"}}
   {{- ""}} and {{$molad.Chalakim}}
-  {{- ""}} {{if eq $molad.Chalakim 1}}cheilek{{else}}chalakim{{end}}
+  {{- ""}} {{if eq $molad.Chalakim 1}}cheilek{{else}}chalokim{{end}}
   {{- ""}} {{$moladTime.Format "PM"}}.
 {{-   end}}
 {{- end}}
@@ -519,7 +536,7 @@ The molad for next month, {{$nextMonth.MonthName $.language}},
 ```json
 {
   "city": "Austin",
-  "language": "ashkenazi",
+  "language": "ashkenazi_standard",
   "molad": true,
   "omer": true,
   "sedrot": true,
@@ -574,23 +591,23 @@ Elul     29 Birthday of the Tzemach Tzedek
 
 ```bash
 $ hebcalfmt -c examples/chabad.json examples/chabad.tmpl 2026-01-21
-Zmanim for Wednesday, 2026-01-21 / 3 Sh'vat 5786, in Austin
+Z'monim for Wednesday, 2026-01-21 / 3 Sh'vot 5786, in Austin
 
-This Shabbos we read Parshas Bo.
+This Shabbos we read Porshas Bo.
 
 06:08:17: Alos HaShachar (16.9 deg)
 06:40:28: Misheyakir (10.2 deg)
 07:26:36: Neitz (0.833 deg)
-10:02:29: Sof Zman Krias Shema
-10:55:42: Sof Zman Tefillah
+10:02:29: Sof Z'man Kri'as Sh'ma
+10:55:42: Sof Z'man T'fillo
 12:42:07: Chatzos
-13:12:07: Mincha Gedolah (floored to 30m past chatzos)
-15:48:22: Mincha Ketanah
-16:54:53: Plag HaMincha
-17:57:39: Shkiah (0.833 deg)
-18:01:24: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+13:12:07: Mincho G'dolo (floored to 30m past chatzos)
+15:48:22: Mincho K'tano
+16:54:53: Plag HaMincho
+17:57:39: Shki'o (0.833 deg)
+18:01:24: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:23:17: Tzeis (6 deg/3 medium stars)
-00:41:58 (Thu): Chatzos HaLailah
+00:41:58 (Thu): Chatzos HaLailo
 
 A halachic hour is 53m13s.
 
@@ -600,7 +617,7 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Sh'vat, is Sunday, 29 Tevet 5786 at 3:06 and 11 chalakim PM.
+The molad for this month, Sh'vot, is Sunday, 29 Teiveis 5786 at 3:06 and 11 chalokim PM.
 ```
 
 

@@ -310,33 +310,34 @@ func TestExamples_Chabad(t *testing.T) {
 	files, now := setupExample(t)
 	const fpath = "chabad.tmpl"
 
-	cases := []struct {
+	type Case struct {
 		Name  string
 		Args  string
 		Want  string
 		Usage bool
 		Err   string
-	}{
+	}
+	cases := []Case{
 		{
 			Name: "empty args",
-			Want: `Zmanim for Monday, 2024-05-06 / 28 Nisan 5784, in Austin
+			Want: `Z'monim for Monday, 2024-05-06 / 28 Nison 5784, in Austin
 Tonight, count the 13th day of the Omer.
 
-This Shabbos we read Parshas Kedoshim.
+This Shabbos we read Porshas K'doshim.
 
 05:20:20: Alos HaShachar (16.9 deg)
 05:55:49: Misheyakir (10.2 deg)
 06:43:00: Neitz (0.833 deg)
-10:03:24: Sof Zman Krias Shema
-11:11:27: Sof Zman Tefillah
+10:03:24: Sof Z'man Kri'as Sh'ma
+11:11:27: Sof Z'man T'fillo
 13:27:31: Chatzos
-14:01:32: Mincha Gedolah
-17:25:39: Mincha Ketanah
-18:50:42: Plag HaMincha
-20:12:03: Shkiah (0.833 deg)
-20:15:45: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+14:01:32: Mincho G'dolo
+17:25:39: Mincho K'tano
+18:50:42: Plag HaMincho
+20:12:03: Shki'o (0.833 deg)
+20:15:45: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:37:48: Tzeis (6 deg/3 medium stars)
-01:27:08 (Tue): Chatzos HaLailah
+01:27:08 (Tue): Chatzos HaLailo
 
 A halachic hour is 1h8m2s.
 
@@ -346,29 +347,29 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Iyyar, is Wednesday, 30 Nisan 5784 at 11:41 and 8 chalakim AM.
+The molad for next month, Iyyor, is Wednesday, 30 Nison 5784 at 11:41 and 8 chalokim AM.
 `,
 		},
 		{
-			Name: "2026-01-21, floored Mincha Gedolah",
+			Name: "2026-01-21, floored Mincho G'dolo",
 			Args: "2026-01-21",
-			Want: `Zmanim for Wednesday, 2026-01-21 / 3 Sh'vat 5786, in Austin
+			Want: `Z'monim for Wednesday, 2026-01-21 / 3 Sh'vot 5786, in Austin
 
-This Shabbos we read Parshas Bo.
+This Shabbos we read Porshas Bo.
 
 06:08:17: Alos HaShachar (16.9 deg)
 06:40:28: Misheyakir (10.2 deg)
 07:26:36: Neitz (0.833 deg)
-10:02:29: Sof Zman Krias Shema
-10:55:42: Sof Zman Tefillah
+10:02:29: Sof Z'man Kri'as Sh'ma
+10:55:42: Sof Z'man T'fillo
 12:42:07: Chatzos
-13:12:07: Mincha Gedolah (floored to 30m past chatzos)
-15:48:22: Mincha Ketanah
-16:54:53: Plag HaMincha
-17:57:39: Shkiah (0.833 deg)
-18:01:24: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+13:12:07: Mincho G'dolo (floored to 30m past chatzos)
+15:48:22: Mincho K'tano
+16:54:53: Plag HaMincho
+17:57:39: Shki'o (0.833 deg)
+18:01:24: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:23:17: Tzeis (6 deg/3 medium stars)
-00:41:58 (Thu): Chatzos HaLailah
+00:41:58 (Thu): Chatzos HaLailo
 
 A halachic hour is 53m13s.
 
@@ -378,30 +379,30 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Sh'vat, is Sunday, 29 Tevet 5786 at 3:06 and 11 chalakim PM.
+The molad for this month, Sh'vot, is Sunday, 29 Teiveis 5786 at 3:06 and 11 chalokim PM.
 `,
 		},
 		{
-			Name: "Kislev 24 5785, Chanukah 1 light at 0.833",
-			Args: "Kislev 24 5785",
-			Want: `Zmanim for Wednesday, 2024-12-25 / 24 Kislev 5785, in Austin
-Chanukah: 1 Candle
+			Name: "Kisleiv 24 5785, Chanuko 1 light at 0.833",
+			Args: "Kisleiv 24 5785",
+			Want: `Z'monim for Wednesday, 2024-12-25 / 24 Kisleiv 5785, in Austin
+Chanuko: 1 Candle
 
-This Shabbos we read Parshas Miketz.
+This Shabbos we read Porshas Mikeitz.
 
 06:04:58: Alos HaShachar (16.9 deg)
 06:37:52: Misheyakir (10.2 deg)
 07:25:21: Neitz (0.833 deg)
-09:56:21: Sof Zman Krias Shema
-10:47:59: Sof Zman Tefillah
+09:56:21: Sof Z'man Kri'as Sh'ma
+10:47:59: Sof Z'man T'fillo
 12:31:14: Chatzos
-13:01:14: Mincha Gedolah (floored to 30m past chatzos)
-15:31:56: Mincha Ketanah
-16:36:28: Plag HaMincha
-17:37:08: Shkiah, Chanukah: 1 Candle (0.833 deg)
-17:41:01: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+13:01:14: Mincho G'dolo (floored to 30m past chatzos)
+15:31:56: Mincho K'tano
+16:36:28: Plag HaMincho
+17:37:08: Shki'o, Chanuko: 1 Candle (0.833 deg)
+17:41:01: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:03:35: Tzeis (6 deg/3 medium stars)
-00:31:26 (Thu): Chatzos HaLailah
+00:31:26 (Thu): Chatzos HaLailo
 
 A halachic hour is 51m38s.
 
@@ -411,30 +412,30 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
+The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Kislev 25 5785, Chanukah 2 lights at 0.833",
+			Name: "Kisleiv 25 5785, Chanuko 2 lights at 0.833",
 			Args: "Kislev 25 5785",
-			Want: `Zmanim for Thursday, 2024-12-26 / 25 Kislev 5785, in Austin
-Chanukah: 2 Candles
+			Want: `Z'monim for Thursday, 2024-12-26 / 25 Kisleiv 5785, in Austin
+Chanuko: 2 Candles
 
-This Shabbos we read Parshas Miketz.
+This Shabbos we read Porshas Mikeitz.
 
 06:05:22: Alos HaShachar (16.9 deg)
 06:38:16: Misheyakir (10.2 deg)
 07:25:44: Neitz (0.833 deg)
-09:56:47: Sof Zman Krias Shema
-10:48:26: Sof Zman Tefillah
+09:56:47: Sof Z'man Kri'as Sh'ma
+10:48:26: Sof Z'man T'fillo
 12:31:43: Chatzos
-13:01:43: Mincha Gedolah (floored to 30m past chatzos)
-15:32:29: Mincha Ketanah
-16:37:02: Plag HaMincha
-17:37:43: Shkiah, Chanukah: 2 Candles (0.833 deg)
-17:41:36: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+13:01:43: Mincho G'dolo (floored to 30m past chatzos)
+15:32:29: Mincho K'tano
+16:37:02: Plag HaMincho
+17:37:43: Shki'o, Chanuko: 2 Candles (0.833 deg)
+17:41:36: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:04:09: Tzeis (6 deg/3 medium stars)
-00:31:54 (Fri): Chatzos HaLailah
+00:31:54 (Fri): Chatzos HaLailo
 
 A halachic hour is 51m39s.
 
@@ -444,31 +445,31 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
+The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Kislev 26 5785, Chanukah 3 lights at 0.833 - 18m",
+			Name: "Kisleiv 26 5785, Chanuko 3 lights at 0.833 - 18m",
 			Args: "Kislev 26 5785",
-			Want: `Zmanim for Friday, 2024-12-27 / 26 Kislev 5785, in Austin
-Chanukah: 3 Candles
+			Want: `Z'monim for Friday, 2024-12-27 / 26 Kisleiv 5785, in Austin
+Chanuko: 3 Candles
 
-This Shabbos we read Parshas Miketz.
+This Shabbos we read Porshas Mikeitz.
 
 06:05:45: Alos HaShachar (16.9 deg)
 06:38:38: Misheyakir (10.2 deg)
 07:26:05: Neitz (0.833 deg)
-09:57:12: Sof Zman Krias Shema
-10:48:52: Sof Zman Tefillah
+09:57:12: Sof Z'man Kri'as Sh'ma
+10:48:52: Sof Z'man T'fillo
 12:32:12: Chatzos
-13:02:12: Mincha Gedolah (floored to 30m past chatzos)
-15:33:02: Mincha Ketanah
-16:37:37: Plag HaMincha
-17:20:19: Chanukah: 3 Candles, Licht bentshen (18m)
-17:38:19: Shkiah (0.833 deg)
-17:42:12: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+13:02:12: Mincho G'dolo (floored to 30m past chatzos)
+15:33:02: Mincho K'tano
+16:37:37: Plag HaMincho
+17:20:19: Chanuko: 3 Candles, Licht Bentsh'n (18m)
+17:38:19: Shki'o (0.833 deg)
+17:42:12: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:04:45: Tzeis (6 deg/3 medium stars)
-00:32:22 (Sat): Chatzos HaLailah
+00:32:22 (Sat): Chatzos HaLailo
 
 A halachic hour is 51m40s.
 
@@ -478,31 +479,31 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
+The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Kislev 27 5785, Chanukah 4 lights at 8.5",
-			Args: "Kislev 27 5785",
-			Want: `Zmanim for Saturday, 2024-12-28 / 27 Kislev 5785, in Austin
-Shabbat Mevarchim Chodesh Tevet
-Chanukah: 4 Candles
+			Name: "Kisleiv 27 5785, Chanuko 4 lights at 8.5",
+			Args: "Kisleiv 27 5785",
+			Want: `Z'monim for Shabbos, 2024-12-28 / 27 Kisleiv 5785, in Austin
+Shabbos M'vorchim Chodesh Teiveis
+Chanuko: 4 Candles
 
-This Shabbos we read Parshas Miketz.
+This Shabbos we read Porshas Mikeitz.
 
 06:06:07: Alos HaShachar (16.9 deg)
 06:38:59: Misheyakir (10.2 deg)
 07:26:25: Neitz (0.833 deg)
-09:57:36: Sof Zman Krias Shema
-10:49:17: Sof Zman Tefillah
+09:57:36: Sof Z'man Kri'as Sh'ma
+10:49:17: Sof Z'man T'fillo
 12:32:40: Chatzos
-13:02:40: Mincha Gedolah (floored to 30m past chatzos)
-15:33:35: Mincha Ketanah
-16:38:12: Plag HaMincha
-17:38:56: Shkiah (0.833 deg)
-17:42:49: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
-18:17:54: Havdalah, Chanukah: 4 Candles (8.5 deg/3 small stars)
-00:32:50 (Sun): Chatzos HaLailah
+13:02:40: Mincho G'dolo (floored to 30m past chatzos)
+15:33:35: Mincho K'tano
+16:38:12: Plag HaMincho
+17:38:56: Shki'o (0.833 deg)
+17:42:49: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:17:54: Havdolo, Chanuko: 4 Candles (8.5 deg/3 small stars)
+00:32:50 (Sun): Chatzos HaLailo
 
 A halachic hour is 51m41s.
 
@@ -512,30 +513,30 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Tevet, is Monday, 29 Kislev 5785 at 5:33 and 16 chalakim PM.
+The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Av 9 5785, Tisha Bav",
+			Name: "Ov 9 5785, Tisha B'Ov",
 			Args: "Av 9 5785",
-			Want: `Zmanim for Sunday, 2025-08-03 / 9 Av 5785, in Austin
-Tish'a B'Av
+			Want: `Z'monim for Sunday, 2025-08-03 / 9 Ov 5785, in Austin
+Tisho B'Ov
 
-This Shabbos we read Parshas Vaeschanan.
+This Shabbos we read Porshas Vo'eschanan.
 
 05:27:36: Alos HaShachar (16.9 deg)
 06:03:23: Misheyakir (10.2 deg)
 06:50:52: Neitz (0.833 deg)
-10:12:06: Sof Zman Krias Shema
-11:20:26: Sof Zman Tefillah
+10:12:06: Sof Z'man Kri'as Sh'ma
+11:20:26: Sof Z'man T'fillo
 13:37:05: Chatzos
-14:11:15: Mincha Gedolah
-17:36:14: Mincha Ketanah
-19:01:38: Plag HaMincha
-20:23:19: Shkiah (0.833 deg)
-20:27:03: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+14:11:15: Mincho G'dolo
+17:36:14: Mincho K'tano
+19:01:38: Plag HaMincho
+20:23:19: Shki'o (0.833 deg)
+20:27:03: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:49:13: Tzeis, Fast ends (6 deg/3 medium stars)
-01:37:24 (Mon): Chatzos HaLailah
+01:37:24 (Mon): Chatzos HaLailo
 
 A halachic hour is 1h8m20s.
 
@@ -545,31 +546,31 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Av, is Friday, 29 Tammuz 5785 at 10:42 and 5 chalakim AM.
+The molad for this month, Ov, is Friday, 29 Tammuz 5785 at 10:42 and 5 chalokim AM.
 `,
 		},
 		{
-			Name: "Av 9 5782, Tisha Bav shenidcheh",
+			Name: "Ov 9 5782, Tisho B'Ov shenidcheh",
 			Args: "Av 9 5782",
-			Want: `Zmanim for Saturday, 2022-08-06 / 9 Av 5782, in Austin
-Erev Tish'a B'Av
+			Want: `Z'monim for Shabbos, 2022-08-06 / 9 Ov 5782, in Austin
+Erev Tisho B'Ov
 Shabbos Chazon
 
-This Shabbos we read Parshas Devarim.
+This Shabbos we read Porshas D'vorim.
 
 05:30:00: Alos HaShachar (16.9 deg)
 06:05:26: Misheyakir (10.2 deg)
 06:52:35: Neitz (0.833 deg)
-10:12:51: Sof Zman Krias Shema
-11:20:51: Sof Zman Tefillah
+10:12:51: Sof Z'man Kri'as Sh'ma
+11:20:51: Sof Z'man T'fillo
 13:36:50: Chatzos
-14:10:50: Mincha Gedolah
-17:34:49: Mincha Ketanah
-18:59:49: Plag HaMincha
-20:21:07: Shkiah, Fast starts (0.833 deg)
-20:24:49: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
-20:59:32: Havdalah (8.5 deg/3 small stars)
-01:37:10 (Sun): Chatzos HaLailah
+14:10:50: Mincho G'dolo
+17:34:49: Mincho K'tano
+18:59:49: Plag HaMincho
+20:21:07: Shki'o, Fast starts (0.833 deg)
+20:24:49: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:59:32: Havdolo (8.5 deg/3 small stars)
+01:37:10 (Sun): Chatzos HaLailo
 
 A halachic hour is 1h8m0s.
 
@@ -579,30 +580,30 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Av, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalakim PM.
+The molad for this month, Ov, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalokim PM.
 `,
 		},
 		{
-			Name: "Av 10 5782, Tisha Bav shenidcheh",
+			Name: "Ov 10 5782, Tisha B'Ov shenidcheh",
 			Args: "Av 10 5782",
-			Want: `Zmanim for Sunday, 2022-08-07 / 10 Av 5782, in Austin
-Tish'a B'Av (observed)
+			Want: `Z'monim for Sunday, 2022-08-07 / 10 Ov 5782, in Austin
+Tisho B'Ov (observed)
 
-This Shabbos we read Parshas Vaeschanan.
+This Shabbos we read Porshas Vo'eschanan.
 
 05:30:51: Alos HaShachar (16.9 deg)
 06:06:10: Misheyakir (10.2 deg)
 06:53:12: Neitz (0.833 deg)
-10:13:07: Sof Zman Krias Shema
-11:21:00: Sof Zman Tefillah
+10:13:07: Sof Z'man Kri'as Sh'ma
+11:21:00: Sof Z'man T'fillo
 13:36:44: Chatzos
-14:10:41: Mincha Gedolah
-17:34:18: Mincha Ketanah
-18:59:08: Plag HaMincha
-20:20:18: Shkiah (0.833 deg)
-20:23:59: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+14:10:41: Mincho G'dolo
+17:34:18: Mincho K'tano
+18:59:08: Plag HaMincho
+20:20:18: Shki'o (0.833 deg)
+20:23:59: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:45:58: Tzeis, Fast ends (6 deg/3 medium stars)
-01:37:03 (Mon): Chatzos HaLailah
+01:37:03 (Mon): Chatzos HaLailo
 
 A halachic hour is 1h7m52s.
 
@@ -612,34 +613,34 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Av, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalakim PM.
+The molad for this month, Ov, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalokim PM.
 `,
 		},
 		{
 			Name: "Nisan 14 5782, Erev Pesach",
 			Args: "Nisan 14 5782",
-			Want: `Zmanim for Friday, 2022-04-15 / 14 Nisan 5782, in Austin
+			Want: `Z'monim for Friday, 2022-04-15 / 14 Nison 5782, in Austin
 Erev Pesach
-Ta’anis Bechoros
+Ta'anis Bechoros
 
-This Shabbos we read Parshas hachag.
+This Shabbos we read Porshas hachag.
 
 05:45:36: Alos HaShachar, Fast starts (16.9 deg)
 06:18:40: Misheyakir (10.2 deg)
 07:03:34: Neitz (0.833 deg)
-10:15:23: Sof Zman Krias Shema
-11:20:30: Sof Zman Tefillah
-11:20:30: Sof Zman Achilas Chametz
-12:25:38: Sof Zman Biur Chametz
+10:15:23: Sof Z'man Kri'as Sh'ma
+11:20:30: Sof Z'man T'fillo
+11:20:30: Sof Z'man Achilas Chomeitz
+12:25:38: Sof Z'man Bi'ur Chomeitz
 13:30:45: Chatzos
-14:03:19: Mincha Gedolah
-17:18:41: Mincha Ketanah
-18:40:05: Plag HaMincha
-19:39:57: Licht bentshen (18m)
-19:57:57: Shkiah (0.833 deg)
-20:01:30: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+14:03:19: Mincho G'dolo
+17:18:41: Mincho K'tano
+18:40:05: Plag HaMincho
+19:39:57: Licht Bentsh'n (18m)
+19:57:57: Shki'o (0.833 deg)
+20:01:30: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:22:33: Tzeis, Fast ends (6 deg/3 medium stars)
-01:30:12 (Sat): Chatzos HaLailah
+01:30:12 (Sat): Chatzos HaLailo
 
 A halachic hour is 1h5m7s.
 
@@ -649,32 +650,32 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Nisan, is Friday, 29 Adar II 5782 at 4:36 and 0 chalakim PM.
+The molad for this month, Nison, is Friday, 29 Ador II 5782 at 4:36 and 0 chalokim PM.
 `,
 		},
 		{
 			Name: "Nisan 13 5785, Early biur chametz, Erev Pesach is Shabbos",
 			Args: "Nisan 13 5785",
-			Want: `Zmanim for Friday, 2025-04-11 / 13 Nisan 5785, in Austin
+			Want: `Z'monim for Friday, 2025-04-11 / 13 Nison 5785, in Austin
 Yahrtzeit of the Tzemach Tzedek
 
-This Shabbos we read Parshas Tzav.
+This Shabbos we read Porshas Tzav.
 
 05:50:30: Alos HaShachar (16.9 deg)
 06:23:14: Misheyakir (10.2 deg)
 07:07:49: Neitz (0.833 deg)
-10:17:59: Sof Zman Krias Shema
-11:22:33: Sof Zman Tefillah
-12:27:07: Sof Zman Biur Chametz
+10:17:59: Sof Z'man Kri'as Sh'ma
+11:22:33: Sof Z'man T'fillo
+12:27:07: Sof Z'man Bi'ur Chomeitz
 13:31:41: Chatzos
-14:03:59: Mincha Gedolah
-17:17:41: Mincha Ketanah
-18:38:24: Plag HaMincha
-19:37:35: Licht bentshen (18m)
-19:55:35: Shkiah (0.833 deg)
-19:59:07: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
+14:03:59: Mincho G'dolo
+17:17:41: Mincho K'tano
+18:38:24: Plag HaMincho
+19:37:35: Licht Bentsh'n (18m)
+19:55:35: Shki'o (0.833 deg)
+19:59:07: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:20:03: Tzeis (6 deg/3 medium stars)
-01:31:07 (Sat): Chatzos HaLailah
+01:31:07 (Sat): Chatzos HaLailo
 
 A halachic hour is 1h4m34s.
 
@@ -684,33 +685,33 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Nisan, is Saturday, 29 Adar 5785 at 7:46 and 1 cheilek AM.
+The molad for this month, Nison, is Shabbos, 29 Ador 5785 at 7:46 and 1 cheilek AM.
 `,
 		},
 		{
 			Name: "Nisan 14 5785, Bittul chametz, Erev Pesach on Shabbos",
 			Args: "Nisan 14 5785",
-			Want: `Zmanim for Saturday, 2025-04-12 / 14 Nisan 5785, in Austin
+			Want: `Z'monim for Shabbos, 2025-04-12 / 14 Nison 5785, in Austin
 Erev Pesach
-Shabbos HaGadol
+Shabbos HaGodol
 
-This Shabbos we read Parshas Tzav.
+This Shabbos we read Porshas Tzav.
 
 05:49:12: Alos HaShachar (16.9 deg)
 06:22:00: Misheyakir (10.2 deg)
 07:06:40: Neitz (0.833 deg)
-10:17:17: Sof Zman Krias Shema
-11:22:00: Sof Zman Tefillah
-11:22:00: Sof Zman Achilas Chametz
-12:26:43: Sof Zman Bittul Chametz
+10:17:17: Sof Z'man Kri'as Sh'ma
+11:22:00: Sof Z'man T'fillo
+11:22:00: Sof Z'man Achilas Chomeitz
+12:26:43: Sof Z'man Bittul Chomeitz
 13:31:26: Chatzos
-14:03:48: Mincha Gedolah
-17:17:57: Mincha Ketanah
-18:38:51: Plag HaMincha
-19:56:13: Shkiah (0.833 deg)
-19:59:45: Shkiah Amitis/Bein HaShmashos starts (1.583 deg)
-20:32:41: Licht bentshen (8.5 deg/3 small stars)
-01:30:52 (Sun): Chatzos HaLailah
+14:03:48: Mincho G'dolo
+17:17:57: Mincho K'tano
+18:38:51: Plag HaMincho
+19:56:13: Shki'o (0.833 deg)
+19:59:45: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:32:41: Licht Bentsh'n (8.5 deg/3 small stars)
+01:30:52 (Sun): Chatzos HaLailo
 
 A halachic hour is 1h4m43s.
 
@@ -720,7 +721,7 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Nisan, is Saturday, 29 Adar 5785 at 7:46 and 1 cheilek AM.
+The molad for this month, Nison, is Shabbos, 29 Ador 5785 at 7:46 and 1 cheilek AM.
 `,
 		},
 	}
