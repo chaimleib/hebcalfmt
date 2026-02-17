@@ -2,7 +2,6 @@ package templating
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/sedra"
@@ -57,9 +56,6 @@ func LocalizedParasha(hd hdate.HDate, il bool, lang string) string {
 	return fmt.Sprintf(
 		"%s %s",
 		parashat,
-		strings.Join(Apply(
-			parsha.Name,
-			func(s string) string { return Translate(lang, s) },
-		), "-"),
+		parsha.Render(lang),
 	)
 }
