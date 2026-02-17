@@ -738,9 +738,7 @@ The molad for this month, Nisan, is Saturday, 29 Adar 5785 at 7:46 and 1 cheilek
 				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
-			if buf.String() != c.Want {
-				t.Errorf("want:\n%s\ngot:\n%s", c.Want, buf.String())
-			}
+			test.CheckString(t, "output", c.Want, buf.String())
 
 			if c.Usage {
 				if !strings.HasPrefix(logBuf.String(), "usage:\n  hebcalfmt ") {
