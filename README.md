@@ -172,7 +172,7 @@ Hebrew: 25 Kislev 5786
 ### Chabad zmanim
 
 This example replaces parts of the zmanim engine with custom templating,
-in other to calculate zmanim as described in
+in order to calculate zmanim as described in
 [
 Chabad.org's article About Our Zmanim Calculations
 ](https://www.chabad.org/library/article_cdo/aid/3209349/jewish/About-Our-Zmanim-Calculations.htm).
