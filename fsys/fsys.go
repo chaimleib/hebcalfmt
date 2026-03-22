@@ -1,3 +1,5 @@
+// Package fsys provides production implementations of [io/fs.FS]
+// which allow easily stubbing it out for testability.
 package fsys
 
 import (
@@ -90,8 +92,12 @@ func (fsf fsFunc) Format(state fmt.State, verb rune) {
 	fmt.Fprintf(state, format, name)
 }
 
+// WrapFS prepends BaseDir to all filepaths before opening them.
 type WrapFS struct {
-	FS      fs.FS
+	// FS is an underlying fs.FS.
+	FS fs.FS
+
+	// BaseDir is a prefix path relative to which all filepaths are interpreted.
 	BaseDir string
 }
 
@@ -109,6 +115,9 @@ func (w WrapFS) Equal(other any) bool {
 	return Equal(w.FS, typedOther.FS)
 }
 
+// Open prepends the BaseDir of the WrapFS to fpath,
+// and then uses the underlying FS to open the resulting path.
+// It fails if fpath is not a local path.
 func (w WrapFS) Open(fpath string) (fs.File, error) {
 	if !filepath.IsLocal(fpath) {
 		return nil, fmt.Errorf(
@@ -125,6 +134,8 @@ func (w WrapFS) Open(fpath string) (fs.File, error) {
 	return w.FS.Open(resolved)
 }
 
+// Format renders the WrapFS as a string for debugging.
+// `%v`, `%+v` and `%#v` are supported.
 func (w WrapFS) Format(state fmt.State, verb rune) {
 	vFormats := map[rune]string{
 		'+': "WrapFS[FS:%+v BaseDir:%s]",
@@ -142,6 +153,11 @@ func (w WrapFS) Format(state fmt.State, verb rune) {
 	fmt.Fprintf(state, format, w.FS, w.BaseDir)
 }
 
+// Equal returns whether two fs.FS instances are equivalent.
+// It is imperfect and can give false negatives,
+// but never false positives.
+// The goal is to be useful for tests when using the types in this package,
+// and common fs.FS types provided by the standard library.
 func Equal(a, b fs.FS) bool {
 	if a == nil && b == nil {
 		return true
