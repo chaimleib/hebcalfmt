@@ -321,7 +321,7 @@ func TestExamples_Chabad(t *testing.T) {
 		{
 			Name: "empty args",
 			Want: `Z'monim for Monday, 2024-05-06 / 28 Nison 5784, in Austin
-Tonight, count the 13th day of the Omer.
+Tonight, count the 14th day of the Omer.
 
 This Shabbos we read Porshas K'doshim.
 

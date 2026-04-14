@@ -259,7 +259,6 @@ Z'monim for {{""}}
       $.event.EREV
       $.event.CHAG
       $.event.CHOL_HAMOED
-      $.event.OMER_COUNT
       $.event.CHANUKAH_CANDLES
       $.event.MINOR_HOLIDAY
       $.event.ROSH_CHODESH
@@ -269,21 +268,26 @@ Z'monim for {{""}}
       $.event.SHABBAT_MEVARCHIM
       $.event.USER_EVENT
 }}
-{{-   if asOmerEvent . }}
-{{-     if $.calOptions.Omer}}
-Tonight, count the {{.Render $.language}}.
-{{-     end}}
-{{-   else if and
+{{-   if and
         (not (asTimedEvent .))
         (or (ne "Chag HaBanot" .Basename) (not $.calOptions.NoModern))
 }}
 {{      replaceAll (.Render $.language) "Shabbat Mevarchim Chodesh" "Shabbos M'vorchim Chodesh" }}
 {{-   end}}
 {{- end}}
+
 {{- /* Restore Chanukah untimed events, since Hebcal replaces them. */}}
 {{- range eventsByFlags (hebcal $d) $.event.CHANUKAH_CANDLES}}
 {{-   with asTimedEvent .}}
 {{      .LinkedEvent.Render $.language}}
+{{-   end}}
+{{- end}}
+
+{{- /* Show tonight's omer count with $d.Next, */}}
+{{- /* rather than last night's count with $d. */}}
+{{- if $.calOptions.Omer}}
+{{-   range eventsByFlags (hebcal $d.Next) $.event.OMER_COUNT}}
+Tonight, count the {{.Render $.language}}.
 {{-   end}}
 {{- end}}
 
