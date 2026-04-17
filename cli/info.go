@@ -9,7 +9,6 @@ import (
 
 	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/zmanim"
-	"github.com/spf13/pflag"
 
 	"github.com/chaimleib/hebcalfmt/config"
 )
@@ -21,7 +20,7 @@ var InfoKeys = []string{
 	"languages",
 }
 
-func infoString(key string, fs *pflag.FlagSet) (string, error) {
+func infoString(key string) (string, error) {
 	switch key {
 	case "cities":
 		return strings.Join(sortedCities(), "\n"), nil
@@ -35,7 +34,6 @@ func infoString(key string, fs *pflag.FlagSet) (string, error) {
 	default:
 		log.Printf("unrecognized key for --info flag: %q", key)
 		log.Printf("Available options: %q", InfoKeys)
-		log.Println(usage(fs))
 		return "", fmt.Errorf("unrecognized key for --info flag: %q", key)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -99,8 +100,9 @@ func processFlags(
 		return nil, fmt.Errorf("%w: get --info: %w", ErrUnreachable, err)
 	}
 	if key != "" {
-		info, err := infoString(key, flagSet)
+		info, err := infoString(key)
 		if err != nil {
+			log.Println(usage(flagSet))
 			return nil, err
 		}
 		fmt.Fprintln(w, info)
