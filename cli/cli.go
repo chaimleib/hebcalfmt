@@ -112,7 +112,7 @@ func RunInEnvironment(
 			return nil
 		}
 		if errors.Is(err, ErrUsage) {
-			log.Println(usage(flagSet))
+			log.Println(usage(flagSet.FlagUsages()))
 		}
 		return err
 	}
@@ -122,7 +122,7 @@ func RunInEnvironment(
 	tmplPath, err := processArgs(flagSet.Args(), cfg)
 	if err != nil {
 		if errors.Is(err, ErrUsage) {
-			log.Println(usage(flagSet))
+			log.Println(usage(flagSet.FlagUsages()))
 		}
 		return err
 	}

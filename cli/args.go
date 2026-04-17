@@ -80,7 +80,7 @@ func processFlags(
 			Errorf("%w: get --help: %w", ErrUnreachable, err)
 	}
 	if help {
-		fmt.Fprintln(w, usage(flagSet))
+		fmt.Fprintln(w, usage(flagSet.FlagUsages()))
 		return nil, ErrDone
 	}
 
@@ -102,7 +102,7 @@ func processFlags(
 	if key != "" {
 		info, err := infoString(key)
 		if err != nil {
-			log.Println(usage(flagSet))
+			log.Println(usage(flagSet.FlagUsages()))
 			return nil, err
 		}
 		fmt.Fprintln(w, info)

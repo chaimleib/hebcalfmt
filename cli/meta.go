@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func usage(fs interface{ FlagUsages() string }) string {
+func usage(flagUsages string) string {
 	return strings.Join(
 		[]string{
 			"usage:",
@@ -21,7 +21,7 @@ func usage(fs interface{ FlagUsages() string }) string {
 			fmt.Sprintf("  %s [ -h | --help | --version ]", ProgName),
 			"",
 			"OPTIONS:",
-			fs.FlagUsages(),
+			flagUsages,
 		},
 		"\n",
 	)
