@@ -3,11 +3,9 @@ package cli
 import (
 	"fmt"
 	"strings"
-
-	"github.com/spf13/pflag"
 )
 
-func usage(fs *pflag.FlagSet) string {
+func usage(fs interface{ FlagUsages() string }) string {
 	return strings.Join(
 		[]string{
 			"usage:",
