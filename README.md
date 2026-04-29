@@ -1,6 +1,6 @@
 # hebcalfmt
 
-[![Build Status](https://github.com/chaimleib/hebcalfmt/actions/workflows/go.yml/badge.svg)](https://github.com/chaimleib/hebcalfmt/actions/workflows/go.yml)
+[![Build Status](https://github.com/chaimleib/hebcalfmt/actions/workflows/tests.yml/badge.svg)](https://github.com/chaimleib/hebcalfmt/actions/workflows/tests.yml)
 [![coverage](https://raw.githubusercontent.com/chaimleib/hebcalfmt/badges/.badges/master/coverage.svg)](https://raw.githubusercontent.com/chaimleib/hebcalfmt/badges/.badges/master/treemap.svg)
 [![CodeQL](https://github.com/chaimleib/hebcalfmt/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/chaimleib/hebcalfmt/actions/workflows/github-code-scanning/codeql)
 [![GoDoc](https://pkg.go.dev/badge/github.com/chaimleib/hebcalfmt?status.svg)](https://pkg.go.dev/github.com/chaimleib/hebcalfmt)
