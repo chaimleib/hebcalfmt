@@ -600,21 +600,21 @@ Z'monim for Wednesday, 2026-01-21 / 3 Shvat 5786, in Austin
 
 This Shabbos we read Parshas Bo.
 
-06:08:17: Alos HaShachar (16.9 deg)
-06:40:28: Misheyakir (10.2 deg)
-07:26:36: Neitz (0.833 deg)
-10:02:29: Sof Z'man Kri'as Sh'ma
-10:55:42: Sof Z'man T'fillo
-12:42:07: Chatzos
-13:12:07: Mincho G'dolo (floored to 30m past chatzos)
-15:48:22: Mincho K'tano
-16:54:53: Plag HaMincho
-17:57:39: Shki'o (0.833 deg)
-18:01:24: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:23:17: Tzeis (6 deg/3 medium stars)
-00:41:58 (Thu): Chatzos HaLailo
+06:08:23: Alos HaShachar (16.9 deg)
+06:40:33: Misheyakir (10.2 deg)
+07:26:40: Neitz (0.833 deg)
+10:02:42: Sof Z'man Kri'as Sh'ma
+10:55:57: Sof Z'man T'fillo
+12:42:29: Chatzos
+13:12:29: Mincho G'dolo (floored to 30m past chatzos)
+15:48:53: Mincho K'tano
+16:55:28: Plag HaMincho
+17:58:17: Shki'o (0.833 deg)
+18:02:02: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:23:55: Tzeis (6 deg/3 medium stars)
+00:42:19 (Thu): Chatzos HaLailo
 
-A halachic hour is 53m13s.
+A halachic hour is 53m16s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -754,16 +754,16 @@ examples/mincha.tmpl
 $ hebcalfmt examples/mincha.tmpl 2025-09-01
 Mon Sep 01, 2025: 7:10 PM
 Tue Sep 02, 2025: 7:10 PM
-Wed Sep 03, 2025: 7:10 PM
+Wed Sep 03, 2025: 7:05 PM
 Thu Sep 04, 2025: 7:05 PM
 Fri Sep 05, 2025: 7:05 PM
-Sat Sep 06, 2025: 7:05 PM
+Sat Sep 06, 2025: 7:00 PM
 Sun Sep 07, 2025: 7:00 PM
 Mon Sep 08, 2025: 7:00 PM
-Tue Sep 09, 2025: 7:00 PM
+Tue Sep 09, 2025: 6:55 PM
 Wed Sep 10, 2025: 6:55 PM
 Thu Sep 11, 2025: 6:55 PM
-Fri Sep 12, 2025: 6:55 PM
+Fri Sep 12, 2025: 6:50 PM
 Sat Sep 13, 2025: 6:50 PM
 Sun Sep 14, 2025: 6:50 PM
 ```
@@ -821,28 +821,28 @@ A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
 $ CITY="Los Angeles" DATE=2025-12-14 hebcalfmt examples/customZmanim.tmpl
 Displaying zmanim for 2025-12-14 in Los Angeles.
 
-05:30:55: Alot HaShachar
-05:54:24: Misheyakir
-06:50:50: Netz
-11:47:54: Chatzot
-16:44:58: Shkiah
-17:25:51: 8.5 degrees below horizon
-18:37:51: 72m after 8.5 degrees below horizon
+05:30:48: Alot HaShachar
+05:54:17: Misheyakir
+06:50:43: Netz
+11:47:51: Chatzot
+16:45:00: Shkiah
+17:25:52: 8.5 degrees below horizon
+18:37:52: 72m after 8.5 degrees below horizon
 
 A halachic hour is 49m31s.
-06:50:50: 0 halachic hours
-07:40:20: 1 halachic hour
-08:29:51: 2 halachic hours
-09:19:22: 3 halachic hours
-10:08:52: 4 halachic hours
-10:58:23: 5 halachic hours
-11:47:54: 6 halachic hours
-12:37:24: 7 halachic hours
-13:26:55: 8 halachic hours
-14:16:26: 9 halachic hours
-15:05:56: 10 halachic hours
-15:55:27: 11 halachic hours
-16:44:58: 12 halachic hours
+06:50:43: 0 halachic hours
+07:40:14: 1 halachic hour
+08:29:45: 2 halachic hours
+09:19:17: 3 halachic hours
+10:08:48: 4 halachic hours
+10:58:20: 5 halachic hours
+11:47:51: 6 halachic hours
+12:37:22: 7 halachic hours
+13:26:54: 8 halachic hours
+14:16:25: 9 halachic hours
+15:05:57: 10 halachic hours
+15:55:28: 11 halachic hours
+16:45:00: 12 halachic hours
 ```
 
 ### Show zmanim for this Shabbos

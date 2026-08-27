@@ -49,19 +49,13 @@ func ForDate(loc *zmanim.Location) func(d time.Time) (*zmanim.Zmanim, error) {
 			return nil, errors.New("provided location was nil")
 		}
 
-		year, month, day := d.Date()
-		tz, err := time.LoadLocation(loc.TimeZoneId)
+		_, err := time.LoadLocation(loc.TimeZoneId)
 		if err != nil {
 			return nil, err
 		}
 
-		return &zmanim.Zmanim{
-			Location: loc,
-			Year:     year,
-			Month:    month,
-			Day:      day,
-			TimeZone: tz,
-		}, nil
+		z := zmanim.New(loc, d)
+		return &z, nil
 	}
 }
 

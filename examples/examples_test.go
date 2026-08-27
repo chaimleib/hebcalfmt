@@ -325,21 +325,21 @@ Tonight, count the 14th day of the Omer.
 
 This Shabbos we read Parshas Kedoshim.
 
-05:20:20: Alos HaShachar (16.9 deg)
+05:20:22: Alos HaShachar (16.9 deg)
 05:55:49: Misheyakir (10.2 deg)
-06:43:00: Neitz (0.833 deg)
-10:03:24: Sof Z'man Kri'as Sh'ma
-11:11:27: Sof Z'man T'fillo
-13:27:31: Chatzos
-14:01:32: Mincho G'dolo
-17:25:39: Mincho K'tano
-18:50:42: Plag HaMincho
-20:12:03: Shki'o (0.833 deg)
-20:15:45: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-20:37:48: Tzeis (6 deg/3 medium stars)
-01:27:08 (Tue): Chatzos HaLailo
+06:42:59: Neitz (0.833 deg)
+10:03:31: Sof Z'man Kri'as Sh'ma
+11:11:36: Sof Z'man T'fillo
+13:27:45: Chatzos
+14:01:47: Mincho G'dolo
+17:26:01: Mincho K'tano
+18:51:07: Plag HaMincho
+20:12:30: Shki'o (0.833 deg)
+20:16:12: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:38:18: Tzeis (6 deg/3 medium stars)
+01:27:21 (Tue): Chatzos HaLailo
 
-A halachic hour is 1h8m2s.
+A halachic hour is 1h8m5s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -357,21 +357,21 @@ The molad for next month, Iyyar, is Wednesday, 30 Nisan 5784 at 11:41 and 8 chal
 
 This Shabbos we read Parshas Bo.
 
-06:08:17: Alos HaShachar (16.9 deg)
-06:40:28: Misheyakir (10.2 deg)
-07:26:36: Neitz (0.833 deg)
-10:02:29: Sof Z'man Kri'as Sh'ma
-10:55:42: Sof Z'man T'fillo
-12:42:07: Chatzos
-13:12:07: Mincho G'dolo (floored to 30m past chatzos)
-15:48:22: Mincho K'tano
-16:54:53: Plag HaMincho
-17:57:39: Shki'o (0.833 deg)
-18:01:24: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:23:17: Tzeis (6 deg/3 medium stars)
-00:41:58 (Thu): Chatzos HaLailo
+06:08:23: Alos HaShachar (16.9 deg)
+06:40:33: Misheyakir (10.2 deg)
+07:26:40: Neitz (0.833 deg)
+10:02:42: Sof Z'man Kri'as Sh'ma
+10:55:57: Sof Z'man T'fillo
+12:42:29: Chatzos
+13:12:29: Mincho G'dolo (floored to 30m past chatzos)
+15:48:53: Mincho K'tano
+16:55:28: Plag HaMincho
+17:58:17: Shki'o (0.833 deg)
+18:02:02: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:23:55: Tzeis (6 deg/3 medium stars)
+00:42:19 (Thu): Chatzos HaLailo
 
-A halachic hour is 53m13s.
+A halachic hour is 53m16s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -390,21 +390,21 @@ Chanukah: 1 Candle
 
 This Shabbos we read Parshas Miketz.
 
-06:04:58: Alos HaShachar (16.9 deg)
-06:37:52: Misheyakir (10.2 deg)
-07:25:21: Neitz (0.833 deg)
-09:56:21: Sof Z'man Kri'as Sh'ma
-10:47:59: Sof Z'man T'fillo
-12:31:14: Chatzos
-13:01:14: Mincho G'dolo (floored to 30m past chatzos)
-15:31:56: Mincho K'tano
-16:36:28: Plag HaMincho
-17:37:08: Shki'o, Chanukah: 1 Candle (0.833 deg)
-17:41:01: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:03:35: Tzeis (6 deg/3 medium stars)
-00:31:26 (Thu): Chatzos HaLailo
+06:04:59: Alos HaShachar (16.9 deg)
+06:37:53: Misheyakir (10.2 deg)
+07:25:23: Neitz (0.833 deg)
+09:56:28: Sof Z'man Kri'as Sh'ma
+10:48:07: Sof Z'man T'fillo
+12:31:25: Chatzos
+13:01:25: Mincho G'dolo (floored to 30m past chatzos)
+15:32:12: Mincho K'tano
+16:36:46: Plag HaMincho
+17:37:27: Shki'o, Chanukah: 1 Candle (0.833 deg)
+17:41:20: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:03:54: Tzeis (6 deg/3 medium stars)
+00:31:37 (Thu): Chatzos HaLailo
 
-A halachic hour is 51m38s.
+A halachic hour is 51m39s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -423,21 +423,21 @@ Chanukah: 2 Candles
 
 This Shabbos we read Parshas Miketz.
 
-06:05:22: Alos HaShachar (16.9 deg)
-06:38:16: Misheyakir (10.2 deg)
-07:25:44: Neitz (0.833 deg)
-09:56:47: Sof Z'man Kri'as Sh'ma
-10:48:26: Sof Z'man T'fillo
-12:31:43: Chatzos
-13:01:43: Mincho G'dolo (floored to 30m past chatzos)
-15:32:29: Mincho K'tano
-16:37:02: Plag HaMincho
-17:37:43: Shki'o, Chanukah: 2 Candles (0.833 deg)
-17:41:36: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:04:09: Tzeis (6 deg/3 medium stars)
-00:31:54 (Fri): Chatzos HaLailo
+06:05:24: Alos HaShachar (16.9 deg)
+06:38:18: Misheyakir (10.2 deg)
+07:25:47: Neitz (0.833 deg)
+09:56:54: Sof Z'man Kri'as Sh'ma
+10:48:35: Sof Z'man T'fillo
+12:31:55: Chatzos
+13:01:55: Mincho G'dolo (floored to 30m past chatzos)
+15:32:46: Mincho K'tano
+16:37:21: Plag HaMincho
+17:38:03: Shki'o, Chanukah: 2 Candles (0.833 deg)
+17:41:56: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:04:30: Tzeis (6 deg/3 medium stars)
+00:32:06 (Fri): Chatzos HaLailo
 
-A halachic hour is 51m39s.
+A halachic hour is 51m40s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -456,22 +456,22 @@ Chanukah: 3 Candles
 
 This Shabbos we read Parshas Miketz.
 
-06:05:45: Alos HaShachar (16.9 deg)
-06:38:38: Misheyakir (10.2 deg)
-07:26:05: Neitz (0.833 deg)
-09:57:12: Sof Z'man Kri'as Sh'ma
-10:48:52: Sof Z'man T'fillo
-12:32:12: Chatzos
-13:02:12: Mincho G'dolo (floored to 30m past chatzos)
-15:33:02: Mincho K'tano
-16:37:37: Plag HaMincho
-17:20:19: Chanukah: 3 Candles, Licht Bentsh'n (18m)
-17:38:19: Shki'o (0.833 deg)
-17:42:12: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:04:45: Tzeis (6 deg/3 medium stars)
-00:32:22 (Sat): Chatzos HaLailo
+06:05:47: Alos HaShachar (16.9 deg)
+06:38:41: Misheyakir (10.2 deg)
+07:26:09: Neitz (0.833 deg)
+09:57:20: Sof Z'man Kri'as Sh'ma
+10:49:02: Sof Z'man T'fillo
+12:32:25: Chatzos
+13:02:25: Mincho G'dolo (floored to 30m past chatzos)
+15:33:20: Mincho K'tano
+16:37:57: Plag HaMincho
+17:20:41: Chanukah: 3 Candles, Licht Bentsh'n (18m)
+17:38:41: Shki'o (0.833 deg)
+17:42:34: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:05:07: Tzeis (6 deg/3 medium stars)
+00:32:35 (Sat): Chatzos HaLailo
 
-A halachic hour is 51m40s.
+A halachic hour is 51m41s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -491,21 +491,21 @@ Chanukah: 4 Candles
 
 This Shabbos we read Parshas Miketz.
 
-06:06:07: Alos HaShachar (16.9 deg)
-06:38:59: Misheyakir (10.2 deg)
-07:26:25: Neitz (0.833 deg)
-09:57:36: Sof Z'man Kri'as Sh'ma
-10:49:17: Sof Z'man T'fillo
-12:32:40: Chatzos
-13:02:40: Mincho G'dolo (floored to 30m past chatzos)
-15:33:35: Mincho K'tano
-16:38:12: Plag HaMincho
-17:38:56: Shki'o (0.833 deg)
-17:42:49: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:17:54: Havdolo, Chanukah: 4 Candles (8.5 deg/3 small stars)
-00:32:50 (Sun): Chatzos HaLailo
+06:06:10: Alos HaShachar (16.9 deg)
+06:39:03: Misheyakir (10.2 deg)
+07:26:29: Neitz (0.833 deg)
+09:57:45: Sof Z'man Kri'as Sh'ma
+10:49:28: Sof Z'man T'fillo
+12:32:54: Chatzos
+13:02:54: Mincho G'dolo (floored to 30m past chatzos)
+15:33:55: Mincho K'tano
+16:38:33: Plag HaMincho
+17:39:19: Shki'o (0.833 deg)
+17:43:12: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:18:18: Havdolo, Chanukah: 4 Candles (8.5 deg/3 small stars)
+00:33:04 (Sun): Chatzos HaLailo
 
-A halachic hour is 51m41s.
+A halachic hour is 51m43s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -524,21 +524,21 @@ Tishah BeAv
 
 This Shabbos we read Parshas Vaeschanan.
 
-05:27:36: Alos HaShachar (16.9 deg)
-06:03:23: Misheyakir (10.2 deg)
-06:50:52: Neitz (0.833 deg)
+05:27:43: Alos HaShachar (16.9 deg)
+06:03:31: Misheyakir (10.2 deg)
+06:51:00: Neitz (0.833 deg)
 10:12:06: Sof Z'man Kri'as Sh'ma
-11:20:26: Sof Z'man T'fillo
-13:37:05: Chatzos
-14:11:15: Mincho G'dolo
-17:36:14: Mincho K'tano
-19:01:38: Plag HaMincho
-20:23:19: Shki'o (0.833 deg)
-20:27:03: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-20:49:13: Tzeis, Fast ends (6 deg/3 medium stars)
-01:37:24 (Mon): Chatzos HaLailo
+11:20:23: Sof Z'man T'fillo
+13:36:56: Chatzos
+14:11:04: Mincho G'dolo
+17:35:54: Mincho K'tano
+19:01:14: Plag HaMincho
+20:22:52: Shki'o (0.833 deg)
+20:26:35: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:48:43: Tzeis, Fast ends (6 deg/3 medium stars)
+01:37:14 (Mon): Chatzos HaLailo
 
-A halachic hour is 1h8m20s.
+A halachic hour is 1h8m17s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -558,21 +558,21 @@ Shabbos Chazon
 
 This Shabbos we read Parshas Devarim.
 
-05:30:00: Alos HaShachar (16.9 deg)
-06:05:26: Misheyakir (10.2 deg)
-06:52:35: Neitz (0.833 deg)
-10:12:51: Sof Z'man Kri'as Sh'ma
-11:20:51: Sof Z'man T'fillo
-13:36:50: Chatzos
-14:10:50: Mincho G'dolo
-17:34:49: Mincho K'tano
-18:59:49: Plag HaMincho
-20:21:07: Shki'o, Fast starts (0.833 deg)
-20:24:49: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-20:59:32: Havdolo (8.5 deg/3 small stars)
-01:37:10 (Sun): Chatzos HaLailo
+05:30:01: Alos HaShachar (16.9 deg)
+06:05:29: Misheyakir (10.2 deg)
+06:52:39: Neitz (0.833 deg)
+10:12:48: Sof Z'man Kri'as Sh'ma
+11:20:44: Sof Z'man T'fillo
+13:36:38: Chatzos
+14:10:37: Mincho G'dolo
+17:34:27: Mincho K'tano
+18:59:23: Plag HaMincho
+20:20:38: Shki'o, Fast starts (0.833 deg)
+20:24:20: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:58:58: Havdolo (8.5 deg/3 small stars)
+01:36:57 (Sun): Chatzos HaLailo
 
-A halachic hour is 1h8m0s.
+A halachic hour is 1h7m57s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -591,21 +591,21 @@ Tishah BeAv (observed)
 
 This Shabbos we read Parshas Vaeschanan.
 
-05:30:51: Alos HaShachar (16.9 deg)
-06:06:10: Misheyakir (10.2 deg)
-06:53:12: Neitz (0.833 deg)
-10:13:07: Sof Z'man Kri'as Sh'ma
-11:21:00: Sof Z'man T'fillo
-13:36:44: Chatzos
-14:10:41: Mincho G'dolo
-17:34:18: Mincho K'tano
-18:59:08: Plag HaMincho
-20:20:18: Shki'o (0.833 deg)
-20:23:59: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-20:45:58: Tzeis, Fast ends (6 deg/3 medium stars)
-01:37:03 (Mon): Chatzos HaLailo
+05:30:52: Alos HaShachar (16.9 deg)
+06:06:13: Misheyakir (10.2 deg)
+06:53:15: Neitz (0.833 deg)
+10:13:02: Sof Z'man Kri'as Sh'ma
+11:20:52: Sof Z'man T'fillo
+13:36:31: Chatzos
+14:10:26: Mincho G'dolo
+17:33:54: Mincho K'tano
+18:58:41: Plag HaMincho
+20:19:47: Shki'o (0.833 deg)
+20:23:28: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:45:24: Tzeis, Fast ends (6 deg/3 medium stars)
+01:36:49 (Mon): Chatzos HaLailo
 
-A halachic hour is 1h7m52s.
+A halachic hour is 1h7m50s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -625,24 +625,24 @@ Ta'anis Bechoros
 
 This Shabbos we read Parshas hachag.
 
-05:45:36: Alos HaShachar, Fast starts (16.9 deg)
-06:18:40: Misheyakir (10.2 deg)
-07:03:34: Neitz (0.833 deg)
-10:15:23: Sof Z'man Kri'as Sh'ma
-11:20:30: Sof Z'man T'fillo
-11:20:30: Sof Z'man Achilas Chomeitz
-12:25:38: Sof Z'man Bi'ur Chomeitz
-13:30:45: Chatzos
-14:03:19: Mincho G'dolo
-17:18:41: Mincho K'tano
-18:40:05: Plag HaMincho
-19:39:57: Licht Bentsh'n (18m)
-19:57:57: Shki'o (0.833 deg)
-20:01:30: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-20:22:33: Tzeis, Fast ends (6 deg/3 medium stars)
-01:30:12 (Sat): Chatzos HaLailo
+05:45:52: Alos HaShachar, Fast starts (16.9 deg)
+06:18:54: Misheyakir (10.2 deg)
+07:03:46: Neitz (0.833 deg)
+10:15:41: Sof Z'man Kri'as Sh'ma
+11:20:51: Sof Z'man T'fillo
+11:20:51: Sof Z'man Achilas Chomeitz
+12:26:00: Sof Z'man Bi'ur Chomeitz
+13:31:10: Chatzos
+14:03:45: Mincho G'dolo
+17:19:13: Mincho K'tano
+18:40:40: Plag HaMincho
+19:40:34: Licht Bentsh'n (18m)
+19:58:34: Shki'o (0.833 deg)
+20:02:07: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:23:13: Tzeis, Fast ends (6 deg/3 medium stars)
+01:30:37 (Sat): Chatzos HaLailo
 
-A halachic hour is 1h5m7s.
+A halachic hour is 1h5m10s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -661,23 +661,23 @@ Yahrtzeit of the Tzemach Tzedek
 
 This Shabbos we read Parshas Tzav.
 
-05:50:30: Alos HaShachar (16.9 deg)
-06:23:14: Misheyakir (10.2 deg)
-07:07:49: Neitz (0.833 deg)
-10:17:59: Sof Z'man Kri'as Sh'ma
-11:22:33: Sof Z'man T'fillo
-12:27:07: Sof Z'man Bi'ur Chomeitz
-13:31:41: Chatzos
-14:03:59: Mincho G'dolo
-17:17:41: Mincho K'tano
-18:38:24: Plag HaMincho
-19:37:35: Licht Bentsh'n (18m)
-19:55:35: Shki'o (0.833 deg)
-19:59:07: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-20:20:03: Tzeis (6 deg/3 medium stars)
-01:31:07 (Sat): Chatzos HaLailo
+05:50:42: Alos HaShachar (16.9 deg)
+06:23:24: Misheyakir (10.2 deg)
+07:07:57: Neitz (0.833 deg)
+10:18:15: Sof Z'man Kri'as Sh'ma
+11:22:52: Sof Z'man T'fillo
+12:27:29: Sof Z'man Bi'ur Chomeitz
+13:32:06: Chatzos
+14:04:24: Mincho G'dolo
+17:18:14: Mincho K'tano
+18:39:00: Plag HaMincho
+19:38:14: Licht Bentsh'n (18m)
+19:56:14: Shki'o (0.833 deg)
+19:59:46: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:20:43: Tzeis (6 deg/3 medium stars)
+01:31:31 (Sat): Chatzos HaLailo
 
-A halachic hour is 1h4m34s.
+A halachic hour is 1h4m37s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -697,23 +697,23 @@ Shabbos HaGadol
 
 This Shabbos we read Parshas Tzav.
 
-05:49:12: Alos HaShachar (16.9 deg)
-06:22:00: Misheyakir (10.2 deg)
-07:06:40: Neitz (0.833 deg)
-10:17:17: Sof Z'man Kri'as Sh'ma
-11:22:00: Sof Z'man T'fillo
-11:22:00: Sof Z'man Achilas Chomeitz
-12:26:43: Sof Z'man Bittul Chomeitz
-13:31:26: Chatzos
-14:03:48: Mincho G'dolo
-17:17:57: Mincho K'tano
-18:38:51: Plag HaMincho
-19:56:13: Shki'o (0.833 deg)
-19:59:45: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-20:32:41: Licht Bentsh'n (8.5 deg/3 small stars)
-01:30:52 (Sun): Chatzos HaLailo
+05:49:24: Alos HaShachar (16.9 deg)
+06:22:11: Misheyakir (10.2 deg)
+07:06:49: Neitz (0.833 deg)
+10:17:34: Sof Z'man Kri'as Sh'ma
+11:22:19: Sof Z'man T'fillo
+11:22:19: Sof Z'man Achilas Chomeitz
+12:27:05: Sof Z'man Bittul Chomeitz
+13:31:50: Chatzos
+14:04:13: Mincho G'dolo
+17:18:30: Mincho K'tano
+18:39:27: Plag HaMincho
+19:56:51: Shki'o (0.833 deg)
+20:00:24: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+20:33:23: Licht Bentsh'n (8.5 deg/3 small stars)
+01:31:16 (Sun): Chatzos HaLailo
 
-A halachic hour is 1h4m43s.
+A halachic hour is 1h4m46s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
@@ -739,7 +739,9 @@ The molad for this month, Nisan, is Shabbos, 29 Adar 5785 at 7:46 and 1 cheilek 
 				args, files, now, templating.BuildData, &buf)
 			test.CheckErr(t, err, c.Err)
 
-			test.CheckString(t, "output", c.Want, buf.String())
+			gotLines := strings.Split(buf.String(), "\n")
+			wantLines := strings.Split(c.Want, "\n")
+			test.CheckSlice(t, "output", wantLines, gotLines)
 
 			if c.Usage {
 				if !strings.HasPrefix(logBuf.String(), "usage:\n  hebcalfmt ") {
@@ -962,19 +964,19 @@ Sun May 19, 2024: 7:55 PM
 			Name: "decreasing times",
 			Args: "8 1 2024",
 			Want: `Thu Aug 01, 2024: 7:55 PM
-Fri Aug 02, 2024: 7:55 PM
+Fri Aug 02, 2024: 7:50 PM
 Sat Aug 03, 2024: 7:50 PM
 Sun Aug 04, 2024: 7:50 PM
 Mon Aug 05, 2024: 7:50 PM
-Tue Aug 06, 2024: 7:50 PM
+Tue Aug 06, 2024: 7:45 PM
 Wed Aug 07, 2024: 7:45 PM
 Thu Aug 08, 2024: 7:45 PM
 Fri Aug 09, 2024: 7:45 PM
-Sat Aug 10, 2024: 7:45 PM
+Sat Aug 10, 2024: 7:40 PM
 Sun Aug 11, 2024: 7:40 PM
 Mon Aug 12, 2024: 7:40 PM
 Tue Aug 13, 2024: 7:40 PM
-Wed Aug 14, 2024: 7:40 PM
+Wed Aug 14, 2024: 7:35 PM
 `,
 		},
 	}
@@ -1174,28 +1176,28 @@ func TestExamples_CustomZmanim(t *testing.T) {
 			Name: "empty inputs",
 			Want: `Displaying zmanim for 2024-05-06 in Phoenix.
 
-04:12:31: Alot HaShachar
-04:38:19: Misheyakir
-05:34:45: Netz
-12:24:51: Chatzot
-19:14:57: Shkiah
-19:55:07: 8.5 degrees below horizon
-21:07:07: 72m after 8.5 degrees below horizon
+04:12:33: Alot HaShachar
+04:38:20: Misheyakir
+05:34:43: Netz
+12:25:05: Chatzot
+19:15:28: Shkiah
+19:55:43: 8.5 degrees below horizon
+21:07:43: 72m after 8.5 degrees below horizon
 
-A halachic hour is 1h8m21s.
-05:34:45: 0 halachic hours
+A halachic hour is 1h8m24s.
+05:34:43: 0 halachic hours
 06:43:06: 1 halachic hour
-07:51:27: 2 halachic hours
-08:59:48: 3 halachic hours
-10:08:09: 4 halachic hours
-11:16:30: 5 halachic hours
-12:24:51: 6 halachic hours
-13:33:12: 7 halachic hours
-14:41:33: 8 halachic hours
-15:49:54: 9 halachic hours
-16:58:15: 10 halachic hours
-18:06:36: 11 halachic hours
-19:14:57: 12 halachic hours
+07:51:30: 2 halachic hours
+08:59:54: 3 halachic hours
+10:08:18: 4 halachic hours
+11:16:41: 5 halachic hours
+12:25:05: 6 halachic hours
+13:33:29: 7 halachic hours
+14:41:53: 8 halachic hours
+15:50:16: 9 halachic hours
+16:58:40: 10 halachic hours
+18:07:04: 11 halachic hours
+19:15:28: 12 halachic hours
 `,
 		},
 		{
@@ -1203,28 +1205,28 @@ A halachic hour is 1h8m21s.
 			City: "Johannesburg",
 			Want: `Displaying zmanim for 2024-05-06 in Johannesburg.
 
-05:23:58: Alot HaShachar
-05:44:56: Misheyakir
-06:34:20: Netz
-12:04:24: Chatzot
-17:34:29: Shkiah
-18:10:06: 8.5 degrees below horizon
-19:22:06: 72m after 8.5 degrees below horizon
+05:24:02: Alot HaShachar
+05:45:00: Misheyakir
+06:34:25: Netz
+12:04:16: Chatzot
+17:34:08: Shkiah
+18:09:47: 8.5 degrees below horizon
+19:21:47: 72m after 8.5 degrees below horizon
 
-A halachic hour is 55m1s.
-06:34:20: 0 halachic hours
-07:29:20: 1 halachic hour
-08:24:21: 2 halachic hours
-09:19:22: 3 halachic hours
-10:14:23: 4 halachic hours
-11:09:23: 5 halachic hours
-12:04:24: 6 halachic hours
-12:59:25: 7 halachic hours
-13:54:26: 8 halachic hours
-14:49:26: 9 halachic hours
-15:44:27: 10 halachic hours
-16:39:28: 11 halachic hours
-17:34:29: 12 halachic hours
+A halachic hour is 54m59s.
+06:34:25: 0 halachic hours
+07:29:23: 1 halachic hour
+08:24:22: 2 halachic hours
+09:19:20: 3 halachic hours
+10:14:19: 4 halachic hours
+11:09:17: 5 halachic hours
+12:04:16: 6 halachic hours
+12:59:15: 7 halachic hours
+13:54:13: 8 halachic hours
+14:49:12: 9 halachic hours
+15:44:10: 10 halachic hours
+16:39:09: 11 halachic hours
+17:34:08: 12 halachic hours
 `,
 		},
 		{
@@ -1232,28 +1234,28 @@ A halachic hour is 55m1s.
 			Date: "2024-05-18",
 			Want: `Displaying zmanim for 2024-05-18 in Phoenix.
 
-04:00:19: Alot HaShachar
-04:27:23: Misheyakir
-05:25:45: Netz
-12:24:53: Chatzot
-19:24:01: Shkiah
-20:05:27: 8.5 degrees below horizon
-21:17:27: 72m after 8.5 degrees below horizon
+04:00:12: Alot HaShachar
+04:27:15: Misheyakir
+05:25:35: Netz
+12:24:58: Chatzot
+19:24:21: Shkiah
+20:05:52: 8.5 degrees below horizon
+21:17:52: 72m after 8.5 degrees below horizon
 
-A halachic hour is 1h9m51s.
-05:25:45: 0 halachic hours
-06:35:36: 1 halachic hour
-07:45:27: 2 halachic hours
-08:55:19: 3 halachic hours
+A halachic hour is 1h9m54s.
+05:25:35: 0 halachic hours
+06:35:28: 1 halachic hour
+07:45:22: 2 halachic hours
+08:55:16: 3 halachic hours
 10:05:10: 4 halachic hours
-11:15:01: 5 halachic hours
-12:24:53: 6 halachic hours
-13:34:44: 7 halachic hours
-14:44:35: 8 halachic hours
-15:54:27: 9 halachic hours
-17:04:18: 10 halachic hours
-18:14:09: 11 halachic hours
-19:24:01: 12 halachic hours
+11:15:04: 5 halachic hours
+12:24:58: 6 halachic hours
+13:34:51: 7 halachic hours
+14:44:45: 8 halachic hours
+15:54:39: 9 halachic hours
+17:04:33: 10 halachic hours
+18:14:27: 11 halachic hours
+19:24:21: 12 halachic hours
 `,
 		},
 		{
