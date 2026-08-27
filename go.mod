@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	github.com/hebcal/greg v1.1.0
-	github.com/hebcal/hdate v1.2.1
+	github.com/hebcal/hdate v1.4.0
 	github.com/hebcal/hebcal-go v0.11.0
 	github.com/spf13/pflag v1.0.10
 )
