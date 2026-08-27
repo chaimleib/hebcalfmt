@@ -596,9 +596,9 @@ Elul     29 Birthday of the Tzemach Tzedek
 
 ```bash
 $ hebcalfmt -c examples/chabad.json examples/chabad.tmpl 2026-01-21
-Z'monim for Wednesday, 2026-01-21 / 3 Sh'vot 5786, in Austin
+Z'monim for Wednesday, 2026-01-21 / 3 Shvat 5786, in Austin
 
-This Shabbos we read Porshas Bo.
+This Shabbos we read Parshas Bo.
 
 06:08:17: Alos HaShachar (16.9 deg)
 06:40:28: Misheyakir (10.2 deg)
@@ -622,7 +622,7 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Sh'vot, is Sunday, 29 Teiveis 5786 at 3:06 and 11 chalokim PM.
+The molad for this month, Shvat, is Sunday, 29 Teives 5786 at 3:06 and 11 chalokim PM.
 ```
 
 
@@ -914,7 +914,7 @@ Erev Shabbat: Fri Dec 19 2025 / 29 Kislev 5786
 05:05 PM: Candle lighting
 
 Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
-06:08 AM: Alot haShachar
+06:08 AM: Alot HaShachar
 06:32 AM: Misheyakir
 06:38 AM: Misheyakir Machmir
 07:28 AM: Sunrise
@@ -922,7 +922,7 @@ Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 09:57 AM: Kriat Shema, sof zeman (GRA)
 10:22 AM: Tefilah, sof zeman (MGA)
 10:46 AM: Tefilah, sof zeman (GRA)
-12:26 PM: Chatzot hayom
+12:26 PM: Chatzot HaYom
 12:50 PM: Mincha Gedolah
 03:19 PM: Mincha Ketanah
 04:21 PM: Plag HaMincha
