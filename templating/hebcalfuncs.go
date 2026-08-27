@@ -25,12 +25,22 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		// using as<Kind>Event functions.
 		"hebcal": Hebcal(opts),
 
+		// getHolidaysOnDate takes a hdate.HDate and a bool for Israel,
+		// and returns the holidays.
+		"getHolidaysOnDate": hebcal.GetHolidaysOnDate,
+
 		// timedEvents returns a slice of [hebcal.TimedEvent]
 		"timedEvents":   TimedEvents(opts),
 		"eventsByFlags": EventsByFlags,
 
 		"dayHasFlags":          DayHasFlags(opts),
 		"dayIsShabbatOrYomTov": DayIsShabbatOrYomTov(opts),
+
+		// isAssurBemlacha takes a time.Time, *zmanim.Location, bool for Israel,
+		// and bool for useElevation, and returns whether that moment
+		// falls within a period when melacha (work) is prohibited -
+		// that is, Shabbat or a Yom Tov.
+		"isAssurBemlacha": hebcal.IsAssurBemlacha,
 	}
 }
 

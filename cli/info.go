@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hebcal/hebcal-go/locales"
 	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/hebcal/locales"
 
 	"github.com/chaimleib/hebcalfmt/config"
 )

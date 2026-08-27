@@ -14,7 +14,6 @@ import (
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
-	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
 
 	"github.com/chaimleib/hebcalfmt/config"
@@ -107,10 +106,22 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 			}
 
 		case *daterange.DateRange:
-			test.CheckNilPtrThen(t, test.CheckDateRange, field.Name, typedWant, field.Got)
+			test.CheckNilPtrThen(
+				t,
+				test.CheckDateRange,
+				field.Name,
+				typedWant,
+				field.Got,
+			)
 
 		case *config.Coordinates:
-			test.CheckNilPtrThen(t, test.CheckCoordinates, field.Name, typedWant, field.Got)
+			test.CheckNilPtrThen(
+				t,
+				test.CheckCoordinates,
+				field.Name,
+				typedWant,
+				field.Got,
+			)
 
 		case []string:
 			typedGot := field.Got.([]string)
@@ -317,6 +328,7 @@ func TestCalOptions(t *testing.T) {
 		CountryCode: "US",
 		Latitude:    40.71427,
 		Longitude:   -74.00597,
+		Elevation:   57,
 		TimeZoneId:  "America/New_York",
 	}
 	failingFS := func() (fs.FS, error) {
@@ -817,7 +829,7 @@ func TestSetShiurim(t *testing.T) {
 			Want: func() *hebcal.CalOptions {
 				opts := baseWant()
 				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = yerushalmi.Vilna
+				opts.YerushalmiEdition = hebcal.Vilna
 				return opts
 			}(),
 		},
@@ -828,7 +840,7 @@ func TestSetShiurim(t *testing.T) {
 			Want: func() *hebcal.CalOptions {
 				opts := baseWant()
 				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = yerushalmi.Vilna
+				opts.YerushalmiEdition = hebcal.Vilna
 				return opts
 			}(),
 		},
@@ -839,7 +851,7 @@ func TestSetShiurim(t *testing.T) {
 			Want: func() *hebcal.CalOptions {
 				opts := baseWant()
 				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = yerushalmi.Schottenstein
+				opts.YerushalmiEdition = hebcal.Schottenstein
 				return opts
 			}(),
 		},
@@ -886,7 +898,7 @@ func TestSetShiurim(t *testing.T) {
 			},
 			Want: &hebcal.CalOptions{
 				YerushalmiYomi:    true,
-				YerushalmiEdition: yerushalmi.Vilna,
+				YerushalmiEdition: hebcal.Vilna,
 				MishnaYomi:        true,
 				DafYomi:           true,
 				NachYomi:          true,
@@ -959,6 +971,7 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "US",
 				Latitude:    40.71427,
 				Longitude:   -74.00597,
+				Elevation:   57,
 				TimeZoneId:  "America/New_York",
 			},
 		},
@@ -970,6 +983,7 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "US",
 				Latitude:    40.71427,
 				Longitude:   -74.00597,
+				Elevation:   57,
 				TimeZoneId:  "Asia/Jerusalem",
 			},
 		},
@@ -981,6 +995,7 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "US",
 				Latitude:    39.73915,
 				Longitude:   -104.9847,
+				Elevation:   1636,
 				TimeZoneId:  "America/Denver",
 			},
 		},
@@ -997,6 +1012,7 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "ZZ",
 				Latitude:    1.5,
 				Longitude:   2.5,
+				Elevation:   0,
 				TimeZoneId:  "UTC",
 			},
 		},
@@ -1012,11 +1028,12 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "ZZ",
 				Latitude:    0,
 				Longitude:   0,
+				Elevation:   0,
 				TimeZoneId:  "UTC",
 			},
 		},
 		{
-			Name: "named Geo in Israel",
+			Name: "named Geo in Israel, no elevation",
 			Cfg: config.Config{
 				City:     "Kotel",
 				Timezone: "Asia/Jerusalem",

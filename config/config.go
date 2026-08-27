@@ -14,9 +14,8 @@ import (
 
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
-	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
+	"github.com/hebcal/locales"
 
 	"github.com/chaimleib/hebcalfmt/daterange"
 	"github.com/chaimleib/hebcalfmt/fsys"
@@ -110,6 +109,9 @@ type Config struct {
 
 	// CandleLighting adds entries for candlelighting times.
 	CandleLighting bool `json:"candle_lighting"`
+
+	// UseElevation enables elevation when calculating zmanim.
+	UseElevation bool `json:"use_elevation"`
 
 	// DailyZmanim adds zmanim events for every day.
 	DailyZmanim bool `json:"daily_zmanim"`
@@ -286,6 +288,7 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	cOpts.Hour24 = c.Hour24
 	cOpts.SunriseSunset = c.SunriseSunset
 	cOpts.CandleLighting = c.CandleLighting
+	cOpts.UseElevation = c.UseElevation
 	cOpts.DailyZmanim = c.DailyZmanim
 	cOpts.Molad = c.Molad
 	cOpts.WeeklyAbbreviated = c.WeeklyAbbreviated
@@ -513,23 +516,23 @@ func SetShiurim(cOpts *hebcal.CalOptions, shiurim []string) error {
 		case "yerushalmi", "yerushalmi:vilna":
 			// TODO: allow both for user comparison
 			if cOpts.YerushalmiEdition != 0 &&
-				cOpts.YerushalmiEdition != yerushalmi.Vilna {
+				cOpts.YerushalmiEdition != hebcal.Vilna {
 				return errors.New(
 					"shiurim: conflicting yerushalmi edition settings found",
 				)
 			}
 			cOpts.YerushalmiYomi = true
-			cOpts.YerushalmiEdition = yerushalmi.Vilna
+			cOpts.YerushalmiEdition = hebcal.Vilna
 		case "yerushalmi:schottenstein":
 			// TODO: allow both for user comparison
 			if cOpts.YerushalmiEdition != 0 &&
-				cOpts.YerushalmiEdition != yerushalmi.Schottenstein {
+				cOpts.YerushalmiEdition != hebcal.Schottenstein {
 				return errors.New(
 					"shiurim: conflicting yerushalmi edition settings found",
 				)
 			}
 			cOpts.YerushalmiYomi = true
-			cOpts.YerushalmiEdition = yerushalmi.Schottenstein
+			cOpts.YerushalmiEdition = hebcal.Schottenstein
 		case "mishna-yomi":
 			cOpts.MishnaYomi = true
 		case "daf-yomi":

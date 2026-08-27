@@ -915,7 +915,7 @@ Erev Shabbat: Fri Dec 19 2025 / 29 Kislev 5786
 
 Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 06:08 AM: Alot HaShachar
-06:32 AM: Misheyakir
+06:31 AM: Misheyakir
 06:38 AM: Misheyakir Machmir
 07:28 AM: Sunrise
 09:21 AM: Kriat Shema, sof zeman (MGA)
@@ -924,8 +924,8 @@ Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 10:46 AM: Tefilah, sof zeman (GRA)
 12:26 PM: Chatzot HaYom
 12:50 PM: Mincha Gedolah
-03:19 PM: Mincha Ketanah
-04:21 PM: Plag HaMincha
+03:20 PM: Mincha Ketanah
+04:22 PM: Plag HaMincha
 05:24 PM: Sunset
 05:43 PM: Bein HaShemashot
 06:36 PM: Havdalah

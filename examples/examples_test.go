@@ -1029,7 +1029,7 @@ Shabbat: Sat May 11 2024 / 3 Iyyar 5784
 12:59 PM: Mincha Gedolah
 04:26 PM: Mincha Ketanah
 05:52 PM: Plag HaMincha
-07:18 PM: Sunset
+07:19 PM: Sunset
 07:38 PM: Bein HaShemashot
 08:31 PM: Havdalah
 `,
@@ -1055,7 +1055,7 @@ Shabbat: Sat May 11 2024 / 3 Iyyar 5784
 12:59 PM: Mincha Gedolah
 04:26 PM: Mincha Ketanah
 05:52 PM: Plag HaMincha
-07:18 PM: Sunset
+07:19 PM: Sunset
 07:38 PM: Bein HaShemashot
 08:31 PM: Havdalah
 `,
@@ -1081,7 +1081,7 @@ Shabbat: Sat May 11 2024 / 3 Iyyar 5784
 12:59 PM: Mincha Gedolah
 04:26 PM: Mincha Ketanah
 05:52 PM: Plag HaMincha
-07:18 PM: Sunset
+07:19 PM: Sunset
 07:38 PM: Bein HaShemashot
 08:31 PM: Havdalah
 `,
@@ -1118,7 +1118,7 @@ Shabbat: Sat May 18 2024 / 10 Iyyar 5784
 			Want: `This Shabbat in Phoenix:
 
 Erev Shabbat: Fri Aug 2 2024 / 27 Tammuz 5784
-07:09 PM: Candle lighting
+07:08 PM: Candle lighting
 
 Shabbat: Sat Aug 3 2024 / 28 Tammuz 5784
 04:19 AM: Alot HaShachar
@@ -1132,9 +1132,9 @@ Shabbat: Sat Aug 3 2024 / 28 Tammuz 5784
 12:34 PM: Chatzot HaYom
 01:08 PM: Mincha Gedolah
 04:34 PM: Mincha Ketanah
-06:00 PM: Plag HaMincha
-07:26 PM: Sunset
-07:45 PM: Bein HaShemashot
+05:59 PM: Plag HaMincha
+07:25 PM: Sunset
+07:44 PM: Bein HaShemashot
 08:38 PM: Havdalah
 `,
 		},
