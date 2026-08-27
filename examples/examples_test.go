@@ -320,10 +320,10 @@ func TestExamples_Chabad(t *testing.T) {
 	cases := []Case{
 		{
 			Name: "empty args",
-			Want: `Z'monim for Monday, 2024-05-06 / 28 Nison 5784, in Austin
+			Want: `Z'monim for Monday, 2024-05-06 / 28 Nisan 5784, in Austin
 Tonight, count the 14th day of the Omer.
 
-This Shabbos we read Porshas K'doshim.
+This Shabbos we read Parshas Kedoshim.
 
 05:20:20: Alos HaShachar (16.9 deg)
 05:55:49: Misheyakir (10.2 deg)
@@ -347,15 +347,15 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Iyyor, is Wednesday, 30 Nison 5784 at 11:41 and 8 chalokim AM.
+The molad for next month, Iyyar, is Wednesday, 30 Nisan 5784 at 11:41 and 8 chalokim AM.
 `,
 		},
 		{
 			Name: "2026-01-21, floored Mincho G'dolo",
 			Args: "2026-01-21",
-			Want: `Z'monim for Wednesday, 2026-01-21 / 3 Sh'vot 5786, in Austin
+			Want: `Z'monim for Wednesday, 2026-01-21 / 3 Shvat 5786, in Austin
 
-This Shabbos we read Porshas Bo.
+This Shabbos we read Parshas Bo.
 
 06:08:17: Alos HaShachar (16.9 deg)
 06:40:28: Misheyakir (10.2 deg)
@@ -379,16 +379,16 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Sh'vot, is Sunday, 29 Teiveis 5786 at 3:06 and 11 chalokim PM.
+The molad for this month, Shvat, is Sunday, 29 Teives 5786 at 3:06 and 11 chalokim PM.
 `,
 		},
 		{
-			Name: "Kisleiv 24 5785, Chanuko 1 light at 0.833",
-			Args: "Kisleiv 24 5785",
-			Want: `Z'monim for Wednesday, 2024-12-25 / 24 Kisleiv 5785, in Austin
-Chanuko: 1 Candle
+			Name: "Kislev 24 5785, Chanukah 1 light at 0.833",
+			Args: "Kislev 24 5785",
+			Want: `Z'monim for Wednesday, 2024-12-25 / 24 Kislev 5785, in Austin
+Chanukah: 1 Candle
 
-This Shabbos we read Porshas Mikeitz.
+This Shabbos we read Parshas Miketz.
 
 06:04:58: Alos HaShachar (16.9 deg)
 06:37:52: Misheyakir (10.2 deg)
@@ -399,7 +399,7 @@ This Shabbos we read Porshas Mikeitz.
 13:01:14: Mincho G'dolo (floored to 30m past chatzos)
 15:31:56: Mincho K'tano
 16:36:28: Plag HaMincho
-17:37:08: Shki'o, Chanuko: 1 Candle (0.833 deg)
+17:37:08: Shki'o, Chanukah: 1 Candle (0.833 deg)
 17:41:01: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:03:35: Tzeis (6 deg/3 medium stars)
 00:31:26 (Thu): Chatzos HaLailo
@@ -412,16 +412,16 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
+The molad for next month, Teives, is Monday, 29 Kislev 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Kisleiv 25 5785, Chanuko 2 lights at 0.833",
+			Name: "Kislev 25 5785, Chanukah 2 lights at 0.833",
 			Args: "Kislev 25 5785",
-			Want: `Z'monim for Thursday, 2024-12-26 / 25 Kisleiv 5785, in Austin
-Chanuko: 2 Candles
+			Want: `Z'monim for Thursday, 2024-12-26 / 25 Kislev 5785, in Austin
+Chanukah: 2 Candles
 
-This Shabbos we read Porshas Mikeitz.
+This Shabbos we read Parshas Miketz.
 
 06:05:22: Alos HaShachar (16.9 deg)
 06:38:16: Misheyakir (10.2 deg)
@@ -432,7 +432,7 @@ This Shabbos we read Porshas Mikeitz.
 13:01:43: Mincho G'dolo (floored to 30m past chatzos)
 15:32:29: Mincho K'tano
 16:37:02: Plag HaMincho
-17:37:43: Shki'o, Chanuko: 2 Candles (0.833 deg)
+17:37:43: Shki'o, Chanukah: 2 Candles (0.833 deg)
 17:41:36: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:04:09: Tzeis (6 deg/3 medium stars)
 00:31:54 (Fri): Chatzos HaLailo
@@ -445,16 +445,16 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
+The molad for next month, Teives, is Monday, 29 Kislev 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Kisleiv 26 5785, Chanuko 3 lights at 0.833 - 18m",
+			Name: "Kislev 26 5785, Chanukah 3 lights at 0.833 - 18m",
 			Args: "Kislev 26 5785",
-			Want: `Z'monim for Friday, 2024-12-27 / 26 Kisleiv 5785, in Austin
-Chanuko: 3 Candles
+			Want: `Z'monim for Friday, 2024-12-27 / 26 Kislev 5785, in Austin
+Chanukah: 3 Candles
 
-This Shabbos we read Porshas Mikeitz.
+This Shabbos we read Parshas Miketz.
 
 06:05:45: Alos HaShachar (16.9 deg)
 06:38:38: Misheyakir (10.2 deg)
@@ -465,7 +465,7 @@ This Shabbos we read Porshas Mikeitz.
 13:02:12: Mincho G'dolo (floored to 30m past chatzos)
 15:33:02: Mincho K'tano
 16:37:37: Plag HaMincho
-17:20:19: Chanuko: 3 Candles, Licht Bentsh'n (18m)
+17:20:19: Chanukah: 3 Candles, Licht Bentsh'n (18m)
 17:38:19: Shki'o (0.833 deg)
 17:42:12: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:04:45: Tzeis (6 deg/3 medium stars)
@@ -479,17 +479,17 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
+The molad for next month, Teives, is Monday, 29 Kislev 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Kisleiv 27 5785, Chanuko 4 lights at 8.5",
-			Args: "Kisleiv 27 5785",
-			Want: `Z'monim for Shabbos, 2024-12-28 / 27 Kisleiv 5785, in Austin
-Shabbos M'vorchim Chodesh Teiveis
-Chanuko: 4 Candles
+			Name: "Kislev 27 5785, Chanukah 4 lights at 8.5",
+			Args: "Kislev 27 5785",
+			Want: `Z'monim for Shabbos, 2024-12-28 / 27 Kislev 5785, in Austin
+Shabbos Mevarchim Chodesh Teives
+Chanukah: 4 Candles
 
-This Shabbos we read Porshas Mikeitz.
+This Shabbos we read Parshas Miketz.
 
 06:06:07: Alos HaShachar (16.9 deg)
 06:38:59: Misheyakir (10.2 deg)
@@ -502,7 +502,7 @@ This Shabbos we read Porshas Mikeitz.
 16:38:12: Plag HaMincho
 17:38:56: Shki'o (0.833 deg)
 17:42:49: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:17:54: Havdolo, Chanuko: 4 Candles (8.5 deg/3 small stars)
+18:17:54: Havdolo, Chanukah: 4 Candles (8.5 deg/3 small stars)
 00:32:50 (Sun): Chatzos HaLailo
 
 A halachic hour is 51m41s.
@@ -513,16 +513,16 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for next month, Teiveis, is Monday, 29 Kisleiv 5785 at 5:33 and 16 chalokim PM.
+The molad for next month, Teives, is Monday, 29 Kislev 5785 at 5:33 and 16 chalokim PM.
 `,
 		},
 		{
-			Name: "Ov 9 5785, Tisha B'Ov",
+			Name: "Av 9 5785, Tisha BeAv",
 			Args: "Av 9 5785",
-			Want: `Z'monim for Sunday, 2025-08-03 / 9 Ov 5785, in Austin
-Tisho B'Ov
+			Want: `Z'monim for Sunday, 2025-08-03 / 9 Av 5785, in Austin
+Tishah BeAv
 
-This Shabbos we read Porshas Vo'eschanan.
+This Shabbos we read Parshas Vaeschanan.
 
 05:27:36: Alos HaShachar (16.9 deg)
 06:03:23: Misheyakir (10.2 deg)
@@ -546,17 +546,17 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Ov, is Friday, 29 Tammuz 5785 at 10:42 and 5 chalokim AM.
+The molad for this month, Av, is Friday, 29 Tammuz 5785 at 10:42 and 5 chalokim AM.
 `,
 		},
 		{
-			Name: "Ov 9 5782, Tisho B'Ov shenidcheh",
+			Name: "Av 9 5782, Tishah BeAv shenidcheh",
 			Args: "Av 9 5782",
-			Want: `Z'monim for Shabbos, 2022-08-06 / 9 Ov 5782, in Austin
-Erev Tisho B'Ov
+			Want: `Z'monim for Shabbos, 2022-08-06 / 9 Av 5782, in Austin
+Erev Tishah BeAv
 Shabbos Chazon
 
-This Shabbos we read Porshas D'vorim.
+This Shabbos we read Parshas Devarim.
 
 05:30:00: Alos HaShachar (16.9 deg)
 06:05:26: Misheyakir (10.2 deg)
@@ -580,16 +580,16 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Ov, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalokim PM.
+The molad for this month, Av, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalokim PM.
 `,
 		},
 		{
-			Name: "Ov 10 5782, Tisha B'Ov shenidcheh",
+			Name: "Av 10 5782, Tishah BeAv shenidcheh",
 			Args: "Av 10 5782",
-			Want: `Z'monim for Sunday, 2022-08-07 / 10 Ov 5782, in Austin
-Tisho B'Ov (observed)
+			Want: `Z'monim for Sunday, 2022-08-07 / 10 Av 5782, in Austin
+Tishah BeAv (observed)
 
-This Shabbos we read Porshas Vo'eschanan.
+This Shabbos we read Parshas Vaeschanan.
 
 05:30:51: Alos HaShachar (16.9 deg)
 06:06:10: Misheyakir (10.2 deg)
@@ -613,17 +613,17 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Ov, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalokim PM.
+The molad for this month, Av, is Thursday, 29 Tammuz 5782 at 7:32 and 4 chalokim PM.
 `,
 		},
 		{
 			Name: "Nisan 14 5782, Erev Pesach",
 			Args: "Nisan 14 5782",
-			Want: `Z'monim for Friday, 2022-04-15 / 14 Nison 5782, in Austin
+			Want: `Z'monim for Friday, 2022-04-15 / 14 Nisan 5782, in Austin
 Erev Pesach
 Ta'anis Bechoros
 
-This Shabbos we read Porshas hachag.
+This Shabbos we read Parshas hachag.
 
 05:45:36: Alos HaShachar, Fast starts (16.9 deg)
 06:18:40: Misheyakir (10.2 deg)
@@ -650,16 +650,16 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Nison, is Friday, 29 Ador II 5782 at 4:36 and 0 chalokim PM.
+The molad for this month, Nisan, is Friday, 29 Adar II 5782 at 4:36 and 0 chalokim PM.
 `,
 		},
 		{
 			Name: "Nisan 13 5785, Early biur chametz, Erev Pesach is Shabbos",
 			Args: "Nisan 13 5785",
-			Want: `Z'monim for Friday, 2025-04-11 / 13 Nison 5785, in Austin
+			Want: `Z'monim for Friday, 2025-04-11 / 13 Nisan 5785, in Austin
 Yahrtzeit of the Tzemach Tzedek
 
-This Shabbos we read Porshas Tzav.
+This Shabbos we read Parshas Tzav.
 
 05:50:30: Alos HaShachar (16.9 deg)
 06:23:14: Misheyakir (10.2 deg)
@@ -685,17 +685,17 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Nison, is Shabbos, 29 Ador 5785 at 7:46 and 1 cheilek AM.
+The molad for this month, Nisan, is Shabbos, 29 Adar 5785 at 7:46 and 1 cheilek AM.
 `,
 		},
 		{
 			Name: "Nisan 14 5785, Bittul chametz, Erev Pesach on Shabbos",
 			Args: "Nisan 14 5785",
-			Want: `Z'monim for Shabbos, 2025-04-12 / 14 Nison 5785, in Austin
+			Want: `Z'monim for Shabbos, 2025-04-12 / 14 Nisan 5785, in Austin
 Erev Pesach
-Shabbos HaGodol
+Shabbos HaGadol
 
-This Shabbos we read Porshas Tzav.
+This Shabbos we read Parshas Tzav.
 
 05:49:12: Alos HaShachar (16.9 deg)
 06:22:00: Misheyakir (10.2 deg)
@@ -721,7 +721,7 @@ They also do not account for atmospheric conditions, local elevation, and local 
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
-The molad for this month, Nison, is Shabbos, 29 Ador 5785 at 7:46 and 1 cheilek AM.
+The molad for this month, Nisan, is Shabbos, 29 Adar 5785 at 7:46 and 1 cheilek AM.
 `,
 		},
 	}
@@ -1017,7 +1017,7 @@ Erev Shabbat: Fri May 10 2024 / 2 Iyyar 5784
 07:00 PM: Candle lighting
 
 Shabbat: Sat May 11 2024 / 3 Iyyar 5784
-04:07 AM: Alot haShachar
+04:07 AM: Alot HaShachar
 04:33 AM: Misheyakir
 04:40 AM: Misheyakir Machmir
 05:30 AM: Sunrise
@@ -1025,7 +1025,7 @@ Shabbat: Sat May 11 2024 / 3 Iyyar 5784
 08:57 AM: Kriat Shema, sof zeman (GRA)
 09:42 AM: Tefilah, sof zeman (MGA)
 10:06 AM: Tefilah, sof zeman (GRA)
-12:24 PM: Chatzot hayom
+12:24 PM: Chatzot HaYom
 12:59 PM: Mincha Gedolah
 04:26 PM: Mincha Ketanah
 05:52 PM: Plag HaMincha
@@ -1043,7 +1043,7 @@ Erev Shabbat: Fri May 10 2024 / 2 Iyyar 5784
 07:00 PM: Candle lighting
 
 Shabbat: Sat May 11 2024 / 3 Iyyar 5784
-04:07 AM: Alot haShachar
+04:07 AM: Alot HaShachar
 04:33 AM: Misheyakir
 04:40 AM: Misheyakir Machmir
 05:30 AM: Sunrise
@@ -1051,7 +1051,7 @@ Shabbat: Sat May 11 2024 / 3 Iyyar 5784
 08:57 AM: Kriat Shema, sof zeman (GRA)
 09:42 AM: Tefilah, sof zeman (MGA)
 10:06 AM: Tefilah, sof zeman (GRA)
-12:24 PM: Chatzot hayom
+12:24 PM: Chatzot HaYom
 12:59 PM: Mincha Gedolah
 04:26 PM: Mincha Ketanah
 05:52 PM: Plag HaMincha
@@ -1069,7 +1069,7 @@ Erev Shabbat: Fri May 10 2024 / 2 Iyyar 5784
 07:00 PM: Candle lighting
 
 Shabbat: Sat May 11 2024 / 3 Iyyar 5784
-04:07 AM: Alot haShachar
+04:07 AM: Alot HaShachar
 04:33 AM: Misheyakir
 04:40 AM: Misheyakir Machmir
 05:30 AM: Sunrise
@@ -1077,7 +1077,7 @@ Shabbat: Sat May 11 2024 / 3 Iyyar 5784
 08:57 AM: Kriat Shema, sof zeman (GRA)
 09:42 AM: Tefilah, sof zeman (MGA)
 10:06 AM: Tefilah, sof zeman (GRA)
-12:24 PM: Chatzot hayom
+12:24 PM: Chatzot HaYom
 12:59 PM: Mincha Gedolah
 04:26 PM: Mincha Ketanah
 05:52 PM: Plag HaMincha
@@ -1095,7 +1095,7 @@ Erev Shabbat: Fri May 17 2024 / 9 Iyyar 5784
 07:05 PM: Candle lighting
 
 Shabbat: Sat May 18 2024 / 10 Iyyar 5784
-04:00 AM: Alot haShachar
+04:00 AM: Alot HaShachar
 04:27 AM: Misheyakir
 04:34 AM: Misheyakir Machmir
 05:25 AM: Sunrise
@@ -1103,7 +1103,7 @@ Shabbat: Sat May 18 2024 / 10 Iyyar 5784
 08:55 AM: Kriat Shema, sof zeman (GRA)
 09:41 AM: Tefilah, sof zeman (MGA)
 10:05 AM: Tefilah, sof zeman (GRA)
-12:24 PM: Chatzot hayom
+12:24 PM: Chatzot HaYom
 12:59 PM: Mincha Gedolah
 04:29 PM: Mincha Ketanah
 05:56 PM: Plag HaMincha
@@ -1121,7 +1121,7 @@ Erev Shabbat: Fri Aug 2 2024 / 27 Tammuz 5784
 07:09 PM: Candle lighting
 
 Shabbat: Sat Aug 3 2024 / 28 Tammuz 5784
-04:19 AM: Alot haShachar
+04:19 AM: Alot HaShachar
 04:45 AM: Misheyakir
 04:53 AM: Misheyakir Machmir
 05:42 AM: Sunrise
@@ -1129,7 +1129,7 @@ Shabbat: Sat Aug 3 2024 / 28 Tammuz 5784
 09:08 AM: Kriat Shema, sof zeman (GRA)
 09:53 AM: Tefilah, sof zeman (MGA)
 10:17 AM: Tefilah, sof zeman (GRA)
-12:34 PM: Chatzot hayom
+12:34 PM: Chatzot HaYom
 01:08 PM: Mincha Gedolah
 04:34 PM: Mincha Ketanah
 06:00 PM: Plag HaMincha

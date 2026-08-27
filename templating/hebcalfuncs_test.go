@@ -663,7 +663,7 @@ func TestTimedEvents(t *testing.T) {
 				return &opts
 			}(),
 			Want: []string{
-				"1979-12-14 - Parashat Vayeshev - Alot haShachar: 5:43",
+				"1979-12-14 - Parashat Vayeshev - Alot HaShachar: 5:43",
 				"1979-12-14 - Parashat Vayeshev - Misheyakir: 6:10",
 				"1979-12-14 - Parashat Vayeshev - Misheyakir Machmir: 6:17",
 				"1979-12-14 - Parashat Vayeshev - Sunrise: 7:15",
@@ -671,7 +671,7 @@ func TestTimedEvents(t *testing.T) {
 				"1979-12-14 - Parashat Vayeshev - Kriat Shema, sof zeman (GRA): 9:30",
 				"1979-12-14 - Parashat Vayeshev - Tefilah, sof zeman (MGA): 9:52",
 				"1979-12-14 - Parashat Vayeshev - Tefilah, sof zeman (GRA): 10:16",
-				"1979-12-14 - Parashat Vayeshev - Chatzot hayom: 11:46",
+				"1979-12-14 - Parashat Vayeshev - Chatzot HaYom: 11:46",
 				"1979-12-14 - Parashat Vayeshev - Mincha Gedolah: 12:09",
 				"1979-12-14 - Parashat Vayeshev - Mincha Ketanah: 2:24",
 				"1979-12-14 - Parashat Vayeshev - Plag HaMincha: 3:20",
@@ -695,7 +695,7 @@ func TestTimedEvents(t *testing.T) {
 				return &opts
 			}(),
 			Want: []string{
-				"1980-05-21 - Parashat Nasso - Alot haShachar: 3:33",
+				"1980-05-21 - Parashat Nasso - Alot HaShachar: 3:33",
 				"1980-05-21 - Parashat Nasso - Misheyakir: 4:09",
 				"1980-05-21 - Parashat Nasso - Misheyakir Machmir: 4:19",
 				"1980-05-21 - Parashat Nasso - Sunrise: 5:22",
@@ -703,7 +703,7 @@ func TestTimedEvents(t *testing.T) {
 				"1980-05-21 - Parashat Nasso - Kriat Shema, sof zeman (GRA): 9:05",
 				"1980-05-21 - Parashat Nasso - Tefilah, sof zeman (MGA): 9:55",
 				"1980-05-21 - Parashat Nasso - Tefilah, sof zeman (GRA): 10:19",
-				"1980-05-21 - Parashat Nasso - Chatzot hayom: 12:48",
+				"1980-05-21 - Parashat Nasso - Chatzot HaYom: 12:48",
 				"1980-05-21 - Parashat Nasso - Mincha Gedolah: 1:25",
 				"1980-05-21 - Parashat Nasso - Mincha Ketanah: 5:08",
 				"1980-05-21 - Parashat Nasso - Plag HaMincha: 6:41",

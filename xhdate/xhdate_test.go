@@ -18,9 +18,8 @@ func TestEqual(t *testing.T) {
 	// so it is no longer struct-equal with rh
 	rhConverted := hdate.FromTime(rhGreg)
 	if rh == rhConverted {
-		t.Errorf(
-			"rh unexpectedly struct-equals rhConverted. Does it still cache the RD?\nrhConverted: %#v",
-			rhConverted,
+		t.Log(
+			"This version of hdate produces struct-equal results from .New() and .FromTime(). However, we should not be depending on private fields, so xhdate.Equal is still useful.",
 		)
 	}
 	chanukah := hdate.New(5775, hdate.Kislev, 25)
