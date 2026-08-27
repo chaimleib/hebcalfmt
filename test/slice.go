@@ -23,6 +23,8 @@ func AsStrings[T any](s []T) []string {
 }
 
 func CheckSlice[T comparable](t Test, name string, want, got []T) {
+	t.Helper()
+
 	var different bool
 
 	// Search for differences.
