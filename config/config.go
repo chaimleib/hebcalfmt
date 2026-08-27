@@ -635,6 +635,7 @@ func (c Config) Location() (*zmanim.Location, error) {
 			CountryCode: country,
 			Latitude:    c.Geo.Lat,
 			Longitude:   c.Geo.Lon,
+			Elevation:   c.Geo.Elevation,
 			TimeZoneId:  c.Timezone,
 		}
 		return loc, nil

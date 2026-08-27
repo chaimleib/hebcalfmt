@@ -17,22 +17,29 @@ func TestCheckCoordinates(t *testing.T) {
 		{Name: "empties"},
 		{
 			Name:      "same coords",
-			WantInput: config.Coordinates{Lat: 30, Lon: 40},
-			GotInput:  config.Coordinates{Lat: 30, Lon: 40},
+			WantInput: config.Coordinates{Lat: 30, Lon: 40, Elevation: 0},
+			GotInput:  config.Coordinates{Lat: 30, Lon: 40, Elevation: 0},
 		},
 		{
 			Name:      "different lat",
-			WantInput: config.Coordinates{Lat: -30, Lon: 40},
-			GotInput:  config.Coordinates{Lat: 30, Lon: 40},
+			WantInput: config.Coordinates{Lat: -30, Lon: 40, Elevation: 0},
+			GotInput:  config.Coordinates{Lat: 30, Lon: 40, Elevation: 0},
 			Failed:    true,
 			Logs:      "Geo.Lat's did not match - want: -30, got: 30\n",
 		},
 		{
 			Name:      "different lon",
-			WantInput: config.Coordinates{Lat: 30, Lon: -40},
-			GotInput:  config.Coordinates{Lat: 30, Lon: 40},
+			WantInput: config.Coordinates{Lat: 30, Lon: -40, Elevation: 0},
+			GotInput:  config.Coordinates{Lat: 30, Lon: 40, Elevation: 0},
 			Failed:    true,
 			Logs:      "Geo.Lon's did not match - want: -40, got: 40\n",
+		},
+		{
+			Name:      "different elevation",
+			WantInput: config.Coordinates{Lat: 30, Lon: -40, Elevation: 50},
+			GotInput:  config.Coordinates{Lat: 30, Lon: -40, Elevation: 100},
+			Failed:    true,
+			Logs:      "Geo.Elevation's did not match - want: 50, got: 100\n",
 		},
 	}
 	for _, c := range cases {

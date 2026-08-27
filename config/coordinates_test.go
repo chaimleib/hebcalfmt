@@ -13,30 +13,35 @@ func TestCoordinates_Validate(t *testing.T) {
 		Err   string
 	}{
 		{"nil", nil, ""},
-		{"origin", &config.Coordinates{0, 0}, ""},
-		{"quadrant I", &config.Coordinates{45, 90}, ""},
-		{"quadrant II", &config.Coordinates{-45, 90}, ""},
-		{"quadrant III", &config.Coordinates{-45, -90}, ""},
-		{"quadrant IV", &config.Coordinates{45, -90}, ""},
+		{"origin", &config.Coordinates{0, 0, 0}, ""},
+		{"quadrant I", &config.Coordinates{45, 90, 0}, ""},
+		{"quadrant II", &config.Coordinates{-45, 90, 0}, ""},
+		{"quadrant III", &config.Coordinates{-45, -90, 0}, ""},
+		{"quadrant IV", &config.Coordinates{45, -90, 0}, ""},
 		{
 			"exceed max Lon",
-			&config.Coordinates{0, 200},
+			&config.Coordinates{0, 200, 0},
 			"invalid longitude: 200.000000",
 		},
 		{
 			"subceed min Lon",
-			&config.Coordinates{0, -200},
+			&config.Coordinates{0, -200, 0},
 			"invalid longitude: -200.000000",
 		},
 		{
 			"exceed max Lat",
-			&config.Coordinates{100, 0},
+			&config.Coordinates{100, 0, 0},
 			"invalid latitude: 100.000000",
 		},
 		{
 			"subceed max Lat",
-			&config.Coordinates{-100, 0},
+			&config.Coordinates{-100, 0, 0},
 			"invalid latitude: -100.000000",
+		},
+		{
+			"negative elevation",
+			&config.Coordinates{0, 0, -9},
+			"negative elevation: -9",
 		},
 	}
 	for _, c := range cases {

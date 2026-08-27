@@ -1005,7 +1005,7 @@ func TestConfig_Location(t *testing.T) {
 			Name: "unnamed Geo",
 			Cfg: config.Config{
 				Timezone: "UTC",
-				Geo:      &config.Coordinates{1.5, 2.5},
+				Geo:      &config.Coordinates{1.5, 2.5, 0},
 			},
 			Want: &zmanim.Location{
 				Name:        "User Defined City",
@@ -1021,7 +1021,7 @@ func TestConfig_Location(t *testing.T) {
 			Cfg: config.Config{
 				City:     "Global Origin",
 				Timezone: "UTC",
-				Geo:      &config.Coordinates{0, 0},
+				Geo:      &config.Coordinates{0, 0, 0},
 			},
 			Want: &zmanim.Location{
 				Name:        "Global Origin",
@@ -1037,7 +1037,7 @@ func TestConfig_Location(t *testing.T) {
 			Cfg: config.Config{
 				City:     "Kotel",
 				Timezone: "Asia/Jerusalem",
-				Geo:      &config.Coordinates{31.7767, 25.2345},
+				Geo:      &config.Coordinates{31.7767, 25.2345, 0},
 				IL:       true,
 			},
 			Want: &zmanim.Location{
@@ -1063,10 +1063,18 @@ func TestConfig_Location(t *testing.T) {
 		{
 			Name: "geo out of bounds",
 			Cfg: config.Config{
-				Geo:      &config.Coordinates{91.0, 0},
+				Geo:      &config.Coordinates{91.0, 0, 0},
 				Timezone: "UTC",
 			},
 			Err: "invalid geo: invalid latitude: 91.000000",
+		},
+		{
+			Name: "negative elevation",
+			Cfg: config.Config{
+				Geo:      &config.Coordinates{0, 0, -10},
+				Timezone: "UTC",
+			},
+			Err: "invalid geo: negative elevation: -10",
 		},
 		{
 			Name: "unknown city",
