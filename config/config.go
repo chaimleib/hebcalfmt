@@ -12,9 +12,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hebcal/hebcal-go/dailylearning"
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
 	"github.com/hebcal/hebcal-go/zmanim"
+	_ "github.com/hebcal/learning"
 	"github.com/hebcal/locales"
 
 	"github.com/chaimleib/hebcalfmt/daterange"
@@ -73,16 +75,11 @@ type Config struct {
 	// If provided, Geo must also be set.
 	Timezone string `json:"timezone"`
 
-	// Shiurim lists daily learning schedules to be displayed.
-	// Avalable options:
-	//
-	// - `daf-yomi`
-	// - `mishna-yomi`
-	// - `nach-yomi`
-	// - `yerushalmi` (defaults to Vilna edition)
-	// - `yerushalmi:vilna`
-	// - `yerushalmi:schottenstein`
-	Shiurim []string `json:"shiurim"`
+	// DailyLearning lists daily learning schedules by registered name
+	// (e.g. "929", "rambam1", "rambam3"). Names are case-insensitive
+	// and resolved through the dailylearning registry.
+	// See github.com/hebcal/learning.
+	DailyLearning []string `json:"daily_learning"`
 
 	// Today makes the hebcal calendar functions only list information
 	// about today.
@@ -329,8 +326,7 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 		return nil, err
 	}
 
-	// YerushalmiYomi, YershushalmiEdition, MishnaYomi, DafYomi, NachYomi
-	if err := SetShiurim(cOpts, c.Shiurim); err != nil {
+	if err := SetDailyLearning(cOpts, c.DailyLearning); err != nil {
 		return nil, err
 	}
 
@@ -504,52 +500,18 @@ func (c Config) SetDateRange(cOpts *hebcal.CalOptions) error {
 	return nil
 }
 
-// SetShiurim reads `shiurim`
+// SetDailyLearning reads `daily_learning`
 // and sets the appropriate options on the [hebcal.CalOptions].
-//
-// Available shiurim values permitted in the list:
-//   - `yerushalmi` `yerushalmi:vilna`
-//   - `yerushalmi:schottenstein`
-//   - `mishna-yomi`
-//   - `daf-yomi`
-//   - `nach-yomi`
-func SetShiurim(cOpts *hebcal.CalOptions, shiurim []string) error {
+func SetDailyLearning(cOpts *hebcal.CalOptions, dailyLearning []string) error {
 	var unknowns []string
-	for _, shiur := range shiurim {
-		switch shiur {
-		case "yerushalmi", "yerushalmi:vilna":
-			// TODO: allow both for user comparison
-			if cOpts.YerushalmiEdition != 0 &&
-				cOpts.YerushalmiEdition != hebcal.Vilna {
-				return errors.New(
-					"shiurim: conflicting yerushalmi edition settings found",
-				)
-			}
-			cOpts.YerushalmiYomi = true
-			cOpts.YerushalmiEdition = hebcal.Vilna
-		case "yerushalmi:schottenstein":
-			// TODO: allow both for user comparison
-			if cOpts.YerushalmiEdition != 0 &&
-				cOpts.YerushalmiEdition != hebcal.Schottenstein {
-				return errors.New(
-					"shiurim: conflicting yerushalmi edition settings found",
-				)
-			}
-			cOpts.YerushalmiYomi = true
-			cOpts.YerushalmiEdition = hebcal.Schottenstein
-		case "mishna-yomi":
-			cOpts.MishnaYomi = true
-		case "daf-yomi":
-			cOpts.DafYomi = true
-		case "nach-yomi":
-			cOpts.NachYomi = true
-		default:
+	for _, shiur := range dailyLearning {
+		if !dailylearning.Has(shiur) {
 			unknowns = append(unknowns, shiur)
 		}
 	}
 
 	if len(unknowns) != 0 {
-		return fmt.Errorf("unrecognized item(s) in shiurim: %q", unknowns)
+		return fmt.Errorf("unrecognized item(s) in daily_learning: %q", unknowns)
 	}
 
 	return nil

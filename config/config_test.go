@@ -51,7 +51,7 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 		{"City", want.City, got.City},
 		{"Geo", want.Geo, got.Geo},
 		{"Timezone", want.Timezone, got.Timezone},
-		{"Shiurim", want.Shiurim, got.Shiurim},
+		{"DailyLearning", want.DailyLearning, got.DailyLearning},
 		{"Today", want.Today, got.Today},
 		{"ChagOnly", want.ChagOnly, got.ChagOnly},
 		{"NoJulian", want.NoJulian, got.NoJulian},
@@ -462,13 +462,28 @@ func TestCalOptions(t *testing.T) {
 			Err: "range type is YEAR, but the date provided is missing the year: DateRange<empty>",
 		},
 		{
-			Name: "unknown Shiurim",
+			Name: "unknown DailyLearning",
 			Cfg: func() config.Config {
 				cfg := config.Default
-				cfg.Shiurim = []string{"unknown"}
+				cfg.DailyLearning = []string{"unknown"}
 				return cfg
 			}(),
-			Err: `unrecognized item(s) in shiurim: ["unknown"]`,
+			Err: `unrecognized item(s) in daily_learning: ["unknown"]`,
+		},
+		{
+			Name: "valid DailyLearning",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.DailyLearning = []string{"rambam1"}
+				return cfg
+			}(),
+			Want: &hebcal.CalOptions{
+				Year:               1,
+				NumYears:           1,
+				CandleLightingMins: 18,
+				Location:           nyc,
+				DailyLearning:      []string{"rambam1"},
+			},
 		},
 		{
 			Name:   "fail fs",
@@ -801,156 +816,6 @@ func TestSetDateRange(t *testing.T) {
 			test.CheckErr(t, err, c.Err)
 			if c.Err == "" { // otherwise if err, don't care about got
 				test.CheckCalOptions(t, want, &got)
-			}
-		})
-	}
-}
-
-func TestSetShiurim(t *testing.T) {
-	baseWant := func() *hebcal.CalOptions {
-		return &hebcal.CalOptions{
-			NumYears:           1,
-			CandleLightingMins: 18,
-		}
-	}
-	cases := []struct {
-		Name  string
-		Input []string
-		Orig  *hebcal.CalOptions // default: new(hebcal.CalOptions)
-		Want  *hebcal.CalOptions // if Err, ignore this
-		Err   string
-	}{
-		{Name: "empty", Want: new(hebcal.CalOptions)},
-		{Name: "base settings", Orig: baseWant(), Want: baseWant()},
-		{
-			Name:  "yerushalmi",
-			Input: []string{"yerushalmi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = hebcal.Vilna
-				return opts
-			}(),
-		},
-		{
-			Name:  "yerushalmi:vilna",
-			Input: []string{"yerushalmi:vilna"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = hebcal.Vilna
-				return opts
-			}(),
-		},
-		{
-			Name:  "yerushalmi:schottenstein",
-			Input: []string{"yerushalmi:schottenstein"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = hebcal.Schottenstein
-				return opts
-			}(),
-		},
-		{
-			Name:  "mishna-yomi",
-			Input: []string{"mishna-yomi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.MishnaYomi = true
-				return opts
-			}(),
-		},
-		{
-			Name:  "daf-yomi",
-			Input: []string{"daf-yomi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.DafYomi = true
-				return opts
-			}(),
-		},
-		{
-			Name:  "nach-yomi",
-			Input: []string{"nach-yomi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.NachYomi = true
-				return opts
-			}(),
-		},
-
-		{
-			Name: "multiple",
-			// can't test all at once,
-			// since yerushalmi and yerushalmi:schottenstein conflict
-			Input: []string{
-				"yerushalmi",
-				"mishna-yomi",
-				"daf-yomi",
-				"nach-yomi",
-			},
-			Want: &hebcal.CalOptions{
-				YerushalmiYomi:    true,
-				YerushalmiEdition: hebcal.Vilna,
-				MishnaYomi:        true,
-				DafYomi:           true,
-				NachYomi:          true,
-			},
-		},
-
-		{
-			Name:  "unknown",
-			Input: []string{"unknown"},
-			Err:   `unrecognized item(s) in shiurim: ["unknown"]`,
-		},
-		{
-			Name:  "unknown and invalid",
-			Input: []string{"unknown", "invalid"},
-			Err:   `unrecognized item(s) in shiurim: ["unknown" "invalid"]`,
-		},
-		{
-			Name:  "invalid empty string shiur",
-			Input: []string{""},
-			Err:   `unrecognized item(s) in shiurim: [""]`,
-		},
-
-		{
-			Name: "conflict yerushalmi:vilna vs yerushalmi:schottenstein",
-			Input: []string{
-				"yerushalmi:vilna",
-				"yerushalmi:schottenstein",
-			},
-			Err: "shiurim: conflicting yerushalmi edition settings found",
-		},
-		{
-			Name: "conflict yerushalmi:schottenstein vs yerushalmi:vilna",
-			Input: []string{
-				"yerushalmi:schottenstein",
-				"yerushalmi:vilna",
-			},
-			Err: "shiurim: conflicting yerushalmi edition settings found",
-		},
-	}
-	for _, c := range cases {
-		t.Run(c.Name, func(t *testing.T) {
-			if c.Orig == nil {
-				c.Orig = new(hebcal.CalOptions)
-			}
-			if c.Want == nil {
-				c.Want = new(hebcal.CalOptions)
-			}
-			got := *c.Orig // copy
-			err := config.SetShiurim(&got, c.Input)
-			test.CheckErr(t, err, c.Err)
-			if c.Err == "" { // otherwise don't care
-				test.CheckCalOptions(t, c.Want, &got)
 			}
 		})
 	}
