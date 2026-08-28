@@ -34,8 +34,8 @@
 {{- $d := $.dateRange.StartOrToday false -}}
 {{- $shabbos := $d.OnOrAfter $.time.Saturday -}}
 
-{{- $z := forLocationDate $.location $d.Gregorian -}}
-{{- $zNext := forLocationDate $.location $d.Next.Gregorian -}}
+{{- $z := forLocationDate $.location $.calOptions.UseElevation $d.Gregorian -}}
+{{- $zNext := forLocationDate $.location $.calOptions.UseElevation $d.Next.Gregorian -}}
 
 {{- define "hdate" -}}
   {{.hdate.Day}}

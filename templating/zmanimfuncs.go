@@ -20,7 +20,7 @@ func ZmanimFuncs(opts *hebcal.CalOptions) map[string]any {
 		"newLocation": zmanim.NewLocation,
 
 		// zmanim.Zmanim
-		"forDate":         ForDate(opts.Location),
+		"forDate":         ForDate(opts.Location, opts.UseElevation),
 		"forLocationDate": ForLocationDate,
 
 		// molad
@@ -38,12 +38,16 @@ func LookupCity(city string) (*zmanim.Location, error) {
 	return l, nil
 }
 
-// ForDate takes a zmanim.Location
-// and returns a constructor for new zmanim.Zmanim objects
-// with different dates in that Location.
+// ForDate takes a zmanim.Location and a bool for use_elevation
+// and returns a constructor for new zmanim.Zmanim objects,
+// which takes time.Times in that Location.
 // Unlike zmanim.New which can panic and returns a struct,
 // this constructor returns a struct pointer and an error.
-func ForDate(loc *zmanim.Location) func(d time.Time) (*zmanim.Zmanim, error) {
+// Also unlike zmanim.New, it assigns the result's UseElevation field.
+func ForDate(
+	loc *zmanim.Location,
+	useElevation bool,
+) func(d time.Time) (*zmanim.Zmanim, error) {
 	return func(d time.Time) (*zmanim.Zmanim, error) {
 		if loc == nil {
 			return nil, errors.New("provided location was nil")
@@ -55,6 +59,7 @@ func ForDate(loc *zmanim.Location) func(d time.Time) (*zmanim.Zmanim, error) {
 		}
 
 		z := zmanim.New(loc, d)
+		z.UseElevation = useElevation
 		return &z, nil
 	}
 }
@@ -62,9 +67,11 @@ func ForDate(loc *zmanim.Location) func(d time.Time) (*zmanim.Zmanim, error) {
 // ForLocationDate creates a new zmanim.Zmanim object.
 // Unlike zmanim.New which can panic and returns a struct,
 // this constructor returns a struct pointer and an error.
+// Also unlike zmanim.New, it assigns the result's UseElevation field.
 func ForLocationDate(
 	loc *zmanim.Location,
+	useElevation bool,
 	d time.Time,
 ) (*zmanim.Zmanim, error) {
-	return ForDate(loc)(d)
+	return ForDate(loc, useElevation)(d)
 }

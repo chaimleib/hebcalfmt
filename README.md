@@ -220,8 +220,8 @@ the omer, the molad, and the parsha of the week.
 {{- $d := $.dateRange.StartOrToday false -}}
 {{- $shabbos := $d.OnOrAfter $.time.Saturday -}}
 
-{{- $z := forLocationDate $.location $d.Gregorian -}}
-{{- $zNext := forLocationDate $.location $d.Next.Gregorian -}}
+{{- $z := forLocationDate $.location $.calOptions.UseElevation $d.Gregorian -}}
+{{- $zNext := forLocationDate $.location $.calOptions.UseElevation $d.Next.Gregorian -}}
 
 {{- define "hdate" -}}
   {{.hdate.Day}}
@@ -792,7 +792,7 @@ or if you simply want to switch your water sprinkler on after dark.
 {{- $d := $.now -}}
 {{- with getenv "DATE"}}{{$d = timeParse $.time.DateOnly .}}{{end -}}
 
-{{- $z := forLocationDate $loc $d -}}
+{{- $z := forLocationDate $loc $.calOptions.UseElevation $d -}}
 Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
 
 {{- $fmt := $.time.TimeOnly}}

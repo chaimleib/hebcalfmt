@@ -5,7 +5,7 @@
 {{- $d := $.now -}}
 {{- with getenv "DATE"}}{{$d = timeParse $.time.DateOnly .}}{{end -}}
 
-{{- $z := forLocationDate $loc $d -}}
+{{- $z := forLocationDate $loc $.calOptions.UseElevation $d -}}
 Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
 
 {{- $fmt := $.time.TimeOnly}}
