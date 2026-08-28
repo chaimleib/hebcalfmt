@@ -910,6 +910,42 @@ func TestExamples_HebcalClassic(t *testing.T) {
 			Args: "--config invalidEvents.json 9 1968",
 			Err:  "failed to build hebcal options from invalidEvents.json: attempted access outside of the BaseDir .: open ../examples/event.txt",
 		},
+		{
+			Name: "daily_learning psalms",
+			Args: "--config psalms.json 8 2026",
+			Want: `8/1/2026 Psalms 88-89
+8/2/2026 Psalms 90-96
+8/3/2026 Psalms 97-103
+8/4/2026 Psalms 104-105
+8/5/2026 Psalms 106-107
+8/6/2026 Psalms 108-112
+8/7/2026 Psalms 113-118
+8/8/2026 Psalms 119:1-119:96
+8/9/2026 Psalms 119:97-119:176
+8/10/2026 Psalms 120-134
+8/11/2026 Psalms 135-139
+8/12/2026 Psalms 140-144
+8/13/2026 Psalms 145-150
+8/14/2026 Psalms 1-9
+8/15/2026 Psalms 10-17
+8/16/2026 Psalms 18-22
+8/17/2026 Psalms 23-28
+8/18/2026 Psalms 29-34
+8/19/2026 Psalms 35-38
+8/20/2026 Psalms 39-43
+8/21/2026 Psalms 44-48
+8/22/2026 Psalms 49-54
+8/23/2026 Psalms 55-59
+8/24/2026 Psalms 60-65
+8/25/2026 Psalms 66-68
+8/26/2026 Psalms 69-71
+8/27/2026 Psalms 72-76
+8/28/2026 Psalms 77-78
+8/29/2026 Psalms 79-82
+8/30/2026 Psalms 83-87
+8/31/2026 Psalms 88-89
+`,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {

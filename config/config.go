@@ -514,6 +514,7 @@ func SetDailyLearning(cOpts *hebcal.CalOptions, dailyLearning []string) error {
 		return fmt.Errorf("unrecognized item(s) in daily_learning: %q", unknowns)
 	}
 
+	cOpts.DailyLearning = dailyLearning
 	return nil
 }
 
