@@ -20,4 +20,9 @@ func CheckCoordinates(
 		t.Errorf("%s.Lon's did not match - want: %v, got: %v",
 			name, want.Lon, got.Lon)
 	}
+
+	if want.Elevation != got.Elevation {
+		t.Errorf("%s.Elevation's did not match - want: %v, got: %v",
+			name, want.Elevation, got.Elevation)
+	}
 }

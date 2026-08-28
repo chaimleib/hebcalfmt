@@ -6,7 +6,6 @@ import (
 
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/hebcal"
-	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
 
 	"github.com/chaimleib/hebcalfmt/test"
@@ -23,13 +22,13 @@ func TestCheckCalOptions(t *testing.T) {
 			Name:      "want nil, got non-nil",
 			WantInput: nil,
 			GotInput:  &hebcal.CalOptions{},
-			Logs:      "expected nil, got: &hebcal.CalOptions{Location:(*zmanim.Location)(nil), Year:0, IsHebrewYear:false, NoJulian:false, Month:0, NumYears:0, Start:hdate.HDate{year:0, month:0, day:0, abs:0}, End:hdate.HDate{year:0, month:0, day:0, abs:0}, CandleLighting:false, CandleLightingMins:0, HavdalahMins:0, HavdalahDeg:0, Sedrot:false, IL:false, NoMinorFast:false, NoModern:false, NoRoshChodesh:false, ShabbatMevarchim:false, NoSpecialShabbat:false, NoHolidays:false, DafYomi:false, MishnaYomi:false, YerushalmiYomi:false, NachYomi:false, YerushalmiEdition:0, Omer:false, Molad:false, AddHebrewDates:false, AddHebrewDatesForEvents:false, Mask:0x0, YomKippurKatan:false, Hour24:false, SunriseSunset:false, DailyZmanim:false, Yahrzeits:[]hebcal.UserYahrzeit(nil), UserEvents:[]hebcal.UserEvent(nil), WeeklyAbbreviated:false, DailySedra:false}\n",
+			Logs:      "expected nil, got: &hebcal.CalOptions{Location:(*zmanim.Location)(nil), Year:0, IsHebrewYear:false, NoJulian:false, Month:0, NumYears:0, Start:hdate.HDate{year:0, month:0, day:0, abs:0}, End:hdate.HDate{year:0, month:0, day:0, abs:0}, CandleLighting:false, UseElevation:false, CandleLightingMins:0, HavdalahMins:0, HavdalahDeg:0, SuppressHavdalah:false, Sedrot:false, IL:false, NoMinorFast:false, NoModern:false, NoRoshChodesh:false, ShabbatMevarchim:false, NoSpecialShabbat:false, NoHolidays:false, DafYomi:false, MishnaYomi:false, YerushalmiYomi:false, NachYomi:false, DailyLearning:[]string(nil), YerushalmiEdition:0, Omer:false, Molad:false, AddHebrewDates:false, AddHebrewDatesForEvents:false, Mask:0x0, YomKippurKatan:false, Hour24:false, SunriseSunset:false, DailyZmanim:false, Yahrzeits:[]hebcal.UserYahrzeit(nil), UserEvents:[]hebcal.UserEvent(nil), WeeklyAbbreviated:false, DailySedra:false}\n",
 		},
 		{
 			Name:      "want non-nil, got nil",
 			WantInput: &hebcal.CalOptions{},
 			GotInput:  nil,
-			Logs:      "got nil, want: &hebcal.CalOptions{Location:(*zmanim.Location)(nil), Year:0, IsHebrewYear:false, NoJulian:false, Month:0, NumYears:0, Start:hdate.HDate{year:0, month:0, day:0, abs:0}, End:hdate.HDate{year:0, month:0, day:0, abs:0}, CandleLighting:false, CandleLightingMins:0, HavdalahMins:0, HavdalahDeg:0, Sedrot:false, IL:false, NoMinorFast:false, NoModern:false, NoRoshChodesh:false, ShabbatMevarchim:false, NoSpecialShabbat:false, NoHolidays:false, DafYomi:false, MishnaYomi:false, YerushalmiYomi:false, NachYomi:false, YerushalmiEdition:0, Omer:false, Molad:false, AddHebrewDates:false, AddHebrewDatesForEvents:false, Mask:0x0, YomKippurKatan:false, Hour24:false, SunriseSunset:false, DailyZmanim:false, Yahrzeits:[]hebcal.UserYahrzeit(nil), UserEvents:[]hebcal.UserEvent(nil), WeeklyAbbreviated:false, DailySedra:false}\n",
+			Logs:      "got nil, want: &hebcal.CalOptions{Location:(*zmanim.Location)(nil), Year:0, IsHebrewYear:false, NoJulian:false, Month:0, NumYears:0, Start:hdate.HDate{year:0, month:0, day:0, abs:0}, End:hdate.HDate{year:0, month:0, day:0, abs:0}, CandleLighting:false, UseElevation:false, CandleLightingMins:0, HavdalahMins:0, HavdalahDeg:0, SuppressHavdalah:false, Sedrot:false, IL:false, NoMinorFast:false, NoModern:false, NoRoshChodesh:false, ShabbatMevarchim:false, NoSpecialShabbat:false, NoHolidays:false, DafYomi:false, MishnaYomi:false, YerushalmiYomi:false, NachYomi:false, DailyLearning:[]string(nil), YerushalmiEdition:0, Omer:false, Molad:false, AddHebrewDates:false, AddHebrewDatesForEvents:false, Mask:0x0, YomKippurKatan:false, Hour24:false, SunriseSunset:false, DailyZmanim:false, Yahrzeits:[]hebcal.UserYahrzeit(nil), UserEvents:[]hebcal.UserEvent(nil), WeeklyAbbreviated:false, DailySedra:false}\n",
 		},
 		{
 			Name:      "mismatching Yahrzeits",
@@ -99,7 +98,7 @@ got:
 				DafYomi:                 true,
 				MishnaYomi:              true,
 				YerushalmiYomi:          true,
-				YerushalmiEdition:       yerushalmi.Schottenstein,
+				YerushalmiEdition:       hebcal.Schottenstein,
 				Omer:                    true,
 				Molad:                   true,
 				AddHebrewDates:          true,
@@ -155,7 +154,7 @@ got:
 				DafYomi:                 true,
 				MishnaYomi:              true,
 				YerushalmiYomi:          true,
-				YerushalmiEdition:       yerushalmi.Schottenstein,
+				YerushalmiEdition:       hebcal.Schottenstein,
 				Omer:                    true,
 				Molad:                   true,
 				AddHebrewDates:          true,

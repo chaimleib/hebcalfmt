@@ -30,4 +30,5 @@ var EventConsts = map[string]any{
 	"ZMANIM":              event.ZMANIM,
 	"YERUSHALMI_YOMI":     event.YERUSHALMI_YOMI,
 	"NACH_YOMI":           event.NACH_YOMI,
+	"DAILY_LEARNING":      event.DAILY_LEARNING,
 }

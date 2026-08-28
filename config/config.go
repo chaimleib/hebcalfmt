@@ -12,11 +12,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hebcal/hebcal-go/dailylearning"
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
-	"github.com/hebcal/hebcal-go/locales"
-	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
+	_ "github.com/hebcal/learning"
+	"github.com/hebcal/locales"
 
 	"github.com/chaimleib/hebcalfmt/daterange"
 	"github.com/chaimleib/hebcalfmt/fsys"
@@ -74,16 +75,11 @@ type Config struct {
 	// If provided, Geo must also be set.
 	Timezone string `json:"timezone"`
 
-	// Shiurim lists daily learning schedules to be displayed.
-	// Avalable options:
-	//
-	// - `daf-yomi`
-	// - `mishna-yomi`
-	// - `nach-yomi`
-	// - `yerushalmi` (defaults to Vilna edition)
-	// - `yerushalmi:vilna`
-	// - `yerushalmi:schottenstein`
-	Shiurim []string `json:"shiurim"`
+	// DailyLearning lists daily learning schedules by registered name
+	// (e.g. "929", "rambam1", "rambam3"). Names are case-insensitive
+	// and resolved through the dailylearning registry.
+	// See github.com/hebcal/learning.
+	DailyLearning []string `json:"daily_learning"`
 
 	// Today makes the hebcal calendar functions only list information
 	// about today.
@@ -110,6 +106,9 @@ type Config struct {
 
 	// CandleLighting adds entries for candlelighting times.
 	CandleLighting bool `json:"candle_lighting"`
+
+	// UseElevation enables elevation when calculating zmanim.
+	UseElevation bool `json:"use_elevation"`
 
 	// DailyZmanim adds zmanim events for every day.
 	DailyZmanim bool `json:"daily_zmanim"`
@@ -176,6 +175,9 @@ type Config struct {
 	// HavdalahDeg sets havdalah to occur when the sun is this many degrees
 	// below the horizon.
 	HavdalahDeg float64 `json:"havdalah_deg"`
+
+	// SuppressHavdalah omits Havdalah events.
+	SuppressHavdalah bool `json:"suppress_havdalah"`
 
 	// NumYears is how many years to generate events for.
 	// Default: 1
@@ -286,6 +288,7 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	cOpts.Hour24 = c.Hour24
 	cOpts.SunriseSunset = c.SunriseSunset
 	cOpts.CandleLighting = c.CandleLighting
+	cOpts.UseElevation = c.UseElevation
 	cOpts.DailyZmanim = c.DailyZmanim
 	cOpts.Molad = c.Molad
 	cOpts.WeeklyAbbreviated = c.WeeklyAbbreviated
@@ -306,6 +309,7 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	cOpts.CandleLightingMins = c.CandleLightingMins
 	cOpts.HavdalahMins = c.HavdalahMins
 	cOpts.HavdalahDeg = c.HavdalahDeg
+	cOpts.SuppressHavdalah = c.SuppressHavdalah
 	cOpts.NumYears = c.NumYears
 
 	// Location
@@ -322,8 +326,7 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 		return nil, err
 	}
 
-	// YerushalmiYomi, YershushalmiEdition, MishnaYomi, DafYomi, NachYomi
-	if err := SetShiurim(cOpts, c.Shiurim); err != nil {
+	if err := SetDailyLearning(cOpts, c.DailyLearning); err != nil {
 		return nil, err
 	}
 
@@ -497,54 +500,21 @@ func (c Config) SetDateRange(cOpts *hebcal.CalOptions) error {
 	return nil
 }
 
-// SetShiurim reads `shiurim`
+// SetDailyLearning reads `daily_learning`
 // and sets the appropriate options on the [hebcal.CalOptions].
-//
-// Available shiurim values permitted in the list:
-//   - `yerushalmi` `yerushalmi:vilna`
-//   - `yerushalmi:schottenstein`
-//   - `mishna-yomi`
-//   - `daf-yomi`
-//   - `nach-yomi`
-func SetShiurim(cOpts *hebcal.CalOptions, shiurim []string) error {
+func SetDailyLearning(cOpts *hebcal.CalOptions, dailyLearning []string) error {
 	var unknowns []string
-	for _, shiur := range shiurim {
-		switch shiur {
-		case "yerushalmi", "yerushalmi:vilna":
-			// TODO: allow both for user comparison
-			if cOpts.YerushalmiEdition != 0 &&
-				cOpts.YerushalmiEdition != yerushalmi.Vilna {
-				return errors.New(
-					"shiurim: conflicting yerushalmi edition settings found",
-				)
-			}
-			cOpts.YerushalmiYomi = true
-			cOpts.YerushalmiEdition = yerushalmi.Vilna
-		case "yerushalmi:schottenstein":
-			// TODO: allow both for user comparison
-			if cOpts.YerushalmiEdition != 0 &&
-				cOpts.YerushalmiEdition != yerushalmi.Schottenstein {
-				return errors.New(
-					"shiurim: conflicting yerushalmi edition settings found",
-				)
-			}
-			cOpts.YerushalmiYomi = true
-			cOpts.YerushalmiEdition = yerushalmi.Schottenstein
-		case "mishna-yomi":
-			cOpts.MishnaYomi = true
-		case "daf-yomi":
-			cOpts.DafYomi = true
-		case "nach-yomi":
-			cOpts.NachYomi = true
-		default:
+	for _, shiur := range dailyLearning {
+		if !dailylearning.Has(shiur) {
 			unknowns = append(unknowns, shiur)
 		}
 	}
 
 	if len(unknowns) != 0 {
-		return fmt.Errorf("unrecognized item(s) in shiurim: %q", unknowns)
+		return fmt.Errorf("unrecognized item(s) in daily_learning: %q", unknowns)
 	}
 
+	cOpts.DailyLearning = dailyLearning
 	return nil
 }
 
@@ -632,6 +602,7 @@ func (c Config) Location() (*zmanim.Location, error) {
 			CountryCode: country,
 			Latitude:    c.Geo.Lat,
 			Longitude:   c.Geo.Lon,
+			Elevation:   c.Geo.Elevation,
 			TimeZoneId:  c.Timezone,
 		}
 		return loc, nil

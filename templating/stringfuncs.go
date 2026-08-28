@@ -3,7 +3,7 @@ package templating
 import (
 	"strings"
 
-	"github.com/hebcal/hebcal-go/locales"
+	"github.com/hebcal/locales"
 )
 
 var StringFuncs = map[string]any{

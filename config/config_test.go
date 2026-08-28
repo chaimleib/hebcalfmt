@@ -14,7 +14,6 @@ import (
 	"github.com/hebcal/hdate"
 	"github.com/hebcal/hebcal-go/event"
 	"github.com/hebcal/hebcal-go/hebcal"
-	"github.com/hebcal/hebcal-go/yerushalmi"
 	"github.com/hebcal/hebcal-go/zmanim"
 
 	"github.com/chaimleib/hebcalfmt/config"
@@ -52,7 +51,7 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 		{"City", want.City, got.City},
 		{"Geo", want.Geo, got.Geo},
 		{"Timezone", want.Timezone, got.Timezone},
-		{"Shiurim", want.Shiurim, got.Shiurim},
+		{"DailyLearning", want.DailyLearning, got.DailyLearning},
 		{"Today", want.Today, got.Today},
 		{"ChagOnly", want.ChagOnly, got.ChagOnly},
 		{"NoJulian", want.NoJulian, got.NoJulian},
@@ -107,10 +106,22 @@ func checkConfig(t *testing.T, want, got *config.Config) {
 			}
 
 		case *daterange.DateRange:
-			test.CheckNilPtrThen(t, test.CheckDateRange, field.Name, typedWant, field.Got)
+			test.CheckNilPtrThen(
+				t,
+				test.CheckDateRange,
+				field.Name,
+				typedWant,
+				field.Got,
+			)
 
 		case *config.Coordinates:
-			test.CheckNilPtrThen(t, test.CheckCoordinates, field.Name, typedWant, field.Got)
+			test.CheckNilPtrThen(
+				t,
+				test.CheckCoordinates,
+				field.Name,
+				typedWant,
+				field.Got,
+			)
 
 		case []string:
 			typedGot := field.Got.([]string)
@@ -317,6 +328,7 @@ func TestCalOptions(t *testing.T) {
 		CountryCode: "US",
 		Latitude:    40.71427,
 		Longitude:   -74.00597,
+		Elevation:   57,
 		TimeZoneId:  "America/New_York",
 	}
 	failingFS := func() (fs.FS, error) {
@@ -450,13 +462,28 @@ func TestCalOptions(t *testing.T) {
 			Err: "range type is YEAR, but the date provided is missing the year: DateRange<empty>",
 		},
 		{
-			Name: "unknown Shiurim",
+			Name: "unknown DailyLearning",
 			Cfg: func() config.Config {
 				cfg := config.Default
-				cfg.Shiurim = []string{"unknown"}
+				cfg.DailyLearning = []string{"unknown"}
 				return cfg
 			}(),
-			Err: `unrecognized item(s) in shiurim: ["unknown"]`,
+			Err: `unrecognized item(s) in daily_learning: ["unknown"]`,
+		},
+		{
+			Name: "valid DailyLearning",
+			Cfg: func() config.Config {
+				cfg := config.Default
+				cfg.DailyLearning = []string{"rambam1"}
+				return cfg
+			}(),
+			Want: &hebcal.CalOptions{
+				Year:               1,
+				NumYears:           1,
+				CandleLightingMins: 18,
+				Location:           nyc,
+				DailyLearning:      []string{"rambam1"},
+			},
 		},
 		{
 			Name:   "fail fs",
@@ -794,156 +821,6 @@ func TestSetDateRange(t *testing.T) {
 	}
 }
 
-func TestSetShiurim(t *testing.T) {
-	baseWant := func() *hebcal.CalOptions {
-		return &hebcal.CalOptions{
-			NumYears:           1,
-			CandleLightingMins: 18,
-		}
-	}
-	cases := []struct {
-		Name  string
-		Input []string
-		Orig  *hebcal.CalOptions // default: new(hebcal.CalOptions)
-		Want  *hebcal.CalOptions // if Err, ignore this
-		Err   string
-	}{
-		{Name: "empty", Want: new(hebcal.CalOptions)},
-		{Name: "base settings", Orig: baseWant(), Want: baseWant()},
-		{
-			Name:  "yerushalmi",
-			Input: []string{"yerushalmi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = yerushalmi.Vilna
-				return opts
-			}(),
-		},
-		{
-			Name:  "yerushalmi:vilna",
-			Input: []string{"yerushalmi:vilna"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = yerushalmi.Vilna
-				return opts
-			}(),
-		},
-		{
-			Name:  "yerushalmi:schottenstein",
-			Input: []string{"yerushalmi:schottenstein"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.YerushalmiYomi = true
-				opts.YerushalmiEdition = yerushalmi.Schottenstein
-				return opts
-			}(),
-		},
-		{
-			Name:  "mishna-yomi",
-			Input: []string{"mishna-yomi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.MishnaYomi = true
-				return opts
-			}(),
-		},
-		{
-			Name:  "daf-yomi",
-			Input: []string{"daf-yomi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.DafYomi = true
-				return opts
-			}(),
-		},
-		{
-			Name:  "nach-yomi",
-			Input: []string{"nach-yomi"},
-			Orig:  baseWant(),
-			Want: func() *hebcal.CalOptions {
-				opts := baseWant()
-				opts.NachYomi = true
-				return opts
-			}(),
-		},
-
-		{
-			Name: "multiple",
-			// can't test all at once,
-			// since yerushalmi and yerushalmi:schottenstein conflict
-			Input: []string{
-				"yerushalmi",
-				"mishna-yomi",
-				"daf-yomi",
-				"nach-yomi",
-			},
-			Want: &hebcal.CalOptions{
-				YerushalmiYomi:    true,
-				YerushalmiEdition: yerushalmi.Vilna,
-				MishnaYomi:        true,
-				DafYomi:           true,
-				NachYomi:          true,
-			},
-		},
-
-		{
-			Name:  "unknown",
-			Input: []string{"unknown"},
-			Err:   `unrecognized item(s) in shiurim: ["unknown"]`,
-		},
-		{
-			Name:  "unknown and invalid",
-			Input: []string{"unknown", "invalid"},
-			Err:   `unrecognized item(s) in shiurim: ["unknown" "invalid"]`,
-		},
-		{
-			Name:  "invalid empty string shiur",
-			Input: []string{""},
-			Err:   `unrecognized item(s) in shiurim: [""]`,
-		},
-
-		{
-			Name: "conflict yerushalmi:vilna vs yerushalmi:schottenstein",
-			Input: []string{
-				"yerushalmi:vilna",
-				"yerushalmi:schottenstein",
-			},
-			Err: "shiurim: conflicting yerushalmi edition settings found",
-		},
-		{
-			Name: "conflict yerushalmi:schottenstein vs yerushalmi:vilna",
-			Input: []string{
-				"yerushalmi:schottenstein",
-				"yerushalmi:vilna",
-			},
-			Err: "shiurim: conflicting yerushalmi edition settings found",
-		},
-	}
-	for _, c := range cases {
-		t.Run(c.Name, func(t *testing.T) {
-			if c.Orig == nil {
-				c.Orig = new(hebcal.CalOptions)
-			}
-			if c.Want == nil {
-				c.Want = new(hebcal.CalOptions)
-			}
-			got := *c.Orig // copy
-			err := config.SetShiurim(&got, c.Input)
-			test.CheckErr(t, err, c.Err)
-			if c.Err == "" { // otherwise don't care
-				test.CheckCalOptions(t, c.Want, &got)
-			}
-		})
-	}
-}
-
 func TestConfig_Location(t *testing.T) {
 	cases := []struct {
 		Name string
@@ -959,6 +836,7 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "US",
 				Latitude:    40.71427,
 				Longitude:   -74.00597,
+				Elevation:   57,
 				TimeZoneId:  "America/New_York",
 			},
 		},
@@ -970,6 +848,7 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "US",
 				Latitude:    40.71427,
 				Longitude:   -74.00597,
+				Elevation:   57,
 				TimeZoneId:  "Asia/Jerusalem",
 			},
 		},
@@ -981,6 +860,7 @@ func TestConfig_Location(t *testing.T) {
 				CountryCode: "US",
 				Latitude:    39.73915,
 				Longitude:   -104.9847,
+				Elevation:   1636,
 				TimeZoneId:  "America/Denver",
 			},
 		},
@@ -990,13 +870,14 @@ func TestConfig_Location(t *testing.T) {
 			Name: "unnamed Geo",
 			Cfg: config.Config{
 				Timezone: "UTC",
-				Geo:      &config.Coordinates{1.5, 2.5},
+				Geo:      &config.Coordinates{1.5, 2.5, 0},
 			},
 			Want: &zmanim.Location{
 				Name:        "User Defined City",
 				CountryCode: "ZZ",
 				Latitude:    1.5,
 				Longitude:   2.5,
+				Elevation:   0,
 				TimeZoneId:  "UTC",
 			},
 		},
@@ -1005,22 +886,23 @@ func TestConfig_Location(t *testing.T) {
 			Cfg: config.Config{
 				City:     "Global Origin",
 				Timezone: "UTC",
-				Geo:      &config.Coordinates{0, 0},
+				Geo:      &config.Coordinates{0, 0, 0},
 			},
 			Want: &zmanim.Location{
 				Name:        "Global Origin",
 				CountryCode: "ZZ",
 				Latitude:    0,
 				Longitude:   0,
+				Elevation:   0,
 				TimeZoneId:  "UTC",
 			},
 		},
 		{
-			Name: "named Geo in Israel",
+			Name: "named Geo in Israel, no elevation",
 			Cfg: config.Config{
 				City:     "Kotel",
 				Timezone: "Asia/Jerusalem",
-				Geo:      &config.Coordinates{31.7767, 25.2345},
+				Geo:      &config.Coordinates{31.7767, 25.2345, 0},
 				IL:       true,
 			},
 			Want: &zmanim.Location{
@@ -1046,10 +928,18 @@ func TestConfig_Location(t *testing.T) {
 		{
 			Name: "geo out of bounds",
 			Cfg: config.Config{
-				Geo:      &config.Coordinates{91.0, 0},
+				Geo:      &config.Coordinates{91.0, 0, 0},
 				Timezone: "UTC",
 			},
 			Err: "invalid geo: invalid latitude: 91.000000",
+		},
+		{
+			Name: "negative elevation",
+			Cfg: config.Config{
+				Geo:      &config.Coordinates{0, 0, -10},
+				Timezone: "UTC",
+			},
+			Err: "invalid geo: negative elevation: -10",
 		},
 		{
 			Name: "unknown city",

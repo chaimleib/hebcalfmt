@@ -210,6 +210,11 @@ the omer, the molad, and the parsha of the week.
 {{- /*  - bool cfg.sedrot - enable the parsha on Shabbos */ -}}
 {{- /*  - bool cfg.shabbat_mevarchim - */ -}}
 {{- /*      enable Shabbat Mevarchim before Rosh Chodesh */ -}}
+{{- /*  - bool cfg.use_elevation - */ -}}
+{{- /*      enable elevation-based zmanim calculations. */ -}}
+{{- /*      This will only affect sunrise, sunset, and candlelighting, */ -}}
+{{- /*      since other times are elevation-independent */ -}}
+{{- /*      or based on the elevation of the Jerusalem mountains. */ -}}
 {{- /*  - int cfg.candle_lighting_mins - */ -}}
 {{- /*      how many minutes before shkiah to light */ -}}
 {{- /*      for Shabbos and Yom Tov */ -}}
@@ -220,8 +225,8 @@ the omer, the molad, and the parsha of the week.
 {{- $d := $.dateRange.StartOrToday false -}}
 {{- $shabbos := $d.OnOrAfter $.time.Saturday -}}
 
-{{- $z := forLocationDate $.location $d.Gregorian -}}
-{{- $zNext := forLocationDate $.location $d.Next.Gregorian -}}
+{{- $z := forLocationDate $.location $.calOptions.UseElevation $d.Gregorian -}}
+{{- $zNext := forLocationDate $.location $.calOptions.UseElevation $d.Next.Gregorian -}}
 
 {{- define "hdate" -}}
   {{.hdate.Day}}
@@ -341,7 +346,7 @@ This {{translate $.language "Shabbat"}} we read
 {{- end}}
 
 {{- if or $.calOptions.DailyZmanim $.calOptions.SunriseSunset}}
-{{ ($z.TimeAtAngle 0.833 true).Format $fmt}}: Neitz (0.833 deg)
+{{ $z.Sunrise.Format $fmt}}: Neitz (0.833 deg)
 {{- end}}
 {{- if $.calOptions.DailyZmanim}}
 {{    ($neitzAmiti.Add (durationMul $h 3)).Format $fmt}}: Sof Z'man Kri'as Sh'ma
@@ -398,7 +403,7 @@ This {{translate $.language "Shabbat"}} we read
           (not (dayIsShabbatOrYomTov $d))
         )
         (dayIsShabbatOrYomTov $d.Next) }}
-{{        (($z.TimeAtAngle 0.833 false).Add
+{{        ($z.Sunset.Add
             (durationMul
               (timeParseDuration "-1m")
               (itof $.calOptions.CandleLightingMins)
@@ -426,7 +431,7 @@ This {{translate $.language "Shabbat"}} we read
         (eq $chanukahTime "normal")
       ))
 }}
-{{   ($z.TimeAtAngle 0.833 false).Format $fmt}}: Shki'o
+{{   $z.Sunset.Format $fmt}}: Shki'o
   {{- if $fast9Av -}}
         , Fast starts
   {{- else if eq $chanukahTime "normal" -}}
@@ -490,8 +495,9 @@ A halachic hour is {{ $h.Round $.time.Second}}.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions,
-  {{- ""}} local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions
+  {{- with not $z.UseElevation}}, local elevation, {{end}}
+  {{- ""}} and local elevations at your horizons.
 Even sitting down or standing up
   {{- ""}} can change observed sunrise and sunset times by about 10s.
 Note well that this software was released
@@ -541,6 +547,7 @@ The molad for next month, {{$nextMonth.MonthName "" | translate $.language}},
 ```json
 {
   "city": "Austin",
+  "use_elevation": true,
   "language": "ashkenazi_standard",
   "molad": true,
   "omer": true,
@@ -600,25 +607,25 @@ Z'monim for Wednesday, 2026-01-21 / 3 Shvat 5786, in Austin
 
 This Shabbos we read Parshas Bo.
 
-06:08:17: Alos HaShachar (16.9 deg)
-06:40:28: Misheyakir (10.2 deg)
-07:26:36: Neitz (0.833 deg)
-10:02:29: Sof Z'man Kri'as Sh'ma
-10:55:42: Sof Z'man T'fillo
-12:42:07: Chatzos
-13:12:07: Mincho G'dolo (floored to 30m past chatzos)
-15:48:22: Mincho K'tano
-16:54:53: Plag HaMincho
-17:57:39: Shki'o (0.833 deg)
-18:01:24: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
-18:23:17: Tzeis (6 deg/3 medium stars)
-00:41:58 (Thu): Chatzos HaLailo
+06:08:23: Alos HaShachar (16.9 deg)
+06:40:33: Misheyakir (10.2 deg)
+07:24:35: Neitz (0.833 deg)
+10:02:42: Sof Z'man Kri'as Sh'ma
+10:55:57: Sof Z'man T'fillo
+12:42:29: Chatzos
+13:12:29: Mincho G'dolo (floored to 30m past chatzos)
+15:48:53: Mincho K'tano
+16:55:28: Plag HaMincho
+18:00:22: Shki'o (0.833 deg)
+18:02:02: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
+18:23:55: Tzeis (6 deg/3 medium stars)
+00:42:19 (Thu): Chatzos HaLailo
 
-A halachic hour is 53m13s.
+A halachic hour is 53m16s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -754,16 +761,16 @@ examples/mincha.tmpl
 $ hebcalfmt examples/mincha.tmpl 2025-09-01
 Mon Sep 01, 2025: 7:10 PM
 Tue Sep 02, 2025: 7:10 PM
-Wed Sep 03, 2025: 7:10 PM
+Wed Sep 03, 2025: 7:05 PM
 Thu Sep 04, 2025: 7:05 PM
 Fri Sep 05, 2025: 7:05 PM
-Sat Sep 06, 2025: 7:05 PM
+Sat Sep 06, 2025: 7:00 PM
 Sun Sep 07, 2025: 7:00 PM
 Mon Sep 08, 2025: 7:00 PM
-Tue Sep 09, 2025: 7:00 PM
+Tue Sep 09, 2025: 6:55 PM
 Wed Sep 10, 2025: 6:55 PM
 Thu Sep 11, 2025: 6:55 PM
-Fri Sep 12, 2025: 6:55 PM
+Fri Sep 12, 2025: 6:50 PM
 Sat Sep 13, 2025: 6:50 PM
 Sun Sep 14, 2025: 6:50 PM
 ```
@@ -792,7 +799,7 @@ or if you simply want to switch your water sprinkler on after dark.
 {{- $d := $.now -}}
 {{- with getenv "DATE"}}{{$d = timeParse $.time.DateOnly .}}{{end -}}
 
-{{- $z := forLocationDate $loc $d -}}
+{{- $z := forLocationDate $loc $.calOptions.UseElevation $d -}}
 Displaying zmanim for {{$d.Format $.time.DateOnly}} in {{$loc.Name}}.
 
 {{- $fmt := $.time.TimeOnly}}
@@ -821,28 +828,28 @@ A halachic hour is {{ ($z.Hour | secondsDuration).Round $.time.Second}}.
 $ CITY="Los Angeles" DATE=2025-12-14 hebcalfmt examples/customZmanim.tmpl
 Displaying zmanim for 2025-12-14 in Los Angeles.
 
-05:30:55: Alot HaShachar
-05:54:24: Misheyakir
-06:50:50: Netz
-11:47:54: Chatzot
-16:44:58: Shkiah
-17:25:51: 8.5 degrees below horizon
-18:37:51: 72m after 8.5 degrees below horizon
+05:30:48: Alot HaShachar
+05:54:17: Misheyakir
+06:50:43: Netz
+11:47:51: Chatzot
+16:45:00: Shkiah
+17:25:52: 8.5 degrees below horizon
+18:37:52: 72m after 8.5 degrees below horizon
 
 A halachic hour is 49m31s.
-06:50:50: 0 halachic hours
-07:40:20: 1 halachic hour
-08:29:51: 2 halachic hours
-09:19:22: 3 halachic hours
-10:08:52: 4 halachic hours
-10:58:23: 5 halachic hours
-11:47:54: 6 halachic hours
-12:37:24: 7 halachic hours
-13:26:55: 8 halachic hours
-14:16:26: 9 halachic hours
-15:05:56: 10 halachic hours
-15:55:27: 11 halachic hours
-16:44:58: 12 halachic hours
+06:50:43: 0 halachic hours
+07:40:14: 1 halachic hour
+08:29:45: 2 halachic hours
+09:19:17: 3 halachic hours
+10:08:48: 4 halachic hours
+10:58:20: 5 halachic hours
+11:47:51: 6 halachic hours
+12:37:22: 7 halachic hours
+13:26:54: 8 halachic hours
+14:16:25: 9 halachic hours
+15:05:57: 10 halachic hours
+15:55:28: 11 halachic hours
+16:45:00: 12 halachic hours
 ```
 
 ### Show zmanim for this Shabbos
@@ -915,7 +922,7 @@ Erev Shabbat: Fri Dec 19 2025 / 29 Kislev 5786
 
 Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 06:08 AM: Alot HaShachar
-06:32 AM: Misheyakir
+06:31 AM: Misheyakir
 06:38 AM: Misheyakir Machmir
 07:28 AM: Sunrise
 09:21 AM: Kriat Shema, sof zeman (MGA)
@@ -924,8 +931,8 @@ Shabbat: Sat Dec 20 2025 / 30 Kislev 5786
 10:46 AM: Tefilah, sof zeman (GRA)
 12:26 PM: Chatzot HaYom
 12:50 PM: Mincha Gedolah
-03:19 PM: Mincha Ketanah
-04:21 PM: Plag HaMincha
+03:20 PM: Mincha Ketanah
+04:22 PM: Plag HaMincha
 05:24 PM: Sunset
 05:43 PM: Bein HaShemashot
 06:36 PM: Havdalah
