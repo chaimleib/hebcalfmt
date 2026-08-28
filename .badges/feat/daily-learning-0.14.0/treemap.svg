@@ -14,20 +14,20 @@
 	text-anchor="start"
 	transform="translate(28.000000,35.600000) scale(1.000000)"
 	style="font-family: Open Sans, verdana, arial, sans-serif !important; font-size: 12px; fill: rgb(255, 255, 255); fill-opacity: 1.00; white-space: pre;" 
-	data-math="N">github.com/chaimleib/hebcalfmt 99.1%</text>
+	data-math="N">github.com/chaimleib/hebcalfmt 99.2%</text>
 		
 </g>
 
 
 <g>
-	<rect x="688.651476" y="317.946667" width="134.183442" height="294.053333" style="fill: rgb(24, 150, 79);opacity:1;fill-opacity:1.00;stroke:rgb(128,128,128);stroke-width:1px;stroke-opacity:1.00;" />
+	<rect x="688.651476" y="317.946667" width="134.183442" height="294.053333" style="fill: rgb(22, 146, 77);opacity:1;fill-opacity:1.00;stroke:rgb(128,128,128);stroke-width:1px;stroke-opacity:1.00;" />
 	
 <text 
 	data-notex="1" 
 	text-anchor="start"
 	transform="translate(696.651476,333.546667) scale(1.000000)"
 	style="font-family: Open Sans, verdana, arial, sans-serif !important; font-size: 12px; fill: rgb(0, 0, 0); fill-opacity: 1.00; white-space: pre;" 
-	data-math="N">cli 90.5%</text>
+	data-math="N">cli 91.3%</text>
 		
 </g>
 
@@ -137,14 +137,14 @@
 
 
 <g>
-	<rect x="696.651476" y="339.546667" width="118.183442" height="149.849947" style="fill: rgb(70, 171, 89);opacity:1;fill-opacity:1.00;stroke:rgb(128,128,128);stroke-width:1px;stroke-opacity:1.00;" />
+	<rect x="696.651476" y="339.546667" width="118.183442" height="149.849947" style="fill: rgb(60, 166, 87);opacity:1;fill-opacity:1.00;stroke:rgb(128,128,128);stroke-width:1px;stroke-opacity:1.00;" />
 	
 <text 
 	data-notex="1" 
 	text-anchor="start"
 	transform="translate(704.651476,355.146667) scale(0.818778)"
 	style="font-family: Open Sans, verdana, arial, sans-serif !important; font-size: 12px; fill: rgb(0, 0, 0); fill-opacity: 1.00; white-space: pre;" 
-	data-math="N">args.go 84.9%</text>
+	data-math="N">args.go 86.3%</text>
 		
 </g>
 
