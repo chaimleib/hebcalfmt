@@ -1,5 +1,6 @@
 {
   "city": "Austin",
+  "use_elevation": true,
   "language": "ashkenazi_standard",
   "molad": true,
   "omer": true,

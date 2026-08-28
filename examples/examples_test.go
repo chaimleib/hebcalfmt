@@ -327,14 +327,14 @@ This Shabbos we read Parshas Kedoshim.
 
 05:20:22: Alos HaShachar (16.9 deg)
 05:55:49: Misheyakir (10.2 deg)
-06:42:59: Neitz (0.833 deg)
+06:40:58: Neitz (0.833 deg)
 10:03:31: Sof Z'man Kri'as Sh'ma
 11:11:36: Sof Z'man T'fillo
 13:27:45: Chatzos
 14:01:47: Mincho G'dolo
 17:26:01: Mincho K'tano
 18:51:07: Plag HaMincho
-20:12:30: Shki'o (0.833 deg)
+20:14:31: Shki'o (0.833 deg)
 20:16:12: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:38:18: Tzeis (6 deg/3 medium stars)
 01:27:21 (Tue): Chatzos HaLailo
@@ -343,7 +343,7 @@ A halachic hour is 1h8m5s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -359,14 +359,14 @@ This Shabbos we read Parshas Bo.
 
 06:08:23: Alos HaShachar (16.9 deg)
 06:40:33: Misheyakir (10.2 deg)
-07:26:40: Neitz (0.833 deg)
+07:24:35: Neitz (0.833 deg)
 10:02:42: Sof Z'man Kri'as Sh'ma
 10:55:57: Sof Z'man T'fillo
 12:42:29: Chatzos
 13:12:29: Mincho G'dolo (floored to 30m past chatzos)
 15:48:53: Mincho K'tano
 16:55:28: Plag HaMincho
-17:58:17: Shki'o (0.833 deg)
+18:00:22: Shki'o (0.833 deg)
 18:02:02: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:23:55: Tzeis (6 deg/3 medium stars)
 00:42:19 (Thu): Chatzos HaLailo
@@ -375,7 +375,7 @@ A halachic hour is 53m16s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -392,14 +392,14 @@ This Shabbos we read Parshas Miketz.
 
 06:04:59: Alos HaShachar (16.9 deg)
 06:37:53: Misheyakir (10.2 deg)
-07:25:23: Neitz (0.833 deg)
+07:23:14: Neitz (0.833 deg)
 09:56:28: Sof Z'man Kri'as Sh'ma
 10:48:07: Sof Z'man T'fillo
 12:31:25: Chatzos
 13:01:25: Mincho G'dolo (floored to 30m past chatzos)
 15:32:12: Mincho K'tano
 16:36:46: Plag HaMincho
-17:37:27: Shki'o, Chanukah: 1 Candle (0.833 deg)
+17:39:37: Shki'o, Chanukah: 1 Candle (0.833 deg)
 17:41:20: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:03:54: Tzeis (6 deg/3 medium stars)
 00:31:37 (Thu): Chatzos HaLailo
@@ -408,7 +408,7 @@ A halachic hour is 51m39s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -425,14 +425,14 @@ This Shabbos we read Parshas Miketz.
 
 06:05:24: Alos HaShachar (16.9 deg)
 06:38:18: Misheyakir (10.2 deg)
-07:25:47: Neitz (0.833 deg)
+07:23:37: Neitz (0.833 deg)
 09:56:54: Sof Z'man Kri'as Sh'ma
 10:48:35: Sof Z'man T'fillo
 12:31:55: Chatzos
 13:01:55: Mincho G'dolo (floored to 30m past chatzos)
 15:32:46: Mincho K'tano
 16:37:21: Plag HaMincho
-17:38:03: Shki'o, Chanukah: 2 Candles (0.833 deg)
+17:40:13: Shki'o, Chanukah: 2 Candles (0.833 deg)
 17:41:56: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:04:30: Tzeis (6 deg/3 medium stars)
 00:32:06 (Fri): Chatzos HaLailo
@@ -441,7 +441,7 @@ A halachic hour is 51m40s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -458,15 +458,15 @@ This Shabbos we read Parshas Miketz.
 
 06:05:47: Alos HaShachar (16.9 deg)
 06:38:41: Misheyakir (10.2 deg)
-07:26:09: Neitz (0.833 deg)
+07:23:59: Neitz (0.833 deg)
 09:57:20: Sof Z'man Kri'as Sh'ma
 10:49:02: Sof Z'man T'fillo
 12:32:25: Chatzos
 13:02:25: Mincho G'dolo (floored to 30m past chatzos)
 15:33:20: Mincho K'tano
 16:37:57: Plag HaMincho
-17:20:41: Chanukah: 3 Candles, Licht Bentsh'n (18m)
-17:38:41: Shki'o (0.833 deg)
+17:22:50: Chanukah: 3 Candles, Licht Bentsh'n (18m)
+17:40:50: Shki'o (0.833 deg)
 17:42:34: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:05:07: Tzeis (6 deg/3 medium stars)
 00:32:35 (Sat): Chatzos HaLailo
@@ -475,7 +475,7 @@ A halachic hour is 51m41s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -493,14 +493,14 @@ This Shabbos we read Parshas Miketz.
 
 06:06:10: Alos HaShachar (16.9 deg)
 06:39:03: Misheyakir (10.2 deg)
-07:26:29: Neitz (0.833 deg)
+07:24:20: Neitz (0.833 deg)
 09:57:45: Sof Z'man Kri'as Sh'ma
 10:49:28: Sof Z'man T'fillo
 12:32:54: Chatzos
 13:02:54: Mincho G'dolo (floored to 30m past chatzos)
 15:33:55: Mincho K'tano
 16:38:33: Plag HaMincho
-17:39:19: Shki'o (0.833 deg)
+17:41:29: Shki'o (0.833 deg)
 17:43:12: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:18:18: Havdolo, Chanukah: 4 Candles (8.5 deg/3 small stars)
 00:33:04 (Sun): Chatzos HaLailo
@@ -509,7 +509,7 @@ A halachic hour is 51m43s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -526,14 +526,14 @@ This Shabbos we read Parshas Vaeschanan.
 
 05:27:43: Alos HaShachar (16.9 deg)
 06:03:31: Misheyakir (10.2 deg)
-06:51:00: Neitz (0.833 deg)
+06:48:58: Neitz (0.833 deg)
 10:12:06: Sof Z'man Kri'as Sh'ma
 11:20:23: Sof Z'man T'fillo
 13:36:56: Chatzos
 14:11:04: Mincho G'dolo
 17:35:54: Mincho K'tano
 19:01:14: Plag HaMincho
-20:22:52: Shki'o (0.833 deg)
+20:24:54: Shki'o (0.833 deg)
 20:26:35: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:48:43: Tzeis, Fast ends (6 deg/3 medium stars)
 01:37:14 (Mon): Chatzos HaLailo
@@ -542,7 +542,7 @@ A halachic hour is 1h8m17s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -560,14 +560,14 @@ This Shabbos we read Parshas Devarim.
 
 05:30:01: Alos HaShachar (16.9 deg)
 06:05:29: Misheyakir (10.2 deg)
-06:52:39: Neitz (0.833 deg)
+06:50:38: Neitz (0.833 deg)
 10:12:48: Sof Z'man Kri'as Sh'ma
 11:20:44: Sof Z'man T'fillo
 13:36:38: Chatzos
 14:10:37: Mincho G'dolo
 17:34:27: Mincho K'tano
 18:59:23: Plag HaMincho
-20:20:38: Shki'o, Fast starts (0.833 deg)
+20:22:39: Shki'o, Fast starts (0.833 deg)
 20:24:20: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:58:58: Havdolo (8.5 deg/3 small stars)
 01:36:57 (Sun): Chatzos HaLailo
@@ -576,7 +576,7 @@ A halachic hour is 1h7m57s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -593,14 +593,14 @@ This Shabbos we read Parshas Vaeschanan.
 
 05:30:52: Alos HaShachar (16.9 deg)
 06:06:13: Misheyakir (10.2 deg)
-06:53:15: Neitz (0.833 deg)
+06:51:15: Neitz (0.833 deg)
 10:13:02: Sof Z'man Kri'as Sh'ma
 11:20:52: Sof Z'man T'fillo
 13:36:31: Chatzos
 14:10:26: Mincho G'dolo
 17:33:54: Mincho K'tano
 18:58:41: Plag HaMincho
-20:19:47: Shki'o (0.833 deg)
+20:21:47: Shki'o (0.833 deg)
 20:23:28: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:45:24: Tzeis, Fast ends (6 deg/3 medium stars)
 01:36:49 (Mon): Chatzos HaLailo
@@ -609,7 +609,7 @@ A halachic hour is 1h7m50s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -627,7 +627,7 @@ This Shabbos we read Parshas hachag.
 
 05:45:52: Alos HaShachar, Fast starts (16.9 deg)
 06:18:54: Misheyakir (10.2 deg)
-07:03:46: Neitz (0.833 deg)
+07:01:49: Neitz (0.833 deg)
 10:15:41: Sof Z'man Kri'as Sh'ma
 11:20:51: Sof Z'man T'fillo
 11:20:51: Sof Z'man Achilas Chomeitz
@@ -636,8 +636,8 @@ This Shabbos we read Parshas hachag.
 14:03:45: Mincho G'dolo
 17:19:13: Mincho K'tano
 18:40:40: Plag HaMincho
-19:40:34: Licht Bentsh'n (18m)
-19:58:34: Shki'o (0.833 deg)
+19:42:31: Licht Bentsh'n (18m)
+20:00:31: Shki'o (0.833 deg)
 20:02:07: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:23:13: Tzeis, Fast ends (6 deg/3 medium stars)
 01:30:37 (Sat): Chatzos HaLailo
@@ -646,7 +646,7 @@ A halachic hour is 1h5m10s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -663,7 +663,7 @@ This Shabbos we read Parshas Tzav.
 
 05:50:42: Alos HaShachar (16.9 deg)
 06:23:24: Misheyakir (10.2 deg)
-07:07:57: Neitz (0.833 deg)
+07:06:01: Neitz (0.833 deg)
 10:18:15: Sof Z'man Kri'as Sh'ma
 11:22:52: Sof Z'man T'fillo
 12:27:29: Sof Z'man Bi'ur Chomeitz
@@ -671,8 +671,8 @@ This Shabbos we read Parshas Tzav.
 14:04:24: Mincho G'dolo
 17:18:14: Mincho K'tano
 18:39:00: Plag HaMincho
-19:38:14: Licht Bentsh'n (18m)
-19:56:14: Shki'o (0.833 deg)
+19:40:10: Licht Bentsh'n (18m)
+19:58:10: Shki'o (0.833 deg)
 19:59:46: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:20:43: Tzeis (6 deg/3 medium stars)
 01:31:31 (Sat): Chatzos HaLailo
@@ -681,7 +681,7 @@ A halachic hour is 1h4m37s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
@@ -699,7 +699,7 @@ This Shabbos we read Parshas Tzav.
 
 05:49:24: Alos HaShachar (16.9 deg)
 06:22:11: Misheyakir (10.2 deg)
-07:06:49: Neitz (0.833 deg)
+07:04:52: Neitz (0.833 deg)
 10:17:34: Sof Z'man Kri'as Sh'ma
 11:22:19: Sof Z'man T'fillo
 11:22:19: Sof Z'man Achilas Chomeitz
@@ -708,7 +708,7 @@ This Shabbos we read Parshas Tzav.
 14:04:13: Mincho G'dolo
 17:18:30: Mincho K'tano
 18:39:27: Plag HaMincho
-19:56:51: Shki'o (0.833 deg)
+19:58:48: Shki'o (0.833 deg)
 20:00:24: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 20:33:23: Licht Bentsh'n (8.5 deg/3 small stars)
 01:31:16 (Sun): Chatzos HaLailo
@@ -717,7 +717,7 @@ A halachic hour is 1h4m46s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 

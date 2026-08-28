@@ -210,6 +210,11 @@ the omer, the molad, and the parsha of the week.
 {{- /*  - bool cfg.sedrot - enable the parsha on Shabbos */ -}}
 {{- /*  - bool cfg.shabbat_mevarchim - */ -}}
 {{- /*      enable Shabbat Mevarchim before Rosh Chodesh */ -}}
+{{- /*  - bool cfg.use_elevation - */ -}}
+{{- /*      enable elevation-based zmanim calculations. */ -}}
+{{- /*      This will only affect sunrise, sunset, and candlelighting, */ -}}
+{{- /*      since other times are elevation-independent */ -}}
+{{- /*      or based on the elevation of the Jerusalem mountains. */ -}}
 {{- /*  - int cfg.candle_lighting_mins - */ -}}
 {{- /*      how many minutes before shkiah to light */ -}}
 {{- /*      for Shabbos and Yom Tov */ -}}
@@ -341,7 +346,7 @@ This {{translate $.language "Shabbat"}} we read
 {{- end}}
 
 {{- if or $.calOptions.DailyZmanim $.calOptions.SunriseSunset}}
-{{ ($z.TimeAtAngle 0.833 true).Format $fmt}}: Neitz (0.833 deg)
+{{ $z.Sunrise.Format $fmt}}: Neitz (0.833 deg)
 {{- end}}
 {{- if $.calOptions.DailyZmanim}}
 {{    ($neitzAmiti.Add (durationMul $h 3)).Format $fmt}}: Sof Z'man Kri'as Sh'ma
@@ -398,7 +403,7 @@ This {{translate $.language "Shabbat"}} we read
           (not (dayIsShabbatOrYomTov $d))
         )
         (dayIsShabbatOrYomTov $d.Next) }}
-{{        (($z.TimeAtAngle 0.833 false).Add
+{{        ($z.Sunset.Add
             (durationMul
               (timeParseDuration "-1m")
               (itof $.calOptions.CandleLightingMins)
@@ -426,7 +431,7 @@ This {{translate $.language "Shabbat"}} we read
         (eq $chanukahTime "normal")
       ))
 }}
-{{   ($z.TimeAtAngle 0.833 false).Format $fmt}}: Shki'o
+{{   $z.Sunset.Format $fmt}}: Shki'o
   {{- if $fast9Av -}}
         , Fast starts
   {{- else if eq $chanukahTime "normal" -}}
@@ -490,8 +495,9 @@ A halachic hour is {{ $h.Round $.time.Second}}.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions,
-  {{- ""}} local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions
+  {{- with not $z.UseElevation}}, local elevation, {{end}}
+  {{- ""}} and local elevations at your horizons.
 Even sitting down or standing up
   {{- ""}} can change observed sunrise and sunset times by about 10s.
 Note well that this software was released
@@ -541,6 +547,7 @@ The molad for next month, {{$nextMonth.MonthName "" | translate $.language}},
 ```json
 {
   "city": "Austin",
+  "use_elevation": true,
   "language": "ashkenazi_standard",
   "molad": true,
   "omer": true,
@@ -602,14 +609,14 @@ This Shabbos we read Parshas Bo.
 
 06:08:23: Alos HaShachar (16.9 deg)
 06:40:33: Misheyakir (10.2 deg)
-07:26:40: Neitz (0.833 deg)
+07:24:35: Neitz (0.833 deg)
 10:02:42: Sof Z'man Kri'as Sh'ma
 10:55:57: Sof Z'man T'fillo
 12:42:29: Chatzos
 13:12:29: Mincho G'dolo (floored to 30m past chatzos)
 15:48:53: Mincho K'tano
 16:55:28: Plag HaMincho
-17:58:17: Shki'o (0.833 deg)
+18:00:22: Shki'o (0.833 deg)
 18:02:02: Shki'o Amitis/Bein HaSh'mashos starts (1.583 deg)
 18:23:55: Tzeis (6 deg/3 medium stars)
 00:42:19 (Thu): Chatzos HaLailo
@@ -618,7 +625,7 @@ A halachic hour is 53m16s.
 
 WARNING: Allow +/-2m, as the above calculations are not exact.
 They approximate the location of a city.
-They also do not account for atmospheric conditions, local elevation, and local horizon elevations.
+They also do not account for transient or regional atmospheric conditions and local elevations at your horizons.
 Even sitting down or standing up can change observed sunrise and sunset times by about 10s.
 Note well that this software was released in the hopes that someone finds it useful, and with no guarantees about correctness or accuracy.
 
