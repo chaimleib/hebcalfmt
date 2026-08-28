@@ -179,6 +179,9 @@ type Config struct {
 	// below the horizon.
 	HavdalahDeg float64 `json:"havdalah_deg"`
 
+	// SuppressHavdalah omits Havdalah events.
+	SuppressHavdalah bool `json:"suppress_havdalah"`
+
 	// NumYears is how many years to generate events for.
 	// Default: 1
 	NumYears int `json:"num_years"`
@@ -309,6 +312,7 @@ func (c Config) CalOptions() (*hebcal.CalOptions, error) {
 	cOpts.CandleLightingMins = c.CandleLightingMins
 	cOpts.HavdalahMins = c.HavdalahMins
 	cOpts.HavdalahDeg = c.HavdalahDeg
+	cOpts.SuppressHavdalah = c.SuppressHavdalah
 	cOpts.NumYears = c.NumYears
 
 	// Location
