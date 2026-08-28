@@ -26,8 +26,12 @@ func HebcalFuncs(opts *hebcal.CalOptions) map[string]any {
 		"hebcal": Hebcal(opts),
 
 		// getHolidaysOnDate takes a hdate.HDate and a bool for Israel,
-		// and returns the holidays.
+		// and returns the holidays as a []event.HolidayEvent.
 		"getHolidaysOnDate": hebcal.GetHolidaysOnDate,
+
+		// getHolidaysForYear takes year and a bool for Israel,
+		// and returns the holidays as a []event.HolidayEvent.
+		"getHolidaysForYear": hebcal.GetHolidaysForYear,
 
 		// timedEvents returns a slice of [hebcal.TimedEvent]
 		"timedEvents":   TimedEvents(opts),
